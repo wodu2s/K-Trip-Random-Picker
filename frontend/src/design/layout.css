@@ -1,0 +1,23 @@
+@layer components {
+  .page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .section-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+  }
+
+  .section-gap {
+    margin-top: var(--space-8);
+  }
+
+  .content-grid {
+    display: grid;
+    gap: var(--space-6);
+  }
+}

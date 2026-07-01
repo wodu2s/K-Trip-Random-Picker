@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@import "../design/tokens.css";
+@import "../design/typography.css";
+@import "../design/layout.css";
+@import "../design/components.css";
+@theme {
+  --color-sky-50: #f0f9ff;
+  --color-sky-100: #e0f2fe;
+  --color-sky-200: #bae6fd;
+  --color-sky-400: #38bdf8;
+  --color-sky-500: #0ea5e9;
+  --color-sky-600: #0284c7;
+
+  --color-yellow-100: #fef9c3;
+  --color-yellow-200: #fef08a;
+  --color-yellow-400: #facc15;
+  --color-yellow-500: #eab308;
+  --color-yellow-600: #ca8a04;
+}
+
+@layer components {
+  .page-container {
+    @apply w-full max-w-6xl mx-auto px-4 sm:px-6 box-border;
+  }
+}
+
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+body {
+  @apply bg-slate-50 text-slate-800 font-sans antialiased overflow-x-hidden;
+  background-image: radial-gradient(circle at 0% 0%, rgba(14, 165, 233, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 100% 100%, rgba(234, 179, 8, 0.05) 0%, transparent 50%);
+}

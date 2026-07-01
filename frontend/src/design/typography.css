@@ -1,0 +1,31 @@
+@layer components {
+  .text-page-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  .text-section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  .text-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  .text-body {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--color-text-primary);
+  }
+
+  .text-caption {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+  }
+}

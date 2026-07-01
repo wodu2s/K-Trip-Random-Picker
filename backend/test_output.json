@@ -1,0 +1,1643 @@
+{
+  "items": [
+    {
+      "id": "kto-1957600",
+      "title": "명동 남대문 북창동 다동무교동 관광특구",
+      "region": "서울특별시",
+      "address": "서울특별시 중구 세종대로 40 (남대문로4가)",
+      "latitude": 37.5599771733,
+      "longitude": 126.9753048316,
+      "imageUrl": "http://tong.visitkorea.or.kr/cms/resource/42/3077642_image2_1.JPG",
+      "themes": [
+        "자연",
+        "문화"
+      ],
+      "distanceKm": 0.8,
+      "summary": "명동 남대문 북창동 다동무교동 관광특구 — 서울특별시 중구 세종대로 40 일대의 추천 관광지입니다.",
+      "reasonBadges": [
+        "관광공사 데이터 기반",
+        "관광 이미지 제공",
+        "서울 출발 기준 150km 이내",
+        "1박 2일 이상 추천",
+        "자연 테마"
+      ],
+      "emojiHints": [
+        "🌿",
+        "⛰️",
+        "🌲",
+        "🦋"
+      ],
+      "dataSource": "KTO_OPEN_API",
+      "travelInfo": {
+        "carDurationText": "8분",
+        "transitDurationText": null,
+        "distanceText": "3.0km",
+        "routeMapUrl": "https://map.kakao.com/link/to/명동남대문북창동다동무교동관광특구,37.5599771733,126.9753048316",
+        "provider": "kakao"
+      },
+      "detail": {
+        "mapQuery": "명동 남대문 북창동 다동무교동 관광특구",
+        "overview": null,
+        "infoCenter": null,
+        "restDate": null,
+        "useTime": null,
+        "parking": null,
+        "useFee": null,
+        "images": [
+          "http://tong.visitkorea.or.kr/cms/resource/42/3077642_image2_1.JPG",
+          "http://tong.visitkorea.or.kr/cms/resource/42/3077642_image3_1.JPG"
+        ],
+        "estimatedTravelTime": null,
+        "canReturnToday": null,
+        "recommendedStayTime": null,
+        "nearbySpots": null,
+        "dayTripCourse": null,
+        "overnightCourse": null,
+        "accommodations": null,
+        "nearbyAttractions": [
+          {
+            "placeName": "덕수궁",
+            "mapUrl": "http://place.map.kakao.com/10305191",
+            "latitude": 37.5655638710672,
+            "longitude": 126.974894754989,
+            "address": "서울 중구 정동 5-1",
+            "distance": "621m"
+          },
+          {
+            "placeName": "남대문갈치조림골목",
+            "mapUrl": "http://place.map.kakao.com/8234306",
+            "latitude": 37.5596933919402,
+            "longitude": 126.976924906434,
+            "address": "서울 중구 남창동 34-155",
+            "distance": "146m"
+          },
+          {
+            "placeName": "덕수궁돌담길",
+            "mapUrl": "http://place.map.kakao.com/23209304",
+            "latitude": 37.564976582796,
+            "longitude": 126.975664628917,
+            "address": "서울 중구 정동 5-1",
+            "distance": "555m"
+          },
+          {
+            "placeName": "정동전망대",
+            "mapUrl": "http://place.map.kakao.com/26094867",
+            "latitude": 37.56456211289399,
+            "longitude": 126.97560817016978,
+            "address": "서울 중구 서소문동 37",
+            "distance": "509m"
+          },
+          {
+            "placeName": "남대문칼국수골목",
+            "mapUrl": "http://place.map.kakao.com/26964517",
+            "latitude": 37.558287872702,
+            "longitude": 126.97711095122,
+            "address": "서울 중구 남창동 60-3",
+            "distance": "246m"
+          }
+        ],
+        "nearbyRestaurants": [
+          {
+            "placeName": "진주회관",
+            "mapUrl": "http://place.map.kakao.com/11152625",
+            "latitude": 37.562478781861735,
+            "longitude": 126.97453133779806,
+            "address": "서울 중구 서소문동 120-35",
+            "distance": "285m"
+          },
+          {
+            "placeName": "가메골손왕만두 남대문본점",
+            "mapUrl": "http://place.map.kakao.com/11486129",
+            "latitude": 37.55835454736746,
+            "longitude": 126.97711545793453,
+            "address": "서울 중구 남창동 60-2",
+            "distance": "240m"
+          },
+          {
+            "placeName": "농민백암순대 시청직영점",
+            "mapUrl": "http://place.map.kakao.com/1062153333",
+            "latitude": 37.56259825108099,
+            "longitude": 126.97715943361476,
+            "address": "서울 중구 북창동 19-4",
+            "distance": "333m"
+          },
+          {
+            "placeName": "서령",
+            "mapUrl": "http://place.map.kakao.com/1644608542",
+            "latitude": 37.55846234223722,
+            "longitude": 126.97549698076399,
+            "address": "서울 중구 남대문로5가 120",
+            "distance": "168m"
+          },
+          {
+            "placeName": "애성회관",
+            "mapUrl": "http://place.map.kakao.com/15892869",
+            "latitude": 37.562409368174585,
+            "longitude": 126.97891384153051,
+            "address": "서울 중구 북창동 93-36",
+            "distance": "418m"
+          }
+        ],
+        "nearbyCafes": [
+          {
+            "placeName": "벌툰 몽유도원명동점",
+            "mapUrl": "http://place.map.kakao.com/902871781",
+            "latitude": 37.5605722740322,
+            "longitude": 126.985071411592,
+            "address": "서울 중구 남산동1가 1-2",
+            "distance": "865m"
+          },
+          {
+            "placeName": "커피앤시가렛",
+            "mapUrl": "http://place.map.kakao.com/1198183678",
+            "latitude": 37.5627823216139,
+            "longitude": 126.97408981511032,
+            "address": "서울 중구 서소문동 75-95",
+            "distance": "329m"
+          },
+          {
+            "placeName": "서울형키즈카페 중림동점",
+            "mapUrl": "http://place.map.kakao.com/349670752",
+            "latitude": 37.5594304378221,
+            "longitude": 126.966260094597,
+            "address": "서울 중구 중림동 155-1",
+            "distance": "801m"
+          },
+          {
+            "placeName": "덕수궁 리에제와플",
+            "mapUrl": "http://place.map.kakao.com/243733683",
+            "latitude": 37.5647929393394,
+            "longitude": 126.976452473606,
+            "address": "서울 중구 태평로2가 365",
+            "distance": "543m"
+          },
+          {
+            "placeName": "커피스니퍼",
+            "mapUrl": "http://place.map.kakao.com/1965342185",
+            "latitude": 37.56336973604095,
+            "longitude": 126.97839178643756,
+            "address": "서울 중구 북창동 11-3",
+            "distance": "464m"
+          }
+        ],
+        "nearbyStays": [
+          {
+            "placeName": "코트야드 메리어트 서울 명동",
+            "mapUrl": "http://place.map.kakao.com/821799963",
+            "latitude": 37.5612503170701,
+            "longitude": 126.976938008129,
+            "address": "서울 중구 남대문로4가 17-23",
+            "distance": "201m"
+          },
+          {
+            "placeName": "라마다호텔앤스위트 서울남대문",
+            "mapUrl": "http://place.map.kakao.com/12783363",
+            "latitude": 37.56048878084385,
+            "longitude": 126.97188584385984,
+            "address": "서울 중구 순화동 151",
+            "distance": "307m"
+          },
+          {
+            "placeName": "롯데호텔 서울",
+            "mapUrl": "http://place.map.kakao.com/7855876",
+            "latitude": 37.56538301228365,
+            "longitude": 126.98101264795298,
+            "address": "서울 중구 소공동 1",
+            "distance": "783m"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kto-2674763",
+      "title": "서후리숲",
+      "region": "경기도",
+      "address": "경기도 양평군 서종면 거북바위1길 200",
+      "latitude": 37.5663707812,
+      "longitude": 127.4301771507,
+      "imageUrl": "http://tong.visitkorea.or.kr/cms/resource/95/3352495_image2_1.jpg",
+      "themes": [
+        "자연"
+      ],
+      "distanceKm": 39.9,
+      "summary": "서후리숲 — 경기도 양평군 서종면 거북바위1길 200 일대의 추천 관광지입니다.",
+      "reasonBadges": [
+        "관광공사 데이터 기반",
+        "관광 이미지 제공",
+        "서울 출발 기준 150km 이내",
+        "1박 2일 이상 추천",
+        "자연 테마"
+      ],
+      "emojiHints": [
+        "🌿",
+        "⛰️",
+        "🌲",
+        "🦋"
+      ],
+      "dataSource": "KTO_OPEN_API",
+      "travelInfo": {
+        "carDurationText": "80분",
+        "transitDurationText": null,
+        "distanceText": "59.7km",
+        "routeMapUrl": "https://map.kakao.com/link/to/서후리숲,37.5663707812,127.4301771507",
+        "provider": "kakao"
+      },
+      "detail": {
+        "mapQuery": "서후리숲",
+        "overview": null,
+        "infoCenter": null,
+        "restDate": null,
+        "useTime": null,
+        "parking": null,
+        "useFee": null,
+        "images": [
+          "http://tong.visitkorea.or.kr/cms/resource/95/3352495_image2_1.jpg",
+          "http://tong.visitkorea.or.kr/cms/resource/95/3352495_image3_1.jpg"
+        ],
+        "estimatedTravelTime": null,
+        "canReturnToday": null,
+        "recommendedStayTime": null,
+        "nearbySpots": null,
+        "dayTripCourse": null,
+        "overnightCourse": null,
+        "accommodations": null,
+        "nearbyAttractions": [],
+        "nearbyRestaurants": [
+          {
+            "placeName": "숲길화덕피자",
+            "mapUrl": "http://place.map.kakao.com/843551426",
+            "latitude": 37.5660383946942,
+            "longitude": 127.418255301807,
+            "address": "경기 양평군 서종면 서후리 280-4",
+            "distance": "1.1km"
+          }
+        ],
+        "nearbyCafes": [],
+        "nearbyStays": [
+          {
+            "placeName": "레이지 조",
+            "mapUrl": "http://place.map.kakao.com/1515702618",
+            "latitude": 37.5711255247114,
+            "longitude": 127.422012434541,
+            "address": "경기 양평군 서종면 서후리 190-14",
+            "distance": "893m"
+          },
+          {
+            "placeName": "서후리펜션",
+            "mapUrl": "http://place.map.kakao.com/761393389",
+            "latitude": 37.5730081092051,
+            "longitude": 127.426907599692,
+            "address": "경기 양평군 서종면 서후리 217-6",
+            "distance": "791m"
+          },
+          {
+            "placeName": "서후리캠핑장",
+            "mapUrl": "http://place.map.kakao.com/210245202",
+            "latitude": 37.572933836531284,
+            "longitude": 127.41947679235001,
+            "address": "경기 양평군 서종면 서후리 319",
+            "distance": "1.2km"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kto-2373364",
+      "title": "이충순 자결 터",
+      "region": "서울특별시",
+      "address": "서울특별시 중구 서소문로 88 (순화동)",
+      "latitude": 37.5616074626,
+      "longitude": 126.9710107321,
+      "imageUrl": "http://tong.visitkorea.or.kr/cms/resource/13/3385013_image2_1.JPG",
+      "themes": [
+        "자연",
+        "문화"
+      ],
+      "distanceKm": 0.8,
+      "summary": "이충순 자결 터 — 서울특별시 중구 서소문로 88 (순화동) 일대의 추천 관광지입니다.",
+      "reasonBadges": [
+        "관광공사 데이터 기반",
+        "관광 이미지 제공",
+        "서울 출발 기준 150km 이내",
+        "1박 2일 이상 추천",
+        "자연 테마"
+      ],
+      "emojiHints": [
+        "🌿",
+        "⛰️",
+        "🌲",
+        "🦋"
+      ],
+      "dataSource": "KTO_OPEN_API",
+      "travelInfo": {
+        "carDurationText": "6분",
+        "transitDurationText": null,
+        "distanceText": "2.6km",
+        "routeMapUrl": "https://map.kakao.com/link/to/이충순자결터,37.5616074626,126.9710107321",
+        "provider": "kakao"
+      },
+      "detail": {
+        "mapQuery": "이충순 자결 터",
+        "overview": null,
+        "infoCenter": null,
+        "restDate": null,
+        "useTime": null,
+        "parking": null,
+        "useFee": null,
+        "images": [
+          "http://tong.visitkorea.or.kr/cms/resource/13/3385013_image2_1.JPG",
+          "http://tong.visitkorea.or.kr/cms/resource/13/3385013_image3_1.JPG"
+        ],
+        "estimatedTravelTime": null,
+        "canReturnToday": null,
+        "recommendedStayTime": null,
+        "nearbySpots": null,
+        "dayTripCourse": null,
+        "overnightCourse": null,
+        "accommodations": null,
+        "nearbyAttractions": [
+          {
+            "placeName": "덕수궁",
+            "mapUrl": "http://place.map.kakao.com/10305191",
+            "latitude": 37.5655638710672,
+            "longitude": 126.974894754989,
+            "address": "서울 중구 정동 5-1",
+            "distance": "557m"
+          },
+          {
+            "placeName": "덕수궁돌담길",
+            "mapUrl": "http://place.map.kakao.com/23209304",
+            "latitude": 37.564976582796,
+            "longitude": 126.975664628917,
+            "address": "서울 중구 정동 5-1",
+            "distance": "555m"
+          },
+          {
+            "placeName": "정동전망대",
+            "mapUrl": "http://place.map.kakao.com/26094867",
+            "latitude": 37.56456211289399,
+            "longitude": 126.97560817016978,
+            "address": "서울 중구 서소문동 37",
+            "distance": "522m"
+          },
+          {
+            "placeName": "남대문갈치조림골목",
+            "mapUrl": "http://place.map.kakao.com/8234306",
+            "latitude": 37.5596933919402,
+            "longitude": 126.976924906434,
+            "address": "서울 중구 남창동 34-155",
+            "distance": "563m"
+          },
+          {
+            "placeName": "서울한양도성 숭례문구간",
+            "mapUrl": "http://place.map.kakao.com/1506860429",
+            "latitude": 37.563523260181675,
+            "longitude": 126.97156325655304,
+            "address": "서울 중구 순화동 1-144",
+            "distance": "218m"
+          }
+        ],
+        "nearbyRestaurants": [
+          {
+            "placeName": "진주회관",
+            "mapUrl": "http://place.map.kakao.com/11152625",
+            "latitude": 37.562478781861735,
+            "longitude": 126.97453133779806,
+            "address": "서울 중구 서소문동 120-35",
+            "distance": "325m"
+          },
+          {
+            "placeName": "농민백암순대 시청직영점",
+            "mapUrl": "http://place.map.kakao.com/1062153333",
+            "latitude": 37.56259825108099,
+            "longitude": 126.97715943361476,
+            "address": "서울 중구 북창동 19-4",
+            "distance": "554m"
+          },
+          {
+            "placeName": "가메골손왕만두 남대문본점",
+            "mapUrl": "http://place.map.kakao.com/11486129",
+            "latitude": 37.55835454736746,
+            "longitude": 126.97711545793453,
+            "address": "서울 중구 남창동 60-2",
+            "distance": "648m"
+          },
+          {
+            "placeName": "유즈라멘 서울역본점",
+            "mapUrl": "http://place.map.kakao.com/469577034",
+            "latitude": 37.556815391728634,
+            "longitude": 126.96823844833658,
+            "address": "서울 중구 만리동1가 53-8",
+            "distance": "585m"
+          },
+          {
+            "placeName": "호수집 원조닭꼬치",
+            "mapUrl": "http://place.map.kakao.com/27276847",
+            "latitude": 37.5590607950843,
+            "longitude": 126.968681156219,
+            "address": "서울 중구 중림동 61-4",
+            "distance": "349m"
+          }
+        ],
+        "nearbyCafes": [
+          {
+            "placeName": "서울형키즈카페 중림동점",
+            "mapUrl": "http://place.map.kakao.com/349670752",
+            "latitude": 37.5594304378221,
+            "longitude": 126.966260094597,
+            "address": "서울 중구 중림동 155-1",
+            "distance": "484m"
+          },
+          {
+            "placeName": "커피앤시가렛",
+            "mapUrl": "http://place.map.kakao.com/1198183678",
+            "latitude": 37.5627823216139,
+            "longitude": 126.97408981511032,
+            "address": "서울 중구 서소문동 75-95",
+            "distance": "301m"
+          },
+          {
+            "placeName": "커피루소 정동점",
+            "mapUrl": "http://place.map.kakao.com/253560122",
+            "latitude": 37.56703961398295,
+            "longitude": 126.97060772065376,
+            "address": "서울 중구 정동 17-4",
+            "distance": "604m"
+          },
+          {
+            "placeName": "덕수궁 리에제와플",
+            "mapUrl": "http://place.map.kakao.com/243733683",
+            "latitude": 37.5647929393394,
+            "longitude": 126.976452473606,
+            "address": "서울 중구 태평로2가 365",
+            "distance": "596m"
+          },
+          {
+            "placeName": "르풀",
+            "mapUrl": "http://place.map.kakao.com/17187804",
+            "latitude": 37.5661407992195,
+            "longitude": 126.97217235313298,
+            "address": "서울 중구 정동 1-28",
+            "distance": "513m"
+          }
+        ],
+        "nearbyStays": [
+          {
+            "placeName": "신라스테이 서대문",
+            "mapUrl": "http://place.map.kakao.com/26431813",
+            "latitude": 37.5651870590594,
+            "longitude": 126.966804196914,
+            "address": "서울 서대문구 미근동 333",
+            "distance": "544m"
+          },
+          {
+            "placeName": "라마다호텔앤스위트 서울남대문",
+            "mapUrl": "http://place.map.kakao.com/12783363",
+            "latitude": 37.56048878084385,
+            "longitude": 126.97188584385984,
+            "address": "서울 중구 순화동 151",
+            "distance": "146m"
+          },
+          {
+            "placeName": "코트야드 메리어트 서울 명동",
+            "mapUrl": "http://place.map.kakao.com/821799963",
+            "latitude": 37.5612503170701,
+            "longitude": 126.976938008129,
+            "address": "서울 중구 남대문로4가 17-23",
+            "distance": "525m"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kto-775394",
+      "title": "광화문광장",
+      "region": "서울특별시",
+      "address": "서울특별시 종로구 세종대로 172",
+      "latitude": 37.5727035021,
+      "longitude": 126.9769709861,
+      "imageUrl": "http://tong.visitkorea.or.kr/cms/resource/84/3589184_image2_1.jpg",
+      "themes": [
+        "자연",
+        "문화"
+      ],
+      "distanceKm": 0.7,
+      "summary": "광화문광장 — 서울특별시 종로구 세종대로 172 일대의 추천 관광지입니다.",
+      "reasonBadges": [
+        "관광공사 데이터 기반",
+        "관광 이미지 제공",
+        "서울 출발 기준 150km 이내",
+        "1박 2일 이상 추천",
+        "자연 테마"
+      ],
+      "emojiHints": [
+        "🌿",
+        "⛰️",
+        "🌲",
+        "🦋"
+      ],
+      "dataSource": "KTO_OPEN_API",
+      "travelInfo": {
+        "carDurationText": "4분",
+        "transitDurationText": null,
+        "distanceText": "1.3km",
+        "routeMapUrl": "https://map.kakao.com/link/to/광화문광장,37.5727035021,126.9769709861",
+        "provider": "kakao"
+      },
+      "detail": {
+        "mapQuery": "광화문광장",
+        "overview": null,
+        "infoCenter": null,
+        "restDate": null,
+        "useTime": null,
+        "parking": null,
+        "useFee": null,
+        "images": [
+          "http://tong.visitkorea.or.kr/cms/resource/84/3589184_image2_1.jpg",
+          "http://tong.visitkorea.or.kr/cms/resource/84/3589184_image3_1.jpg"
+        ],
+        "estimatedTravelTime": null,
+        "canReturnToday": null,
+        "recommendedStayTime": null,
+        "nearbySpots": null,
+        "dayTripCourse": null,
+        "overnightCourse": null,
+        "accommodations": null,
+        "nearbyAttractions": [
+          {
+            "placeName": "경복궁",
+            "mapUrl": "http://place.map.kakao.com/18619553",
+            "latitude": 37.577613288258206,
+            "longitude": 126.97689786832184,
+            "address": "서울 종로구 세종로 1-1",
+            "distance": "544m"
+          },
+          {
+            "placeName": "덕수궁",
+            "mapUrl": "http://place.map.kakao.com/10305191",
+            "latitude": 37.5655638710672,
+            "longitude": 126.974894754989,
+            "address": "서울 중구 정동 5-1",
+            "distance": "813m"
+          },
+          {
+            "placeName": "인사동 문화의거리",
+            "mapUrl": "http://place.map.kakao.com/21273056",
+            "latitude": 37.5745467832909,
+            "longitude": 126.985591616819,
+            "address": "서울 종로구 관훈동 30-1",
+            "distance": "788m"
+          },
+          {
+            "placeName": "경희궁",
+            "mapUrl": "http://place.map.kakao.com/10166255",
+            "latitude": 37.5707881525953,
+            "longitude": 126.968649079046,
+            "address": "서울 종로구 신문로2가 2-1",
+            "distance": "765m"
+          },
+          {
+            "placeName": "덕수궁돌담길",
+            "mapUrl": "http://place.map.kakao.com/23209304",
+            "latitude": 37.564976582796,
+            "longitude": 126.975664628917,
+            "address": "서울 중구 정동 5-1",
+            "distance": "865m"
+          }
+        ],
+        "nearbyRestaurants": [
+          {
+            "placeName": "광화문미진 본점",
+            "mapUrl": "http://place.map.kakao.com/21326655",
+            "latitude": 37.570844667978704,
+            "longitude": 126.9799234417087,
+            "address": "서울 종로구 종로1가 24",
+            "distance": "332m"
+          },
+          {
+            "placeName": "청진옥",
+            "mapUrl": "http://place.map.kakao.com/27540102",
+            "latitude": 37.571717650682224,
+            "longitude": 126.97944890786793,
+            "address": "서울 종로구 청진동 183-1",
+            "distance": "244m"
+          },
+          {
+            "placeName": "광화문국밥 본점",
+            "mapUrl": "http://place.map.kakao.com/2067124772",
+            "latitude": 37.5689589279236,
+            "longitude": 126.975391668232,
+            "address": "서울 중구 정동 1-48",
+            "distance": "438m"
+          },
+          {
+            "placeName": "무교동북어국집",
+            "mapUrl": "http://place.map.kakao.com/11064200",
+            "latitude": 37.56773441926809,
+            "longitude": 126.9798518336699,
+            "address": "서울 중구 다동 173",
+            "distance": "607m"
+          },
+          {
+            "placeName": "화목순대국 광화문1호점",
+            "mapUrl": "http://place.map.kakao.com/15431872",
+            "latitude": 37.571193257636395,
+            "longitude": 126.97473438948012,
+            "address": "서울 종로구 당주동 40",
+            "distance": "259m"
+          }
+        ],
+        "nearbyCafes": [
+          {
+            "placeName": "놀숲 종로관철점",
+            "mapUrl": "http://place.map.kakao.com/1797985577",
+            "latitude": 37.56924729467428,
+            "longitude": 126.98701096148542,
+            "address": "서울 종로구 관철동 7-5",
+            "distance": "966m"
+          },
+          {
+            "placeName": "벌툰 인더스트리얼 종각점",
+            "mapUrl": "http://place.map.kakao.com/1654396478",
+            "latitude": 37.56965274898378,
+            "longitude": 126.98706862044833,
+            "address": "서울 종로구 관철동 6-5",
+            "distance": "954m"
+          },
+          {
+            "placeName": "포비 광화문점",
+            "mapUrl": "http://place.map.kakao.com/27187492",
+            "latitude": 37.570995859341494,
+            "longitude": 126.9789148169238,
+            "address": "서울 종로구 청진동 246",
+            "distance": "255m"
+          },
+          {
+            "placeName": "테라로사 광화문점",
+            "mapUrl": "http://place.map.kakao.com/24725284",
+            "latitude": 37.57482524736088,
+            "longitude": 126.97982728286621,
+            "address": "서울 종로구 중학동 19",
+            "distance": "345m"
+          },
+          {
+            "placeName": "레드버튼 종로점",
+            "mapUrl": "http://place.map.kakao.com/2055835737",
+            "latitude": 37.569449085306,
+            "longitude": 126.986720016475,
+            "address": "서울 종로구 관철동 13-1",
+            "distance": "933m"
+          }
+        ],
+        "nearbyStays": [
+          {
+            "placeName": "신라스테이 광화문",
+            "mapUrl": "http://place.map.kakao.com/26993676",
+            "latitude": 37.57253694035176,
+            "longitude": 126.98115799085134,
+            "address": "서울 종로구 수송동 156",
+            "distance": "370m"
+          },
+          {
+            "placeName": "롯데호텔 서울",
+            "mapUrl": "http://place.map.kakao.com/7855876",
+            "latitude": 37.56538301228365,
+            "longitude": 126.98101264795298,
+            "address": "서울 중구 소공동 1",
+            "distance": "887m"
+          },
+          {
+            "placeName": "웨스틴조선 서울",
+            "mapUrl": "http://place.map.kakao.com/10686757",
+            "latitude": 37.56446833738266,
+            "longitude": 126.98002023008999,
+            "address": "서울 중구 소공동 87-1",
+            "distance": "952m"
+          }
+        ]
+      }
+    },
+    {
+      "id": "kto-735749",
+      "title": "서울 종로 낙지볶음 골목",
+      "region": "서울특별시",
+      "address": "서울특별시 종로구 종로 19 (종로1가)",
+      "latitude": 37.5708982096,
+      "longitude": 126.9799374337,
+      "imageUrl": "http://tong.visitkorea.or.kr/cms/resource/46/3478546_image2_1.jpg",
+      "themes": [
+        "자연",
+        "문화"
+      ],
+      "distanceKm": 0.5,
+      "summary": "서울 종로 낙지볶음 골목 — 서울특별시 종로구 종로 19 (종로1가) 일대의 추천 관광지입니다.",
+      "reasonBadges": [
+        "관광공사 데이터 기반",
+        "상세 관광정보 제공",
+        "관광 이미지 제공",
+        "서울 출발 기준 150km 이내",
+        "1박 2일 이상 추천",
+        "자연 테마"
+      ],
+      "emojiHints": [
+        "🌿",
+        "⛰️",
+        "🌲",
+        "🦋"
+      ],
+      "dataSource": "KTO_OPEN_API",
+      "travelInfo": {
+        "carDurationText": "5분",
+        "transitDurationText": null,
+        "distanceText": "1.2km",
+        "routeMapUrl": "https://map.kakao.com/link/to/서울종로낙지볶음골목,37.5708982096,126.9799374337",
+        "provider": "kakao"
+      },
+      "detail": {
+        "mapQuery": "서울 종로 낙지볶음 골목",
+        "overview": null,
+        "infoCenter": "광화문 관광안내소 02-735-8688",
+        "restDate": "점포 별로 상이함",
+        "useTime": "점포 별로 상이함",
+        "parking": "불가능",
+        "useFee": null,
+        "images": [
+          "http://tong.visitkorea.or.kr/cms/resource/46/3478546_image2_1.jpg",
+          "http://tong.visitkorea.or.kr/cms/resource/46/3478546_image3_1.jpg",
+          "http://tong.visitkorea.or.kr/cms/resource/72/3384772_image2_1.JPG",
+          "http://tong.visitkorea.or.kr/cms/resource/75/3384775_image2_1.JPG",
+          "http://tong.visitkorea.or.kr/cms/resource/77/3384777_image2_1.JPG",
+          "http://tong.visitkorea.or.kr/cms/resource/78/3384778_image2_1.JPG",
+          "http://tong.visitkorea.or.kr/cms/resource/43/3478543_image2_1.jpg",
+          "http://tong.visitkorea.or.kr/cms/resource/44/3478544_image2_1.jpg",
+          "http://tong.visitkorea.or.kr/cms/resource/45/3478545_image2_1.jpg",
+          "http://tong.visitkorea.or.kr/cms/resource/47/3478547_image2_1.jpg",
+          "http://tong.visitkorea.or.kr/cms/resource/48/3478548_image2_1.jpg",
+          "http://tong.visitkorea.or.kr/cms/resource/73/3384773_image2_1.JPG"
+        ],
+        "estimatedTravelTime": null,
+        "canReturnToday": null,
+        "recommendedStayTime": null,
+        "nearbySpots": null,
+        "dayTripCourse": null,
+        "overnightCourse": null,
+        "accommodations": null,
+        "nearbyAttractions": [
+          {
+            "placeName": "인사동 문화의거리",
+            "mapUrl": "http://place.map.kakao.com/21273056",
+            "latitude": 37.5745467832909,
+            "longitude": 126.985591616819,
+            "address": "서울 종로구 관훈동 30-1",
+            "distance": "643m"
+          },
+          {
+            "placeName": "덕수궁",
+            "mapUrl": "http://place.map.kakao.com/10305191",
+            "latitude": 37.5655638710672,
+            "longitude": 126.974894754989,
+            "address": "서울 중구 정동 5-1",
+            "distance": "740m"
+          },
+          {
+            "placeName": "경복궁",
+            "mapUrl": "http://place.map.kakao.com/18619553",
+            "latitude": 37.577613288258206,
+            "longitude": 126.97689786832184,
+            "address": "서울 종로구 세종로 1-1",
+            "distance": "792m"
+          },
+          {
+            "placeName": "덕수궁돌담길",
+            "mapUrl": "http://place.map.kakao.com/23209304",
+            "latitude": 37.564976582796,
+            "longitude": 126.975664628917,
+            "address": "서울 중구 정동 5-1",
+            "distance": "757m"
+          },
+          {
+            "placeName": "다이나믹메이즈 서울인사동점",
+            "mapUrl": "http://place.map.kakao.com/27215154",
+            "latitude": 37.57189803811425,
+            "longitude": 126.98714973498457,
+            "address": "서울 종로구 인사동 43",
+            "distance": "646m"
+          }
+        ],
+        "nearbyRestaurants": [
+          {
+            "placeName": "광화문미진 본점",
+            "mapUrl": "http://place.map.kakao.com/21326655",
+            "latitude": 37.570844667978704,
+            "longitude": 126.9799234417087,
+            "address": "서울 종로구 종로1가 24",
+            "distance": "6m"
+          },
+          {
+            "placeName": "무교동북어국집",
+            "mapUrl": "http://place.map.kakao.com/11064200",
+            "latitude": 37.56773441926809,
+            "longitude": 126.9798518336699,
+            "address": "서울 중구 다동 173",
+            "distance": "351m"
+          },
+          {
+            "placeName": "청진옥",
+            "mapUrl": "http://place.map.kakao.com/27540102",
+            "latitude": 37.571717650682224,
+            "longitude": 126.97944890786793,
+            "address": "서울 종로구 청진동 183-1",
+            "distance": "100m"
+          },
+          {
+            "placeName": "일품진진수라 광화문점",
+            "mapUrl": "http://place.map.kakao.com/967729291",
+            "latitude": 37.5706357409413,
+            "longitude": 126.980543813707,
+            "address": "서울 종로구 청진동 128",
+            "distance": "61m"
+          },
+          {
+            "placeName": "종로도담",
+            "mapUrl": "http://place.map.kakao.com/439177229",
+            "latitude": 37.5720540468687,
+            "longitude": 126.981409413137,
+            "address": "서울 종로구 청진동 46",
+            "distance": "182m"
+          }
+        ],
+        "nearbyCafes": [
+          {
+            "placeName": "놀숲 종로관철점",
+            "mapUrl": "http://place.map.kakao.com/1797985577",
+            "latitude": 37.56924729467428,
+            "longitude": 126.98701096148542,
+            "address": "서울 종로구 관철동 7-5",
+            "distance": "651m"
+          },
+          {
+            "placeName": "벌툰 인더스트리얼 종각점",
+            "mapUrl": "http://place.map.kakao.com/1654396478",
+            "latitude": 37.56965274898378,
+            "longitude": 126.98706862044833,
+            "address": "서울 종로구 관철동 6-5",
+            "distance": "645m"
+          },
+          {
+            "placeName": "레드버튼 종로점",
+            "mapUrl": "http://place.map.kakao.com/2055835737",
+            "latitude": 37.569449085306,
+            "longitude": 126.986720016475,
+            "address": "서울 종로구 관철동 13-1",
+            "distance": "620m"
+          },
+          {
+            "placeName": "포비 광화문점",
+            "mapUrl": "http://place.map.kakao.com/27187492",
+            "latitude": 37.570995859341494,
+            "longitude": 126.9789148169238,
+            "address": "서울 종로구 청진동 246",
+            "distance": "91m"
+          },
+          {
+            "placeName": "테라로사 광화문점",
+            "mapUrl": "http://place.map.kakao.com/24725284",
+            "latitude": 37.57482524736088,
+            "longitude": 126.97982728286621,
+            "address": "서울 종로구 중학동 19",
+            "distance": "436m"
+          }
+        ],
+        "nearbyStays": [
+          {
+            "placeName": "신라스테이 광화문",
+            "mapUrl": "http://place.map.kakao.com/26993676",
+            "latitude": 37.57253694035176,
+            "longitude": 126.98115799085134,
+            "address": "서울 종로구 수송동 156",
+            "distance": "211m"
+          },
+          {
+            "placeName": "롯데호텔 서울",
+            "mapUrl": "http://place.map.kakao.com/7855876",
+            "latitude": 37.56538301228365,
+            "longitude": 126.98101264795298,
+            "address": "서울 중구 소공동 1",
+            "distance": "619m"
+          },
+          {
+            "placeName": "이비스 앰배서더 서울 명동",
+            "mapUrl": "http://place.map.kakao.com/17361103",
+            "latitude": 37.56418499093799,
+            "longitude": 126.98300503572362,
+            "address": "서울 중구 명동1가 59-5",
+            "distance": "792m"
+          }
+        ]
+      }
+    }
+  ],
+  "resolvedOrigin": null,
+  "debugLogs": [
+    {
+      "title": "경성 부민관 폭탄 의거지",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "덕수궁 대한문",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "대한성공회 서울주교좌성당",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "덕수궁 돌담길",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "청계광장",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "중명전",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "충무공 이순신 동상",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "서울 종로 낙지볶음 골목",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "위라이드 서울전차",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "보신각터",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "나석주의사동상",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "광화문광장",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "세종대왕 동상",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "경희궁 흥화문",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "경희궁공원",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "우당 이회영 선생 흉상",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "남대문 갈치조림골목",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "숭례문",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "명동 남대문 북창동 다동무교동 관광특구",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "명동",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "생명보험교육문화센터",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "세종로공원",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "민영환 자결터",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "이충순 자결 터",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "이재명 의거지",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "K-컬처 스크린(대한민국역사박물관)",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "서울 경교장",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "서울 명동성당",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "조계사(서울)",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "보성사터",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "초안산",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "관악산",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "서울 태릉(문정왕후)과 강릉(명종·인순왕후) [유네스코 세계유산]",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "서울 선릉과 정릉 [유네스코 세계유산]",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "백련사(강북)",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "차민성형외과의원",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "연세굿데이치과의원 양재점",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "남산케이블카",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "서대문독립공원",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "상수동 카페거리",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "백악마루",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "북악산",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "신당동 떡볶이타운",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "삼천사(서울)",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "불암산",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "대모산도시자연공원",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "장충동 족발 골목",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "독립선언문 배부 터",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "동십자각",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "사직공원(서울)",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "낙원동 아구찜 거리",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "은평한옥마을",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "법룡사",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "자양동 양꼬치거리 (중국음식문화거리)",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "역삼개나리공원",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "망원정 터",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "양천나눔누리타운",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "서운동산",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "안성향교",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "지평향교",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "명달리계곡",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "석산계곡",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "사나사(양평)",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "아침고요수목원",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "덕우저수지",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "들꽃가람농장",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "올드타임",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "신해철거리(성남)",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "서후리숲",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "수원통닭거리",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "인계예술공원",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "쇠꼴마을",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "당남지구공원",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "극락사(경기)",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "용인 곤충테마파크",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "국립 산음자연휴양림",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "도드람테마파크",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "주파크",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "포천 산정호수",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "서천사(평택)",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "개군레포츠공원",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "쁘띠프랑스",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "안성 정무공 오정방 고택",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "아쿠아플라넷 일산",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "축령산",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "하피랜드",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "수미마을",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "금란정",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": "distance_over_limit",
+      "finalPassed": false
+    },
+    {
+      "title": "소이산",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "초도해변",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": "distance_over_limit",
+      "finalPassed": false
+    },
+    {
+      "title": "두타연 평화누리길",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "한화리조트 설악 워터피아",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": "distance_over_limit",
+      "finalPassed": false
+    },
+    {
+      "title": "오대산국립공원",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "신세계센트럴시티 영랑호리조트",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": "distance_over_limit",
+      "finalPassed": false
+    },
+    {
+      "title": "행복&피크닉",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "태백산 국립공원",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": "distance_over_limit",
+      "finalPassed": false
+    },
+    {
+      "title": "고랭길",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "[효석문학100리길 5-1코스] 마을길따라 노산가는 길",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "강원 영월 김삿갓면 [슬로시티]",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    },
+    {
+      "title": "섬강(섬강유원지)",
+      "selectedTheme": "전체",
+      "matchedKeywords": [],
+      "rejectReason": null,
+      "finalPassed": true
+    }
+  ]
+}
