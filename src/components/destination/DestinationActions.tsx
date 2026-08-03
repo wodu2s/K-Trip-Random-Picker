@@ -6,6 +6,25 @@ import { Button } from "@/components/ui/Button";
 
 const FONT = "'Pretendard', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif";
 
+// 카카오 JavaScript 앱 키 (Kakao Developers에서 발급 → .env.local 에 설정)
+const KAKAO_JS_KEY = process.env.NEXT_PUBLIC_KAKAO_JS_KEY;
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/** 카카오 JS SDK를 최초 1회만 동적 로드한다. */
+function loadKakao(): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const w = window as any;
+    if (w.Kakao) return resolve(w.Kakao);
+    const s = document.createElement("script");
+    s.src = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js";
+    s.async = true;
+    s.onload = () => resolve((window as any).Kakao);
+    s.onerror = () => reject(new Error("Kakao SDK load failed"));
+    document.head.appendChild(s);
+  });
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 // 테마별 공유 카드 배경 그라데이션
 const THEME_BG: Record<string, [string, string]> = {
   sea: ["#5aa0e0", "#2a6bb0"],
@@ -199,23 +218,47 @@ export function DestinationActions({
     }
   }
 
-  // ===== URL 공유 =====
+  // ===== 공유 (카카오톡 → Web Share → 링크 복사) =====
   async function handleShare() {
     const url = typeof window !== "undefined" ? window.location.href : "";
-    const shareData = {
-      title: `Pick&Go — ${destination.name}`,
-      text: `${destination.name} · ${destination.tagline}`,
-      url,
-    };
+    const title = `Pick&Go — ${destination.name}`;
+    const text = `${destination.name} · ${destination.tagline}`;
+
+    // 1) 카카오톡 공유 (JS 키가 설정된 경우)
+    if (KAKAO_JS_KEY) {
+      try {
+        const Kakao = await loadKakao();
+        if (!Kakao.isInitialized()) Kakao.init(KAKAO_JS_KEY);
+        Kakao.Share.sendDefault({
+          objectType: "feed",
+          content: {
+            title: text,
+            description: destination.shortDescription,
+            imageUrl: `${window.location.origin}/p1.png`,
+            link: { mobileWebUrl: url, webUrl: url },
+          },
+          buttons: [
+            { title: "여행지 보러가기", link: { mobileWebUrl: url, webUrl: url } },
+          ],
+        });
+        return;
+      } catch {
+        // 카카오 실패 → 아래 기본 공유로 폴백
+      }
+    }
+
+    // 2) Web Share API (모바일 네이티브 공유 시트 — 카카오톡 포함)
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share(shareData);
+        await navigator.share({ title, text, url });
         return;
       } catch {
         // 사용자가 취소 → 무시
         return;
       }
     }
+
+    // 3) 클립보드에 링크 복사
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -265,7 +308,7 @@ export function DestinationActions({
           className="flex-1"
           onClick={handleShare}
         >
-          {copied ? "✅ 링크 복사됨" : "🔗 공유하기"}
+          {copied ? "✅ 링크 복사됨" : "💬 카카오톡 공유"}
         </Button>
       </div>
 

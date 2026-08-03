@@ -787,11 +787,14 @@ src/
 │  ├─ ui/        Button · Card
 │  ├─ landing/   FeatureItems · TravelHero3D(미사용, CSS 3D 원본 보관)
 │  ├─ conditions/ ConditionsControls · ConditionsForm(구버전) · ConditionsScene(SVG)
-│  ├─ cards/     ShuffleScene · MysteryCard · CardDeck
-│  └─ destination/ DestinationHero · DestinationMeta · HiddenPlaceCards · DestinationActions
+│  ├─ cards/     ShuffleScene · MysteryCard · CardDeck(PC 그리드/모바일 스와이프)
+│  ├─ destination/ DestinationHero · DestinationMeta · HiddenPlaceCards · DestinationActions(이미지저장·카카오공유)
+│  └─ system/    DeviceProvider(useDevice·DeviceSwitch)
 ├─ stores/travelStore.ts            # Zustand (duration·themes·cards·selectedCardId·revealedDestinationId / location·travelTime는 미사용 잔존)
 ├─ data/destinations.ts             # 샘플 여행지 6곳 + THEME_META (+ tagline·story·hiddenPlaces·rating·reviewCount)
-├─ lib/recommend.ts                 # 테마 필터 + 랜덤 5장 뽑기
+├─ lib/
+│  ├─ recommend.ts                  # 테마 필터 + 랜덤 5장 뽑기
+│  └─ device.ts                     # 서버 User-Agent 기기 판별(getDeviceType)
 └─ types/travel.ts
 ```
 
@@ -810,3 +813,26 @@ npm run build    # 프로덕션 빌드/타입검사
 - 실사 이미지(한옥/여행지 사진) 제공 시 PAGE 3·5 배경 및 PAGE 5 히어로 교체 가능.
 - `travelTime`/`location` 필드는 store/type에 잔존하지만 UI에서 제거됨(미사용). 완전 정리 시 삭제 가능.
 - 로그인/회원가입, 실시간 API 등은 스펙상 프로토타입 범위 밖(미구현).
+
+### 15.7 PC/모바일 분리 렌더 + 카카오톡 공유 (신규)
+
+**(1) 접속 기기 감지 후 분리 렌더**
+- `src/lib/device.ts` : 서버에서 요청 `User-Agent`로 `"mobile" | "desktop"` 판별(`getDeviceType()`). 이 호출로 `/`·`/conditions`는 **동적 렌더링**으로 전환됨(의도된 트레이드오프).
+- `src/components/system/DeviceProvider.tsx` :
+  - `DeviceProvider` — 서버 판별값(initial)을 전역 공급 + 마운트 후 `matchMedia(max-width:767px)`로 보정(데스크톱 좁은 창·화면 회전·태블릿 대응).
+  - `useDevice()` — 클라이언트에서 현재 기기 읽기.
+  - `DeviceSwitch mobile/desktop` — 서버 컴포넌트 페이지에서 기기별 전용 서브트리를 **하나만** 렌더.
+- `layout.tsx` : `<html data-device=...>` + `DeviceProvider`로 앱 감쌈.
+- 적용:
+  - **PAGE 1 랜딩** : `LandingDesktop`(뷰포트 꽉 채운 히어로) / `LandingMobile`(이미지 위 세로 스택·전체폭 버튼) — `DeviceSwitch`.
+  - **PAGE 2 조건** : `ConditionsDesktop`(p2.png 오버레이) / `ConditionsMobile`(흰 카드 스택) — `DeviceSwitch`.
+  - **PAGE 4 카드** : `CardDeck`이 `useDevice()`로 분기 — 데스크톱 5열 그리드 / 모바일 **가로 스와이프 캐러셀(스냅+인디케이터)**.
+- 검증: 동일 URL에 데스크톱/모바일 UA로 요청 시 **DOM 트리가 실제로 달라짐**(각 1개 히어로 이미지만 렌더). 두 트리 클래스가 원시 HTML에 함께 보이는 것은 RSC 페이로드(리사이즈 시 클라 전환용)일 뿐 visible DOM은 한쪽만.
+
+**(2) 카카오톡 공유** (`DestinationActions.tsx`)
+- 기존 "🔗 공유하기" → **"💬 카카오톡 공유"** 로 변경. 3단계 폴백:
+  1. `NEXT_PUBLIC_KAKAO_JS_KEY` 설정 시 → Kakao JS SDK(2.7.4) 동적 로드 → `Kakao.Share.sendDefault({objectType:"feed"})`. 대표 이미지는 `origin/p1.png`.
+  2. 미설정/실패 시 → **Web Share API**(모바일 네이티브 공유 시트에 카카오톡 포함).
+  3. 그것도 없으면 → **링크 클립보드 복사**("✅ 링크 복사됨").
+- **키 설정**: `.env.local`에 `NEXT_PUBLIC_KAKAO_JS_KEY=발급받은_JS키`. Kakao Developers → [플랫폼 > Web]에 배포 도메인(`https://deepbot-liart.vercel.app`) 등록 필수. Vercel은 프로젝트 Environment Variables에 동일 키 추가. (`.env.local.example` 참고)
+- 이미지 저장(1080×1080 Canvas 공유 카드)은 그대로 유지.

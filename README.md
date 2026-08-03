@@ -31,6 +31,22 @@
 
 ---
 
+## 📱 PC / 모바일 분리 렌더 · 공유
+
+- **접속 기기 감지 후 분리 렌더** — 서버에서 `User-Agent`로 기기를 판별해(`src/lib/device.ts`) 데스크톱은 데스크톱 전용, 모바일은 모바일 전용 화면을 각각 렌더합니다. 랜딩·조건 페이지는 기기별 서브트리를 **하나만** 그리고, 카드 선택은 데스크톱 5열 그리드 / 모바일 가로 스와이프 캐러셀로 나뉩니다. 마운트 후 뷰포트 폭으로 한 번 더 보정해 창 크기 변경·화면 회전도 대응합니다.
+- **카카오톡 공유** — 여행지 공개 페이지의 공유 버튼은 카카오톡 공유(Kakao JS SDK) → Web Share → 링크 복사 순으로 동작합니다. 카카오 공유를 켜려면 `.env.local`에 JavaScript 앱 키를 넣으세요(미설정 시 자동으로 Web Share/링크 복사로 대체).
+
+```bash
+# .env.local  (예시는 .env.local.example 참고)
+NEXT_PUBLIC_KAKAO_JS_KEY=발급받은_카카오_JavaScript_키
+```
+
+> Kakao Developers → 내 애플리케이션 → [플랫폼 > Web]에 배포 도메인 등록이 필요합니다. Vercel 배포 시 프로젝트 Environment Variables에도 같은 키를 추가하세요.
+
+- **이미지 저장** — 여행지 공개 화면을 1080×1080 브랜드 공유 카드(PNG)로 즉석 생성해 다운로드합니다(외부 라이브러리 미사용).
+
+---
+
 ## 🛠️ 기술 스택
 
 - **[Next.js](https://nextjs.org) 15** (App Router) · **React 19** · **TypeScript**

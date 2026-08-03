@@ -1,6 +1,7 @@
 import { PageContainer } from "@/components/layout/PageContainer";
 import { StepProgress } from "@/components/layout/StepProgress";
 import { ConditionsControls } from "@/components/conditions/ConditionsControls";
+import { DeviceSwitch } from "@/components/system/DeviceProvider";
 
 function TipBar({ className = "" }: { className?: string }) {
   return (
@@ -15,52 +16,64 @@ function TipBar({ className = "" }: { className?: string }) {
   );
 }
 
-/** PAGE 2 여행 조건 설정 — p2.png 배경(크게) 위 하얀 박스에 컨트롤을 오버레이 */
+/** 데스크톱: 크게 채운 p2.png 배경 + 하얀 박스 위 컨트롤 오버레이 */
+function ConditionsDesktop() {
+  return (
+    <section className="relative mx-auto w-full max-w-[1536px] px-4 pb-10 lg:px-8">
+      <div className="relative">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/p2.png"
+          alt="여행 준비 풍경 — 창밖 여행지, 지구본, 지도, 여행 가방"
+          className="block w-full select-none rounded-card"
+          draggable={false}
+        />
+
+        {/* 하얀 박스 위 컨트롤 (박스 안 좌우 대칭 + 세로 중앙) */}
+        <div
+          className="absolute flex flex-col justify-center"
+          style={{ left: "5.2%", top: "12%", width: "31.5%", height: "82%" }}
+        >
+          <ConditionsControls />
+        </div>
+
+        {/* 하단 TIP 바 (실측 좌표) */}
+        <div
+          className="absolute flex items-center pl-[3%]"
+          style={{ left: "38.2%", top: "87.1%", width: "59.8%", height: "9.2%" }}
+        >
+          <TipBar />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** 모바일: 세로 스택 (실제 흰 카드로 감싼 컨트롤 + TIP) */
+function ConditionsMobile() {
+  return (
+    <PageContainer className="pt-0">
+      <div className="surface-card rounded-card p-5 sm:p-6">
+        <ConditionsControls />
+      </div>
+      <TipBar className="surface-card mt-4 rounded-2xl px-4 py-3" />
+    </PageContainer>
+  );
+}
+
+/** PAGE 2 여행 조건 설정 — 서버 기기 판별로 PC/모바일 전용 화면을 분기 */
 export default function ConditionsPage() {
   return (
     <main>
-      {/* 진행 단계 (제목은 박스 상단으로 이동) */}
+      {/* 진행 단계 (제목은 컨트롤 상단으로 이동) */}
       <PageContainer className="pb-4">
         <StepProgress current={1} className="mx-auto max-w-2xl" />
       </PageContainer>
 
-      {/* ===== 데스크톱(lg+): 크게 채운 p2.png 배경 + 하얀 박스 위 컨트롤 ===== */}
-      <section className="relative mx-auto hidden w-full max-w-[1536px] px-4 pb-10 lg:block lg:px-8">
-        <div className="relative">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/p2.png"
-            alt="여행 준비 풍경 — 창밖 여행지, 지구본, 지도, 여행 가방"
-            className="block w-full select-none rounded-card"
-            draggable={false}
-          />
-
-          {/* 하얀 박스 위 컨트롤 (박스 실측: left 1.9% / right 39.9% / w 38% / h 83.3%)
-              → 박스 안에서 좌우 대칭(각 3.25% 여백) + 세로 중앙 정렬 */}
-          <div
-            className="absolute flex flex-col justify-center"
-            style={{ left: "5.2%", top: "12%", width: "31.5%", height: "82%" }}
-          >
-            <ConditionsControls />
-          </div>
-
-          {/* 하단 TIP 바 (실측: left 38.2% / top 87.1% / w 59.8% / h 9.2%) */}
-          <div
-            className="absolute flex items-center pl-[3%]"
-            style={{ left: "38.2%", top: "87.1%", width: "59.8%", height: "9.2%" }}
-          >
-            <TipBar />
-          </div>
-        </div>
-      </section>
-
-      {/* ===== 모바일/태블릿(<lg): 세로 스택 ===== */}
-      <PageContainer className="lg:hidden">
-        <div className="surface-card rounded-card p-5 sm:p-6">
-          <ConditionsControls />
-        </div>
-        <TipBar className="surface-card mt-4 rounded-2xl px-4 py-3" />
-      </PageContainer>
+      <DeviceSwitch
+        mobile={<ConditionsMobile />}
+        desktop={<ConditionsDesktop />}
+      />
     </main>
   );
 }

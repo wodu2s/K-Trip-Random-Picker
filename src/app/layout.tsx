@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
+import { getDeviceType } from "@/lib/device";
+import { DeviceProvider } from "@/components/system/DeviceProvider";
 
 export const metadata: Metadata = {
   title: "Pick&Go — 오늘은 여행지를 뽑아보세요",
@@ -14,16 +16,20 @@ export const viewport: Viewport = {
   themeColor: "#2f73f6",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const device = await getDeviceType();
+
   return (
-    <html lang="ko">
+    <html lang="ko" data-device={device}>
       <body className="min-h-screen overflow-x-hidden">
-        <Header />
-        {children}
+        <DeviceProvider initial={device}>
+          <Header />
+          {children}
+        </DeviceProvider>
       </body>
     </html>
   );
