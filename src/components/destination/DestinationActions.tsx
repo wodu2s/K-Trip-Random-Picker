@@ -1,37 +1,26 @@
-"use client";
-
 import { useState } from "react";
-import type { Destination } from "@/types/travel";
-import { Button } from "@/components/ui/Button";
+import { Bookmark, Check, RouteIcon, Shuffle } from "lucide-react";
+import type { Destination } from "../../types/travel";
+import { Button } from "../ui/Button";
+import { useTravel } from "../../state/TravelContext";
+import { StampBadge } from "../layout/AdventurePageShell";
 
 /**
- * 여행지 공개 화면의 CTA.
- * - 길찾기: 프로토타입이므로 카카오맵 검색 URL(placeholder)을 새 탭으로 연다.
- * - 저장: 로컬 상태로만 저장 표시 (실제 백엔드 없음).
+ * 결과 화면 액션 — 코스 / 저장 / 새 카드
  */
-export function DestinationActions({
-  destination,
-}: {
-  destination: Destination;
-}) {
+export function DestinationActions({ destination }: { destination: Destination }) {
   const [saved, setSaved] = useState(false);
+  const { startShuffle, restart } = useTravel();
 
-  // 실제 지도 API 대신 카카오맵 검색 링크(placeholder)
-  const mapUrl = `https://map.kakao.com/?q=${encodeURIComponent(
-    `${destination.region} ${destination.name}`,
-  )}`;
+  function scrollToSchedule() {
+    document.getElementById("schedule-timeline")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
     <div className="space-y-3">
-      <Button
-        href={mapUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        variant="accent"
-        size="lg"
-        className="w-full"
-      >
-        📍 지금 길찾기 시작하기
+      <Button variant="primary" size="lg" className="w-full" onClick={scrollToSchedule}>
+        <RouteIcon className="h-5 w-5 text-accent" strokeWidth={2.2} aria-hidden="true" />
+        상세 코스 보기
       </Button>
 
       <Button
@@ -41,14 +30,38 @@ export function DestinationActions({
         aria-pressed={saved}
         onClick={() => setSaved((v) => !v)}
       >
-        {saved ? "✅ 저장되었어요" : "🔖 이 여행 저장하기"}
+        {saved ? (
+          <Check className="h-5 w-5" strokeWidth={2.4} aria-hidden="true" />
+        ) : (
+          <Bookmark className="h-5 w-5" strokeWidth={2.2} aria-hidden="true" />
+        )}
+        {saved ? "저장됨" : "저장하기"}
+        {saved && (
+          <StampBadge className="ml-1" tone="orange">
+            LOG
+          </StampBadge>
+        )}
       </Button>
 
       {saved && (
         <p className="text-center text-sm text-success" role="status">
-          내 여행 목록에 저장했어요! (프로토타입 · 로컬 저장)
+          탐험 기록에 저장했어요! (프로토타입 · 로컬 저장)
         </p>
       )}
+
+      <Button variant="accent" size="lg" className="w-full" onClick={startShuffle}>
+        <Shuffle className="h-5 w-5 text-primary" strokeWidth={2.2} aria-hidden="true" />새 여행 카드 받기
+      </Button>
+
+      <button
+        type="button"
+        onClick={restart}
+        className="w-full py-2 text-sm font-semibold text-muted underline-offset-2 hover:text-primary hover:underline"
+      >
+        조건부터 다시 설정
+      </button>
+
+      <span className="sr-only">{destination.name}</span>
     </div>
   );
 }

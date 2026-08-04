@@ -1,0 +1,490 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css");
+@import "tailwindcss";
+
+@theme {
+  /* Classic Expedition → Tailwind semantic tokens */
+  --color-primary: #1f3d2e;
+  --color-primary-dark: #16281f;
+  --color-accent: #c9a227;
+  --color-background: #ede4ce;
+  --color-surface: #f5f0e1;
+  --color-paper: #f5f0e1;
+  --color-card-info: #e4d6b0;
+  --color-ink: #2b2318;
+  --color-muted: #6b5f49;
+  --color-line: #d4c4a4;
+  --color-success: #3d8b6e;
+  --color-brass: #c9a227;
+  --color-orange: #a95b36;
+  --color-navy: #16281f;
+
+  --font-sans: "Pretendard Variable", "Pretendard", "Noto Sans KR", -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  --font-serif: "Noto Serif KR", "Source Han Serif KR", "Georgia", serif;
+  --font-display: "Playfair Display", "Noto Serif KR", Georgia, serif;
+
+  --radius-card: 10px;
+  --radius-card-inner: 8px;
+
+  --shadow-card: 0 12px 32px rgba(22, 40, 31, 0.12);
+  --shadow-card-hover: 0 18px 44px rgba(22, 40, 31, 0.2);
+}
+
+:root {
+  --header-height: 4rem;
+
+  /* Flow pages — alias Classic Expedition tokens */
+  --adventure-forest: #1f3d2e;
+  --adventure-forest-dark: #16281f;
+  --adventure-navy: #16281f;
+  --adventure-navy-deep: #122018;
+  --adventure-parchment: #ede4ce;
+  --adventure-parchment-light: #f5f0e1;
+  --adventure-paper: #f5f0e1;
+  --adventure-brass: #c9a227;
+  --adventure-yellow: #d8b84a;
+  --adventure-orange: #a95b36;
+  --adventure-red: #98483a;
+  --adventure-ink: #2b2318;
+  --adventure-muted: #6b5f49;
+  --adventure-line: rgba(90, 74, 46, 0.18);
+
+  /* Vintage Expedition design system */
+  --color-forest-900: #16281f;
+  --color-forest-800: #1f3d2e;
+  --color-forest-700: #2a4a38;
+  --color-brass-500: #c9a227;
+  --color-brass-400: #d8b84a;
+  --color-brass-300: #e8ce7c;
+  --color-brass-line: #b8952e;
+  --color-parchment-100: #f5f0e1;
+  --color-parchment-200: #ede4ce;
+  --color-parchment-300: #e4d6b0;
+  --color-parchment-line: rgba(90, 74, 46, 0.18);
+  --color-text-headline: #2b2318;
+  --color-text-body-muted: #6b5f49;
+  --color-text-on-forest: #f0e6c8;
+  --color-text-on-brass-btn: #f5ebc8;
+
+  --font-family-display: "Playfair Display", "Noto Serif KR", serif;
+  --font-family-base: "Pretendard Variable", "Pretendard", -apple-system, sans-serif;
+
+  --radius-card: 10px;
+  --radius-btn: 8px;
+  --radius-feature-bar: 16px;
+  --radius-ticket: 4px;
+
+  --shadow-card-stack: 0 16px 40px rgba(22, 40, 31, 0.35);
+  --shadow-compass: 0 8px 20px rgba(0, 0, 0, 0.3);
+  --space-hero-padding: 80px;
+}
+
+/* Landing — Dark Expedition Luxury (scoped; other pages unchanged) */
+.landing-page {
+  --landing-max: none;
+  --landing-ivory: #f3e8d2;
+  --landing-gold: #d0a54d;
+  --landing-gold-point: #c99a3e;
+  --landing-beige: #b8ad98;
+  --landing-beige-muted: #8f846f;
+  --landing-navy: #050d18;
+  --landing-navy-panel: #081725;
+  position: relative;
+  overflow-x: hidden;
+  background-color: var(--landing-navy);
+  font-family: var(--font-family-base);
+  color: var(--landing-ivory);
+}
+
+.landing-hero-inner {
+  max-width: none;
+  width: 100%;
+  min-height: auto;
+  padding-top: 24px;
+  padding-bottom: 28px;
+}
+
+@media (min-width: 1024px) {
+  .landing-hero-inner {
+    min-height: min(calc(100svh - var(--header-height)), 836px);
+    padding-top: var(--space-hero-padding);
+    padding-bottom: 28px;
+    justify-content: flex-start;
+  }
+
+  .landing-hero-main {
+    flex: 0 0 auto;
+  }
+
+}
+
+.font-landing-display {
+  font-family: var(--font-family-display);
+}
+
+.landing-feature-bar {
+  display: flex;
+  width: 100%;
+  min-height: 93px;
+  max-height: 99px;
+  align-items: center;
+  padding: 20px 36px;
+  border-radius: 4px;
+  background: rgba(5, 18, 30, 0.9);
+  border: 1px solid rgba(197, 160, 89, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+  transform: none;
+}
+
+.landing-feature-item {
+  padding-inline: 8px;
+}
+
+.landing-feature-sep {
+  display: none;
+}
+
+.landing-feature-title {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #f0e9da;
+  font-family: var(--font-family-base);
+}
+
+.landing-feature-desc {
+  display: none;
+  margin-top: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: #cfc4ae;
+  font-family: var(--font-family-base);
+}
+
+.landing-feature-badge {
+  height: 55px;
+  width: 55px;
+  flex-shrink: 0;
+  background: rgba(7, 23, 36, 0.55);
+  border: 1px solid rgba(197, 160, 89, 0.55);
+  color: #c5a059;
+  font-size: 13px;
+  transition:
+    background-color 0.28s ease,
+    border-color 0.28s ease,
+    color 0.28s ease;
+}
+
+/* Active: badge + icon only — no row glow */
+.landing-feature-badge-active {
+  background: rgba(197, 160, 89, 0.22);
+  border-color: rgba(197, 160, 89, 0.72);
+  color: #e2c48a;
+}
+
+.landing-feature-badge-passed {
+  background: rgba(212, 164, 62, 0.12);
+  border-color: rgba(212, 164, 62, 0.4);
+  color: #d4a64a;
+}
+
+.landing-feature-wrap {
+  margin-top: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .landing-feature-sep {
+    display: block;
+  }
+
+  .landing-feature-desc {
+    display: block;
+  }
+
+  .landing-feature-item {
+    padding-inline: 14px;
+  }
+
+  .landing-feature-bar {
+    padding-inline: 32px;
+  }
+
+  .landing-feature-title {
+    font-size: 19px;
+  }
+
+  .landing-feature-desc {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-feature-wrap {
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  .landing-feature-bar {
+    min-height: 96px;
+    height: 96px;
+    max-height: 96px;
+    padding-inline: 48px;
+  }
+
+  .landing-feature-badge {
+    height: 55px;
+    width: 55px;
+  }
+}
+
+@media (min-width: 1440px) and (min-height: 820px) {
+  .landing-feature-bar {
+    height: 96px;
+    min-height: 96px;
+    max-height: 96px;
+    padding-inline: 52px;
+  }
+
+  .landing-feature-title {
+    font-size: 20px;
+  }
+
+  .landing-feature-desc {
+    font-size: 16px;
+  }
+
+  .landing-feature-sep {
+    opacity: 0.72;
+  }
+}
+
+@media (max-width: 639px) {
+  .landing-feature-bar {
+    min-height: 72px;
+    max-height: none;
+    padding: 12px 14px;
+  }
+
+  .landing-feature-badge {
+    height: 2rem;
+    width: 2rem;
+  }
+
+  .landing-feature-item {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    padding-inline: 4px;
+    text-align: center;
+  }
+
+  .landing-feature-item > div {
+    padding-top: 0;
+  }
+
+  .landing-feature-item .flex.items-center {
+    justify-content: center;
+  }
+}
+
+.landing-cta {
+  position: relative;
+  display: inline-flex;
+  height: 56px;
+  width: 280px;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  overflow: hidden;
+  border-radius: 9px;
+  border: 1px solid #e1b85e;
+  background: linear-gradient(180deg, #b97925 0%, #815019 58%, #5c3510 100%);
+  color: #fff3d8;
+  font: 700 16px/1 var(--font-family-base);
+  letter-spacing: 0.01em;
+  box-shadow:
+    0 1px 0 rgba(255, 236, 190, 0.28) inset,
+    0 8px 0 #3a220c,
+    0 12px 24px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(212, 168, 74, 0.18);
+  transition:
+    filter 0.22s ease-out,
+    box-shadow 0.22s ease-out;
+}
+
+.landing-cta::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 2px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 230, 170, 0.25);
+}
+
+.landing-cta-shine {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  transform: translateX(-120%);
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 236, 190, 0.28) 48%,
+    transparent 62%
+  );
+}
+
+.landing-cta:hover .landing-cta-shine,
+.landing-cta[data-shine="true"] .landing-cta-shine {
+  animation: landing-cta-shine 0.65s ease-out 1;
+}
+
+.landing-cta:disabled {
+  cursor: wait;
+  opacity: 0.92;
+}
+
+@keyframes landing-cta-shine {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(120%);
+  }
+}
+
+@media (max-width: 639px) {
+  .landing-cta {
+    width: 100%;
+    height: 52px;
+  }
+}
+
+/* Landing header — full-bleed (no max-width trap) */
+.header-landing {
+  background: #040c16;
+  border-bottom: 1px solid rgba(205, 162, 76, 0.22);
+}
+
+.header-landing + * {
+  --header-height: 86px;
+}
+
+/* Optional parchment noise — only applied when WebP preload succeeds */
+.landing-parchment-noise {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  opacity: 0.045;
+  mix-blend-mode: multiply;
+  z-index: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-background);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(1000px 500px at 85% -5%, rgba(22, 40, 31, 0.07), transparent 55%),
+    radial-gradient(800px 420px at -5% 15%, rgba(201, 162, 39, 0.1), transparent 50%);
+  background-attachment: fixed;
+}
+
+.font-expedition {
+  font-family: var(--font-family-display);
+}
+
+:focus-visible {
+  outline: 3px solid var(--adventure-brass);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.surface-card {
+  background: rgba(245, 240, 225, 0.94);
+  border: 1px solid var(--adventure-line);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--radius-card);
+}
+
+.expedition-panel {
+  background: var(--color-parchment-100);
+  border: 1px solid var(--color-parchment-line);
+  border-radius: var(--radius-feature-bar);
+  box-shadow: 0 10px 28px rgba(43, 35, 24, 0.1);
+}
+
+.adventure-map-decor {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  opacity: 0.07;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-1200 {
+  perspective: 1200px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+@keyframes expedition-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(201, 162, 39, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(201, 162, 39, 0);
+  }
+  100% {
+    box-shadow: 0 6px 16px rgba(201, 162, 39, 0.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

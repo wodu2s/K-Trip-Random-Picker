@@ -1,107 +1,199 @@
-"use client";
-
 import { useState } from "react";
+import { Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
-import { Button } from "@/components/ui/Button";
+import { useTravel } from "../../state/TravelContext";
+import { cn } from "../../utils/cn";
 
 const NAV_ITEMS = [
-  { label: "서비스 소개", href: "/#intro" },
-  { label: "사용 방법", href: "/#how" },
-  { label: "추천 여행지", href: "/#recommend" },
-  { label: "숨은 명소", href: "/#hidden" },
+  { label: "\uD0D0\uD5D8\uD558\uAE30", page: "landing" as const },
+  { label: "\uC870\uAC74 \uC124\uC815", page: "conditions" as const },
 ];
 
-/**
- * 전역 헤더 — 로고 + 네비게이션 + 로그인/회원가입.
- * 데스크톱: 가로 배치 / 모바일: 햄버거 메뉴.
- * (로그인·회원가입은 프로토타입 범위 밖 → 자리표시 버튼)
- */
+/** Header ? full-bleed on landing (target B), parchment on other pages */
 export function Header() {
   const [open, setOpen] = useState(false);
+  const { page, goToLanding, goToConditions } = useTravel();
+  const dark = page === "landing";
+
+  function handleNav(target: "landing" | "conditions") {
+    setOpen(false);
+    if (target === "landing") goToLanding();
+    else goToConditions();
+  }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line/60 bg-surface/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-content items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Logo />
+    <header
+      className={cn("sticky top-0 z-[30]", dark && "header-landing")}
+      data-landing-header={dark ? "true" : undefined}
+      style={
+        dark
+          ? { minHeight: 86, height: 86 }
+          : {
+              background: "var(--color-parchment-100)",
+              borderBottom: "1px solid var(--color-parchment-line)",
+            }
+      }
+    >
+      <div
+        className={cn(
+          "relative flex w-full items-center justify-between",
+          dark
+            ? "h-[86px] min-h-[86px] max-w-none pl-8 pr-[30px]"
+            : "mx-auto h-16 max-w-[1200px] gap-6 px-5 sm:px-8 lg:gap-10",
+        )}
+      >
+        <Logo
+          onClick={() => handleNav("landing")}
+          tone={dark ? "dark" : "light"}
+        />
 
-        {/* 데스크톱 네비게이션 */}
         <nav
-          className="hidden items-center gap-8 md:flex"
-          aria-label="주요 메뉴"
+          className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-[48px] md:flex"
+          aria-label={"\uC8FC\uC694 \uBA54\uB274"}
+          style={{ fontFamily: "var(--font-family-base)" }}
         >
-          {NAV_ITEMS.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className="text-[15px] font-semibold text-ink/80 transition-colors hover:text-primary"
-            >
-              {item.label}
-            </a>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const active = page === item.page;
+            return (
+              <button
+                key={item.label}
+                type="button"
+                onClick={() => handleNav(item.page)}
+                className={cn(
+                  "relative font-medium transition-colors",
+                  dark ? "text-[16.5px]" : "text-[16px]",
+                  dark
+                    ? active
+                      ? "text-[#F0E9DA]"
+                      : "text-[#F0E9DA]/75 hover:text-[#F0E9DA]"
+                    : active
+                      ? "text-[var(--color-forest-800)]"
+                      : "text-[var(--color-text-headline)]/80 hover:text-[var(--color-forest-800)]",
+                )}
+              >
+                {item.label}
+                {active ? (
+                  <span
+                    className="absolute -bottom-1 left-1/2 h-[2px] w-[72%] -translate-x-1/2 rounded-full"
+                    style={{ background: dark ? "#C5A059" : "var(--color-brass-500)" }}
+                    aria-hidden="true"
+                  />
+                ) : null}
+              </button>
+            );
+          })}
         </nav>
 
-        {/* 데스크톱 인증 버튼 */}
-        <div className="hidden items-center gap-2 md:flex">
-          <Button variant="secondary" size="sm">
-            로그인
-          </Button>
-          <Button variant="primary" size="sm">
-            회원가입
-          </Button>
+        <div className="hidden items-center gap-3.5 md:flex">
+          <button
+            type="button"
+            className={cn(
+              "inline-flex items-center justify-center rounded-[8px] border text-[15px] font-semibold transition-colors",
+              dark ? "h-[50px] px-6" : "h-11 px-5",
+            )}
+            style={
+              dark
+                ? {
+                    background: "transparent",
+                    borderColor: "rgba(208,165,77,0.55)",
+                    color: "#F0E9DA",
+                    fontFamily: "var(--font-family-base)",
+                  }
+                : {
+                    background: "var(--color-parchment-100)",
+                    borderColor: "rgba(43,35,24,0.35)",
+                    color: "var(--color-text-headline)",
+                    fontFamily: "var(--font-family-base)",
+                  }
+            }
+          >
+            {"\uB85C\uADF8\uC778"}
+          </button>
+          <button
+            type="button"
+            className={cn(
+              "inline-flex items-center justify-center rounded-[8px] text-[15px] font-semibold transition-colors",
+              dark ? "h-[50px] px-6" : "h-11 px-5",
+            )}
+            style={
+              dark
+                ? {
+                    background: "#1F3D2E",
+                    color: "#F0E6C8",
+                    fontFamily: "var(--font-family-base)",
+                    border: "1px solid rgba(208,165,77,0.35)",
+                  }
+                : {
+                    background: "var(--color-forest-800)",
+                    color: "var(--color-text-on-forest)",
+                    fontFamily: "var(--font-family-base)",
+                  }
+            }
+          >
+            {"\uD68C\uC6D0\uAC00\uC785"}
+          </button>
         </div>
 
-        {/* 모바일 햄버거 */}
         <button
           type="button"
-          className="flex h-10 w-10 items-center justify-center rounded-xl text-ink md:hidden"
-          aria-label={open ? "메뉴 닫기" : "메뉴 열기"}
+          className="flex h-11 w-11 items-center justify-center rounded-[10px] md:hidden"
+          style={{ color: dark ? "#F0E9DA" : "var(--color-text-headline)" }}
+          aria-label={open ? "\uBA54\uB274 \uB2EB\uAE30" : "\uBA54\uB274 \uC5F4\uAE30"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            {open ? (
-              <path
-                d="M6 6l12 12M18 6L6 18"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            ) : (
-              <path
-                d="M4 7h16M4 12h16M4 17h16"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            )}
-          </svg>
+          {open ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
         </button>
       </div>
 
-      {/* 모바일 드롭다운 메뉴 */}
       {open && (
-        <div className="border-t border-line/60 bg-surface md:hidden">
+        <div
+          className="border-t md:hidden"
+          style={{
+            borderColor: dark ? "rgba(205,162,76,0.22)" : "var(--color-parchment-line)",
+            background: dark ? "#040C16" : "var(--color-parchment-100)",
+          }}
+        >
           <nav
-            className="mx-auto flex max-w-content flex-col gap-1 px-4 py-3"
-            aria-label="모바일 메뉴"
+            className="flex flex-col gap-1 px-5 py-3"
+            aria-label={"\uBAA8\uBC14\uC77C \uBA54\uB274"}
           >
             {NAV_ITEMS.map((item) => (
-              <a
+              <button
                 key={item.label}
-                href={item.href}
-                className="rounded-lg px-3 py-3 text-base font-semibold text-ink/80 hover:bg-background hover:text-primary"
-                onClick={() => setOpen(false)}
+                type="button"
+                onClick={() => handleNav(item.page)}
+                className="rounded-[10px] px-3 py-3 text-left text-base font-medium"
+                style={{
+                  color: dark ? "#F0E9DA" : "var(--color-text-headline)",
+                  fontFamily: "var(--font-family-base)",
+                }}
               >
                 {item.label}
-              </a>
+              </button>
             ))}
             <div className="mt-2 flex gap-2">
-              <Button variant="secondary" size="sm" className="flex-1">
-                로그인
-              </Button>
-              <Button variant="primary" size="sm" className="flex-1">
-                회원가입
-              </Button>
+              <button
+                type="button"
+                className="flex-1 rounded-[8px] border py-2.5 text-[15px] font-semibold"
+                style={{
+                  borderColor: dark ? "rgba(208,165,77,0.55)" : "var(--color-text-headline)",
+                  color: dark ? "#F0E9DA" : "var(--color-text-headline)",
+                  background: "transparent",
+                }}
+              >
+                {"\uB85C\uADF8\uC778"}
+              </button>
+              <button
+                type="button"
+                className="flex-1 rounded-[8px] py-2.5 text-[15px] font-semibold"
+                style={{
+                  background: dark ? "#1F3D2E" : "var(--color-forest-800)",
+                  color: "#F0E6C8",
+                }}
+              >
+                {"\uD68C\uC6D0\uAC00\uC785"}
+              </button>
             </div>
           </nav>
         </div>

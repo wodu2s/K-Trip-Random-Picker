@@ -1,108 +1,339 @@
-"use client";
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "motion/react";
+import { getDestinationById } from "../../data/destinations";
+import { getEmojiHints } from "../../lib/icons";
+import { getLayoutScale, poseForCard } from "../../lib/cardLayout";
+import {
+  CARD_MOTION,
+  cardStaggerDelay,
+  durationForShufflePhase,
+  SHUFFLE_EASE,
+  transitionEaseForPhase,
+} from "../../lib/cardMotion";
+import {
+  isSelectable,
+  isSelecting,
+  showsCardBack,
+} from "../../lib/cardPhaseUtils";
+import type { CardPhase, MysteryCardData } from "../../types/travel";
+import { AdventureTravelCard } from "./AdventureTravelCard";
+import { CardFx } from "./CardFx";
+import { TravelCardBack } from "./TravelCardBack";
+import "./shuffleDeck.css";
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { useTravelStore } from "@/stores/travelStore";
-import { MysteryCard } from "./MysteryCard";
+const LIVE_PHASES = new Set<CardPhase>([
+  "gathering",
+  "fanOut",
+  "crossing",
+  "mixing",
+  "restacking",
+  "selectable",
+  "selected",
+  "revealing",
+]);
 
 /**
- * 추천된 5장의 미스터리 카드를 배치하고 선택 인터랙션을 담당한다.
- * - 데스크톱: 5장 한 줄(가운데 카드 약간 강조) / 모바일: 2열 + 마지막 카드 중앙.
- * - 선택 시: 나머지 카드는 바깥으로 흩어져 흐려지고, 선택 카드는 중앙에서 뒤집힌 뒤
- *   /destination/[id] 로 이동한다.
+ * 카드 5장의 위치·z-index·transform 애니메이션.
  */
-export function CardDeck() {
-  const router = useRouter();
-  const reduce = useReducedMotion();
-  const cards = useTravelStore((s) => s.cards);
-  const selectCard = useTravelStore((s) => s.selectCard);
-  const reveal = useTravelStore((s) => s.reveal);
+export function CardDeck({
+  cards,
+  phase,
+  mixStep,
+  reduce,
+  isMobile,
+  stageW,
+  cardW,
+  cardH,
+  selectedId,
+  stamped,
+  flipped,
+  hoveredId,
+  locked,
+  onHoverChange,
+  onSelect,
+}: {
+  cards: MysteryCardData[];
+  phase: CardPhase;
+  mixStep: 0 | 1;
+  reduce: boolean;
+  isMobile: boolean;
+  stageW: number;
+  cardW: number;
+  cardH: number;
+  selectedId: string | null;
+  stamped: boolean;
+  flipped: boolean;
+  hoveredId: string | null;
+  locked: boolean;
+  onHoverChange: (id: string | null) => void;
+  onSelect: (cardId: string, destinationId: string) => void;
+}) {
+  const layoutScale = getLayoutScale(stageW, cardW);
+  const [hintOnce, setHintOnce] = useState(false);
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showBack = showsCardBack(phase) && !isSelecting(phase) && phase !== "complete";
 
-  // 언마운트 시 타이머 정리
-  useEffect(() => () => {
-    if (timer.current) clearTimeout(timer.current);
-  }, []);
+  useEffect(() => {
+    setHintOnce(false);
+  }, [phase, selectedId]);
 
-  const selecting = selectedId !== null;
-  const selectedCard = cards.find((c) => c.id === selectedId) ?? null;
+  useEffect(() => {
+    if (phase !== "selectable" || selectedId || locked || reduce) return;
+    const t = window.setTimeout(() => setHintOnce(true), 3000);
+    return () => window.clearTimeout(t);
+  }, [phase, selectedId, locked, reduce]);
 
-  function handleSelect(cardId: string, destinationId: string) {
-    if (selecting) return;
-    setSelectedId(cardId);
-    selectCard(cardId);
-    const delay = reduce ? 350 : 850;
-    timer.current = setTimeout(() => {
-      reveal(destinationId);
-      router.push(`/destination/${destinationId}`);
-    }, delay);
-  }
+  const cardEntries = useMemo(
+    () =>
+      cards
+        .map((card, i) => {
+          const destination = getDestinationById(card.destinationId);
+          if (!destination) return null;
+          return { card, i, destination, hints: getEmojiHints(destination) };
+        })
+        .filter(Boolean) as {
+        card: MysteryCardData;
+        i: number;
+        destination: NonNullable<ReturnType<typeof getDestinationById>>;
+        hints: string[];
+      }[],
+    [cards],
+  );
+
+  const deckClass = [
+    "shuffle-deck",
+    isMobile ? "shuffle-deck--mobile" : "",
+    hintOnce ? "shuffle-deck--hint-once" : "",
+    phase === "complete" ? "shuffle-deck--complete-fade" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <div className="relative">
-      {/* 카드 그리드 */}
-      <div className="mx-auto grid max-w-3xl grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5 lg:gap-3">
-        {cards.map((card, i) => {
-          const isSelected = card.id === selectedId;
-          const isLastOdd = i === 4;
+    <div className={deckClass} data-shuffle-phase={phase}>
+      <CardFx
+        phase={phase}
+        reduce={reduce}
+        isMobile={isMobile}
+        centerGlow={isSelectable(phase) && !selectedId}
+      />
+
+      <motion.div
+        className="shuffle-deck__stage"
+        aria-live="polite"
+        animate={
+          phase === "ready" && !reduce ? { y: [0, -4, 0] } : { y: 0 }
+        }
+        transition={
+          phase === "ready" && !reduce
+            ? { duration: 3.6, repeat: Infinity, ease: "easeInOut" }
+            : { duration: 0.2 }
+        }
+      >
+        {cardEntries.map(({ card, i, destination, hints }) => {
+          const isSelected = selectedId === card.id;
+          const pose = poseForCard(
+            phase,
+            mixStep,
+            i,
+            cardEntries.length,
+            layoutScale,
+            selectedId,
+            card.id,
+          );
+
+          const isHover =
+            isSelectable(phase) &&
+            !locked &&
+            !selectedId &&
+            hoveredId === card.id &&
+            !isMobile;
+
+          let { x, y, rotate, scale, opacity, z, rotateX = 0 } = pose;
+
+          if (isHover) {
+            y -= 14;
+            scale = Math.min(scale + 0.04, 1.04);
+            rotate *= 0.35;
+            z = 18;
+          } else if (
+            isSelectable(phase) &&
+            hoveredId &&
+            hoveredId !== card.id &&
+            !selectedId &&
+            !isMobile
+          ) {
+            scale *= 0.99;
+          }
+
+          const duration = durationForShufflePhase(phase, reduce);
+          const delay = cardStaggerDelay(phase, i, reduce);
+          const ease = transitionEaseForPhase(phase);
+          const disabled = !isSelectable(phase) || locked || Boolean(selectedId);
+
+          const isFocusSelected =
+            isSelected &&
+            (phase === "selected" || phase === "revealing" || phase === "complete");
+
+          const showHintFace =
+            (isSelectable(phase) || isSelecting(phase) || phase === "complete") && !showBack;
+          const showReveal = isSelected && flipped;
+          const rotateY = showReveal ? 180 : showHintFace ? 0 : showBack ? 180 : 0;
+
+          const faceTurnDuration =
+            showReveal && flipped
+              ? reduce
+                ? 0.18
+                : CARD_MOTION.flip
+              : showHintFace && isSelectable(phase)
+                ? reduce
+                  ? 0.14
+                  : CARD_MOTION.selectable
+                : 0;
+
+          const scaleAnim =
+            phase === "gathering"
+              ? 1
+              : phase === "ready" && i === 2 && !reduce
+                ? [1, 1.025, 1]
+                : scale;
+
+          const showTrail = !reduce && (phase === "fanOut" || phase === "crossing");
+          const liveMotion = LIVE_PHASES.has(phase) || phase === "ready";
+
+          const transition =
+            phase === "selectable" && !reduce
+              ? { type: "spring" as const, stiffness: 420, damping: 28, delay }
+              : phase === "ready" && i === 2 && !reduce
+                ? {
+                    scale: { duration: 2.4, repeat: Infinity, ease: "easeInOut" as const },
+                    default: { duration: 0.2 },
+                  }
+                : {
+                    duration: reduce ? 0.14 : duration,
+                    ease,
+                    delay,
+                  };
+
           return (
-            <motion.div
+            <motion.button
               key={card.id}
-              className={
-                isLastOdd
-                  ? "col-span-2 mx-auto w-[calc(50%-6px)] lg:col-span-1 lg:w-auto"
-                  : ""
+              type="button"
+              className={[
+                "shuffle-deck__card",
+                liveMotion ? "shuffle-deck__card--live" : "",
+                isHover ? "shuffle-deck__card--hover" : "",
+                showTrail ? "shuffle-deck__card--trail" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              style={{
+                width: cardW,
+                height: cardH,
+                zIndex: z,
+                marginLeft: -cardW / 2,
+                marginTop: -cardH / 2,
+                filter: isFocusSelected
+                  ? "drop-shadow(0 16px 32px rgba(22,40,31,0.28))"
+                  : "drop-shadow(0 12px 24px rgba(22,40,31,0.16))",
+              }}
+              disabled={disabled}
+              aria-disabled={disabled}
+              aria-pressed={isSelected}
+              aria-label={
+                showReveal
+                  ? `선택된 여행지 ${destination.name}`
+                  : `${hints.slice(0, 5).join(", ")} 힌트가 포함된 여행 카드 선택`
               }
-              animate={
-                selecting && !isSelected
-                  ? { opacity: 0, scale: 0.85, x: (i - 2) * 44 }
-                  : { opacity: 1, scale: 1, x: 0 }
-              }
-              transition={{ duration: 0.4, ease: "easeOut" }}
-              style={{ visibility: isSelected ? "hidden" : "visible" }}
+              initial={false}
+              animate={{
+                x: reduce && selectedId && !isSelected ? x * 0.4 : x,
+                y,
+                rotate,
+                rotateX,
+                scale: scaleAnim,
+                opacity,
+              }}
+              transition={transition}
+              onClick={() => {
+                if (disabled) return;
+                setHintOnce(false);
+                onSelect(card.id, card.destinationId);
+              }}
+              onPointerEnter={() => {
+                if (!disabled && !isMobile) onHoverChange(card.id);
+              }}
+              onPointerLeave={() => onHoverChange(null)}
+              onFocus={() => {
+                if (!disabled && !isMobile) onHoverChange(card.id);
+              }}
+              onBlur={() => onHoverChange(null)}
             >
-              <MysteryCard
-                hints={card.emojiHints}
-                index={i + 1}
-                emphasize={i === 2}
-                disabled={selecting}
-                onSelect={() => handleSelect(card.id, card.destinationId)}
-              />
-            </motion.div>
+              <div className="shuffle-deck__trail" aria-hidden="true" />
+              <div className="shuffle-deck__shine" aria-hidden="true" />
+
+              {i === 2 && isSelectable(phase) && !selectedId ? (
+                <div
+                  className="shuffle-deck__center-glow shuffle-deck__center-glow--pulse"
+                  aria-hidden="true"
+                />
+              ) : null}
+
+              <div className="shuffle-deck__flip perspective-1000 relative h-full w-full">
+                <motion.div
+                  className="preserve-3d relative h-full w-full"
+                  style={{ transformStyle: "preserve-3d" }}
+                  initial={false}
+                  animate={{ rotateY }}
+                  transition={{
+                    rotateY: { duration: faceTurnDuration, ease: SHUFFLE_EASE },
+                  }}
+                >
+                  <div className="backface-hidden absolute inset-0">
+                    {showHintFace ? (
+                      <AdventureTravelCard
+                        embedded
+                        hints={hints}
+                        index={i + 1}
+                        face="hint"
+                        selected={isFocusSelected}
+                        stamped={isSelected && stamped}
+                        needleBoost={isHover ? 10 : 0}
+                      />
+                    ) : (
+                      <TravelCardBack expedition serial={i + 1} />
+                    )}
+                  </div>
+
+                  <div
+                    className="backface-hidden absolute inset-0"
+                    style={{ transform: "rotateY(180deg)" }}
+                  >
+                    {showReveal ? (
+                      <AdventureTravelCard
+                        embedded
+                        hints={hints}
+                        index={i + 1}
+                        face="hint"
+                        flipped
+                        reveal={{
+                          name: destination.name,
+                          region: destination.region,
+                          image: destination.image,
+                          shortDescription: destination.shortDescription,
+                          tags: destination.tags,
+                        }}
+                      />
+                    ) : (
+                      <TravelCardBack expedition serial={i + 1} />
+                    )}
+                  </div>
+                </motion.div>
+              </div>
+            </motion.button>
           );
         })}
-      </div>
-
-      {/* 선택 카드: 중앙으로 이동 + 뒤집기 오버레이 */}
-      <AnimatePresence>
-        {selecting && selectedCard && (
-          <motion.div
-            className="fixed inset-0 z-40 flex items-center justify-center bg-background/70 px-6 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            aria-live="polite"
-          >
-            <motion.div
-              className="w-[190px] sm:w-[210px]"
-              initial={{ scale: 0.85, y: 20 }}
-              animate={{ scale: 1.12, y: 0 }}
-              transition={{ duration: reduce ? 0 : 0.5, ease: "easeOut" }}
-            >
-              <MysteryCard
-                hints={selectedCard.emojiHints}
-                index={0}
-                disabled
-                flipped={!reduce}
-              />
-            </motion.div>
-            <span className="sr-only">여행지를 공개하는 중이에요…</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

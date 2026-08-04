@@ -1,28 +1,29 @@
-export const TRAVEL_STEPS = [
-  "조건 설정",
-  "카드 섞는 중",
-  "카드 선택",
-  "여행지 공개",
-] as const;
+import { useEffect, useState } from "react";
+import { Check } from "lucide-react";
+import { cn } from "../../utils/cn";
+
+export const TRAVEL_STEPS = ["조건 설정", "신호 탐색", "카드 선택", "목적지 공개"] as const;
 
 /**
- * 진행 단계 표시 (1 → 4).
- * current(1-based)에 해당하는 원만 파란색으로 채워지고,
- * 이전 단계는 완료 상태, 이후 단계는 흐린 상태로 표시된다.
+ * Expedition 진행 표시 — 넓은 점선 경로 + 큰 노드.
+ * 현재: 황동 + 1회 pulse / 완료: 포레스트 + 체크 / 모바일 축약.
  */
-export function StepProgress({
-  current,
-  className = "",
-}: {
-  current: 1 | 2 | 3 | 4;
-  className?: string;
-}) {
+export function StepProgress({ current, className = "" }: { current: 1 | 2 | 3 | 4; className?: string }) {
+  const [pulse, setPulse] = useState(true);
+
+  useEffect(() => {
+    setPulse(true);
+    const id = window.setTimeout(() => setPulse(false), 700);
+    return () => window.clearTimeout(id);
+  }, [current]);
+
   return (
-    <nav
-      aria-label="진행 단계"
-      className={`w-full ${className}`}
-    >
-      <ol className="flex items-start justify-between gap-1 sm:gap-2">
+    <nav aria-label="탐험 진행 단계" className={cn("w-full", className)}>
+      <p className="font-expedition mb-3 text-center text-[12px] font-bold tracking-[0.14em] text-brass sm:hidden">
+        {current} / 4 · {TRAVEL_STEPS[current - 1]}
+      </p>
+
+      <ol className="flex items-start justify-between">
         {TRAVEL_STEPS.map((label, i) => {
           const step = i + 1;
           const isCurrent = step === current;
@@ -35,33 +36,35 @@ export function StepProgress({
               className="relative flex min-w-0 flex-1 flex-col items-center"
               aria-current={isCurrent ? "step" : undefined}
             >
-              {/* 단계 사이 연결선 */}
               {!isLast && (
                 <span
-                  className={`absolute left-1/2 top-4 -z-0 h-0.5 w-full ${
-                    isDone ? "bg-primary" : "bg-line"
-                  }`}
+                  className={cn(
+                    "absolute left-[calc(50%+20px)] right-[calc(-50%+20px)] top-[18px] -z-0 border-t-2",
+                    isDone ? "border-solid border-primary" : "border-dashed border-line",
+                  )}
                   aria-hidden="true"
                 />
               )}
 
               <span
-                className={[
-                  "relative z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold",
+                className={cn(
+                  "relative z-10 flex items-center justify-center rounded-full font-bold",
                   isCurrent
-                    ? "bg-primary text-white shadow-[0_6px_16px_rgba(47,115,246,0.4)]"
-                    : isDone
-                      ? "bg-primary/90 text-white"
-                      : "bg-surface text-muted ring-1 ring-line",
-                ].join(" ")}
+                    ? "h-10 w-10 text-base bg-brass text-[var(--color-forest-900)] ring-[3px] ring-brass/40 shadow-[0_8px_18px_rgba(201,162,39,0.4)]"
+                      : isDone
+                      ? "h-9 w-9 text-sm bg-primary text-[var(--color-text-on-brass-btn)]"
+                      : "h-9 w-9 text-sm bg-surface text-muted ring-1 ring-line",
+                  isCurrent && pulse && "animate-[expedition-pulse_0.65s_ease-out_1]",
+                )}
               >
-                {isDone ? "✓" : step}
+                {isDone ? <Check className="h-4 w-4" strokeWidth={2.8} aria-hidden="true" /> : step}
               </span>
 
               <span
-                className={`mt-2 truncate text-center text-[11px] font-semibold sm:text-[13px] ${
-                  isCurrent ? "text-primary" : "text-muted"
-                }`}
+                className={cn(
+                  "mt-2.5 hidden truncate text-center text-[12px] sm:block sm:text-[13px]",
+                  isCurrent ? "font-bold text-primary" : "font-semibold text-muted",
+                )}
               >
                 {label}
               </span>

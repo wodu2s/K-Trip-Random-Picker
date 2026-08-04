@@ -1,6 +1,7 @@
+import { cn } from "../../utils/cn";
+
 /**
- * 페이지 콘텐츠 래퍼 — 최대 너비 제한 + 좌우 여백 + 세로 패딩.
- * 모든 페이지가 동일한 그리드 폭/여백을 갖도록 통일한다.
+ * 페이지 콘텐츠 래퍼 — 최대 너비 1280px + 반응형 패딩.
  */
 export function PageContainer({
   children,
@@ -13,7 +14,10 @@ export function PageContainer({
 }) {
   return (
     <Tag
-      className={`mx-auto w-full max-w-content px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12 ${className}`}
+      className={cn(
+        "mx-auto w-full max-w-[1280px] px-4 py-8 sm:px-6 sm:py-10 lg:px-10 lg:py-12",
+        className,
+      )}
     >
       {children}
     </Tag>

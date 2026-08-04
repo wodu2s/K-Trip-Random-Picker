@@ -1,0 +1,548 @@
+/* Target B — pixel-locked desktop (1648×920), no root scale/zoom */
+.landing-hero {
+  --hero-bg: #03101b;
+  --hero-ivory: #f0e9da;
+  --hero-beige: #cfc4ae;
+  --hero-muted: #9e8f78;
+  --hero-green: #2f5340;
+  --font-family-base: "Pretendard Variable", "Pretendard", -apple-system, sans-serif;
+  --font-family-display: "Playfair Display", "Noto Serif KR", Georgia, serif;
+
+  position: relative;
+  width: 100%;
+  min-height: calc(100svh - 86px);
+  overflow: hidden;
+  color: var(--hero-ivory);
+  background: var(--hero-bg);
+  font-family: var(--font-family-base);
+  transform: none;
+  zoom: normal;
+}
+
+@media (min-width: 1024px) {
+  .landing-hero {
+    height: calc(100svh - 86px);
+    min-height: 734px;
+    max-height: calc(100svh - 86px);
+  }
+}
+
+.landing-hero__vignette {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(3, 16, 27, 0.82) 0%,
+      rgba(3, 16, 27, 0.55) 14%,
+      rgba(3, 16, 27, 0.22) 28%,
+      rgba(3, 16, 27, 0.06) 40%,
+      transparent 52%
+    ),
+    radial-gradient(ellipse 72% 62% at 68% 44%, transparent 46%, rgba(3, 16, 27, 0.22) 100%);
+}
+
+/* Full-bleed map — hero absolute, not inside card visual */
+.landing-hero__map-bleed {
+  pointer-events: none;
+  position: absolute;
+  z-index: 1;
+  left: 20%;
+  top: 6%;
+  width: 84%;
+  height: 104%;
+  opacity: 0.85;
+  transform: none;
+}
+
+/* Dual-plate landing map */
+.landing-hero-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.landing-hero-map__base,
+.landing-hero-map__glow {
+  position: absolute;
+  inset: 0;
+}
+
+.landing-hero-map__base {
+  z-index: 1;
+}
+
+.landing-hero-map__base img,
+.landing-hero-map__glow img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 54% 40%;
+  user-select: none;
+  pointer-events: none;
+}
+
+.landing-hero-map__base img {
+  filter: brightness(1.16) contrast(1.08) saturate(0.96);
+}
+
+.landing-hero-map__glow {
+  z-index: 2;
+  mix-blend-mode: soft-light;
+  opacity: 0.5;
+}
+
+.landing-hero-map__glow img {
+  filter: brightness(1.18) saturate(1.02);
+  /* glow plate only — keep terrain crisp on base layer */
+  transform: none;
+}
+
+.landing-hero-map__network {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.landing-hero-map__network .korea-expedition-map--overlay-only {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  aspect-ratio: auto;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+
+/* Copy */
+.landing-hero__copy {
+  position: relative;
+  z-index: 15;
+  width: min(480px, 92vw);
+  padding: clamp(48px, 12vh, 110px) 24px 24px;
+  box-sizing: border-box;
+  transform: none;
+}
+
+.landing-hero__copy-inner {
+  max-width: none;
+  width: max-content;
+}
+
+.landing-hero__eyebrow {
+  margin: 0 0 20px;
+  font-family: var(--font-family-display);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: #eee5d2;
+}
+
+.landing-hero__title {
+  margin: 0;
+  font-family: var(--font-family-display);
+  font-size: 64px;
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  color: #f0e9da;
+  white-space: nowrap;
+  width: max-content;
+}
+
+.landing-hero__amp {
+  color: var(--hero-green);
+  padding: 0 0.02em;
+}
+
+.landing-hero__desc {
+  margin: 28px 0 0;
+  max-width: 420px;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.75;
+  color: var(--hero-beige);
+  white-space: pre-line;
+}
+
+.landing-hero__desc-em {
+  font-weight: 600;
+  color: #ddd2bc;
+}
+
+.landing-hero__cta-wrap {
+  margin-top: 30px;
+  width: max-content;
+  max-width: 100%;
+}
+
+.landing-hero__cta {
+  position: relative;
+  display: inline-flex;
+  width: 320px;
+  height: 72px;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgba(255, 205, 107, 0.95);
+  border-radius: 11px;
+  background: linear-gradient(180deg, #c58a28 0%, #9d6619 48%, #754411 100%);
+  color: #1a1208;
+  font: 700 20px/1 var(--font-family-base);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 196, 0.4),
+    0 0 5px rgba(226, 158, 45, 0.16),
+    0 0 12px rgba(185, 113, 17, 0.08);
+  cursor: pointer;
+  transform: none;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.landing-hero__cta-label {
+  position: relative;
+  z-index: 1;
+  letter-spacing: -0.01em;
+}
+
+.landing-hero__cta-arrow {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  color: #1a1208;
+  opacity: 0.92;
+}
+
+.landing-hero__cta-arrow svg {
+  width: 36px;
+  height: 14px;
+}
+
+.landing-hero__cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 36%,
+    rgba(255, 236, 190, 0.22) 48%,
+    transparent 62%
+  );
+  transform: translateX(-130%);
+  opacity: 0;
+}
+
+.landing-hero__cta:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  animation: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 196, 0.55),
+    0 0 24px rgba(226, 158, 45, 0.75),
+    0 0 52px rgba(185, 113, 17, 0.4);
+}
+
+.landing-hero__cta:hover:not(:disabled)::after {
+  opacity: 1;
+  animation: landing-cta-shine 0.55s ease-out 1;
+}
+
+.landing-hero__cta:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.landing-hero__cta:disabled {
+  cursor: wait;
+  opacity: 0.88;
+  animation: none;
+}
+
+.landing-hero__cta:focus-visible {
+  outline: 2px solid rgba(255, 205, 107, 0.9);
+  outline-offset: 3px;
+}
+
+.landing-hero__note {
+  margin: 14px 0 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--hero-muted);
+}
+
+@keyframes landing-cta-shine {
+  0% {
+    transform: translateX(-130%);
+  }
+  100% {
+    transform: translateX(130%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-hero__cta {
+    animation: none;
+  }
+
+  .landing-hero__cta:hover:not(:disabled)::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Visual stage */
+.landing-hero__visual {
+  position: relative;
+  z-index: 12;
+  width: 100%;
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px 24px;
+  box-sizing: border-box;
+  transform: none;
+  overflow: visible;
+}
+
+.landing-hero__steps {
+  position: relative;
+  z-index: 16;
+  width: calc(100% - 32px);
+  max-width: none;
+  margin: 8px 16px 16px;
+  padding: 0;
+  transform: none;
+}
+
+/* Tablet / mid desktop — mild shrink only below locked desktop */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .landing-hero__copy {
+    padding: 85px 0 0 72px;
+    width: 420px;
+  }
+
+  .landing-hero__eyebrow {
+    font-size: 28px;
+  }
+
+  .landing-hero__title {
+    font-size: 78px;
+  }
+
+  .landing-hero__desc {
+    font-size: 17px;
+    margin-top: 26px;
+  }
+
+  .landing-hero__cta-wrap {
+    margin-top: 30px;
+  }
+
+  .landing-hero__cta {
+    width: 360px;
+    height: 80px;
+    font-size: 22px;
+  }
+
+  .landing-hero__visual {
+    position: absolute;
+    top: 20px;
+    right: -10px;
+    width: 780px;
+    height: 620px;
+    min-height: 0;
+    padding: 0;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .landing-hero__map-bleed {
+    left: 43%;
+    top: 4%;
+    width: 36%;
+    height: 92%;
+  }
+
+  .landing-hero__steps {
+    position: absolute;
+    left: 32px;
+    right: 32px;
+    bottom: 12px;
+    width: auto;
+    margin: 0;
+  }
+}
+
+/*
+ * Locked desktop — tablet shrink MUST NOT apply.
+ * 1648×920 and 1920×1080 stay at target pixel sizes (or larger).
+ */
+@media (min-width: 1440px) and (min-height: 820px) {
+  .landing-hero {
+    min-height: 734px;
+  }
+
+  .landing-hero__map-bleed {
+    left: 43%;
+    top: 7%;
+    width: 31%;
+    height: 78%;
+    right: auto;
+    bottom: auto;
+  }
+
+  .landing-hero__copy {
+    position: absolute;
+    left: 116px;
+    top: 155px;
+    width: 460px;
+    padding: 0;
+  }
+
+  .landing-hero__eyebrow {
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+
+  .landing-hero__title {
+    font-size: 92px;
+    letter-spacing: -0.035em;
+  }
+
+  .landing-hero__desc {
+    font-size: 19px;
+    margin-top: 30px;
+    max-width: 440px;
+  }
+
+  .landing-hero__cta-wrap {
+    margin-top: 34px;
+  }
+
+  .landing-hero__cta {
+    width: 405px;
+    max-width: none;
+    height: 90px;
+    font-size: 25px;
+  }
+
+  .landing-hero__note {
+    font-size: 15px;
+    margin-top: 14px;
+  }
+
+  .landing-hero__visual {
+    position: absolute;
+    top: 15px;
+    right: 1.5%;
+    width: 940px;
+    height: 700px;
+    min-height: 0;
+    padding: 0;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  /* Compass — pulled clear of the map, sits left of the card cluster */
+  [data-landing-compass] {
+    left: 387px !important;
+  }
+
+  .landing-hero__steps {
+    position: absolute;
+    left: 42px;
+    right: 42px;
+    bottom: 10px;
+    width: auto;
+    height: 96px;
+    min-height: 96px;
+    margin: 0;
+  }
+}
+
+/* Wide screens — keep size, never shrink below locked desktop */
+@media (min-width: 1680px) and (min-height: 820px) {
+  .landing-hero__visual {
+    right: 1.5%;
+    width: 960px;
+  }
+
+  .landing-hero__title {
+    font-size: 96px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .landing-hero__map-bleed {
+    left: 0;
+    right: -8%;
+    top: 28%;
+    bottom: 8%;
+    height: auto;
+    opacity: 0.8;
+  }
+
+  .landing-hero__cta {
+    width: 100%;
+    max-width: none;
+    height: 72px;
+    font-size: 20px;
+  }
+
+  .landing-hero__title {
+    font-size: clamp(52px, 10vw, 72px);
+    white-space: normal;
+  }
+}
+
+@media (max-width: 767px) {
+  .landing-hero {
+    min-height: auto;
+    overflow-x: hidden;
+  }
+
+  .landing-hero__map-bleed {
+    top: 38%;
+    opacity: 0.45;
+  }
+
+  .landing-hero__copy {
+    padding: 36px 20px 8px;
+  }
+
+  .landing-hero__visual {
+    min-height: 360px;
+    overflow: hidden;
+  }
+
+  .landing-hero__steps {
+    width: calc(100% - 24px);
+    margin: 4px 12px 20px;
+    height: auto;
+    min-height: 0;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

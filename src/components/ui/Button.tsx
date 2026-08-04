@@ -1,34 +1,29 @@
-"use client";
-
-import Link from "next/link";
 import { forwardRef } from "react";
+import { cn } from "../../utils/cn";
 
 type Variant = "primary" | "accent" | "secondary";
 type Size = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-bold " +
-  "transition-transform duration-150 ease-out select-none " +
-  "hover:scale-[1.03] active:scale-[0.98] " +
+  "inline-flex items-center justify-center gap-2 rounded-[8px] font-semibold " +
+  "transition-all duration-150 ease-out select-none " +
+  "hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 " +
   "focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 " +
-  "disabled:opacity-50 disabled:pointer-events-none";
+  "disabled:opacity-50 disabled:pointer-events-none disabled:hover:translate-y-0";
 
 const variants: Record<Variant, string> = {
-  // 파란 CTA (선택/진행)
   primary:
-    "bg-primary text-white shadow-[0_12px_28px_rgba(47,115,246,0.35)] focus-visible:outline-primary",
-  // 노란 CTA (랜덤/강조 — 여행지 뽑기)
+    "bg-primary text-[var(--color-text-on-brass-btn)] shadow-[0_10px_24px_rgba(22,40,31,0.28)] focus-visible:outline-brass",
   accent:
-    "bg-accent text-ink shadow-[0_12px_28px_rgba(255,209,102,0.45)] focus-visible:outline-accent",
-  // 흰 배경 + 파란 테두리
+    "bg-accent text-[var(--color-forest-900)] shadow-[0_10px_24px_rgba(201,162,39,0.35)] focus-visible:outline-accent",
   secondary:
-    "bg-surface text-primary border border-primary/40 shadow-sm focus-visible:outline-primary",
+    "bg-surface text-primary border border-brass/40 shadow-sm focus-visible:outline-primary",
 };
 
 const sizes: Record<Size, string> = {
   sm: "min-h-[40px] px-4 text-[15px]",
   md: "min-h-[48px] px-6 text-[16px]",
-  lg: "min-h-[56px] px-8 text-[18px]",
+  lg: "min-h-[52px] px-8 text-[17px]",
 };
 
 type CommonProps = {
@@ -50,40 +45,23 @@ type ButtonAsLink = CommonProps &
 
 export type ButtonProps = ButtonAsButton | ButtonAsLink;
 
-/**
- * 공통 버튼.
- * - href가 있으면 next/link 앵커로, 없으면 <button>으로 렌더링.
- * - variant: primary(파랑) / accent(노랑) / secondary(흰 테두리)
- */
-export const Button = forwardRef<
-  HTMLButtonElement | HTMLAnchorElement,
-  ButtonProps
->(function Button(
+export const Button = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(function Button(
   { variant = "primary", size = "md", className = "", children, ...rest },
   ref,
 ) {
-  const classes = `${base} ${variants[variant]} ${sizes[size]} ${className}`;
+  const classes = cn(base, variants[variant], sizes[size], className);
 
   if ("href" in rest && rest.href !== undefined) {
     const { href, ...anchorRest } = rest as ButtonAsLink;
     return (
-      <Link
-        href={href}
-        ref={ref as React.Ref<HTMLAnchorElement>}
-        className={classes}
-        {...anchorRest}
-      >
+      <a href={href} ref={ref as React.Ref<HTMLAnchorElement>} className={classes} {...anchorRest}>
         {children}
-      </Link>
+      </a>
     );
   }
 
   return (
-    <button
-      ref={ref as React.Ref<HTMLButtonElement>}
-      className={classes}
-      {...(rest as ButtonAsButton)}
-    >
+    <button ref={ref as React.Ref<HTMLButtonElement>} className={classes} {...(rest as ButtonAsButton)}>
       {children}
     </button>
   );

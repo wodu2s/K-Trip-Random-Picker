@@ -1,4 +1,5 @@
 import { forwardRef } from "react";
+import { cn } from "../../utils/cn";
 
 type CardProps = React.HTMLAttributes<HTMLDivElement> & {
   /** 선택/강조 상태일 때 테두리·그림자 강화 */
@@ -8,11 +9,7 @@ type CardProps = React.HTMLAttributes<HTMLDivElement> & {
   children: React.ReactNode;
 };
 
-/**
- * 공통 카드 표면 스타일.
- * 둥근 모서리 + 부드러운 그림자 + 글래스 배경 (CLAUDE.md 카드 원칙).
- * 페이지별 카드(MysteryCard 등)는 이 컴포넌트를 기반으로 확장한다.
- */
+/** Shared surface card — parchment paper + adventure selection states. */
 export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
   { selected = false, interactive = false, className = "", children, ...rest },
   ref,
@@ -20,18 +17,12 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
   return (
     <div
       ref={ref}
-      className={[
+      className={cn(
         "surface-card rounded-card",
-        interactive
-          ? "transition-all duration-200 ease-out hover:-translate-y-1.5 hover:shadow-card-hover"
-          : "",
-        selected
-          ? "ring-2 ring-primary shadow-card-hover -translate-y-1"
-          : "",
+        interactive && "transition-all duration-200 ease-out hover:-translate-y-[3px] hover:shadow-card-hover hover:border-primary/40",
+        selected && "border-primary bg-primary/[0.04] shadow-card-hover ring-2 ring-primary/30",
         className,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      )}
       {...rest}
     >
       {children}
