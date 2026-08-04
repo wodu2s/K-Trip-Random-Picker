@@ -1,6 +1,14 @@
 import { useEffect, useId, useState } from "react";
 import southKorea from "@svg-maps/south-korea";
 
+type SouthKoreaLocation = {
+  id: string;
+  name: string;
+  path: string;
+};
+
+const locations = southKorea.locations as SouthKoreaLocation[];
+
 type NodeId = "seoul" | "gangneung" | "busan" | "jeju";
 
 /**
@@ -67,7 +75,7 @@ export function LandingHeroMap({ pulse = false }: { pulse?: boolean }) {
           <circle cx="2" cy="2" r="0.6" fill="#c89b3c" fillOpacity={0.35} />
         </pattern>
         <clipPath id={clipId}>
-          {southKorea.locations.map((loc) => (
+          {locations.map((loc) => (
             <path key={`clip-${loc.id}`} d={loc.path} />
           ))}
         </clipPath>
@@ -82,7 +90,7 @@ export function LandingHeroMap({ pulse = false }: { pulse?: boolean }) {
 
       {/* Layer 1 — navy gradient fill + very faint dot pattern (clipped to landmass) */}
       <g fill={`url(#${landGradId})`} fillOpacity={0.22} stroke="none">
-        {southKorea.locations.map((loc) => (
+        {locations.map((loc) => (
           <path key={`fill-${loc.id}`} d={loc.path} />
         ))}
       </g>
@@ -90,7 +98,7 @@ export function LandingHeroMap({ pulse = false }: { pulse?: boolean }) {
 
       {/* Layer 2 — province boundaries (also serves as the thin coastline) */}
       <g fill="none" stroke="#c89b3c" strokeOpacity={0.16} strokeWidth={0.8}>
-        {southKorea.locations.map((loc) => (
+        {locations.map((loc) => (
           <path key={`edge-${loc.id}`} d={loc.path} />
         ))}
       </g>
