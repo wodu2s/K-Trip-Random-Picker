@@ -1,5 +1,17 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css");
+/* 마루 부리 (Naver, SIL OFL 1.1 — 웹폰트 임베딩 허용) */
+@import url("https://cdn.jsdelivr.net/gh/fonts-archive/MaruBuri/MaruBuri.css");
 @import "tailwindcss";
+
+/* 독립체 (눈누 배포 웹폰트, 웹폰트 사용 허용) */
+@font-face {
+  font-family: "Independent";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_twelve@1.1/Dokrip.woff")
+    format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 @theme {
   /* Classic Expedition → Tailwind semantic tokens */

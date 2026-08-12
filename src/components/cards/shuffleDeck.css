@@ -2,8 +2,10 @@
   position: relative;
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow: visible;
   isolation: isolate;
+  /* 대형 배경 나침반(ShuffleFx, z:1)보다 항상 위에 오도록 명시 */
+  z-index: 5;
 }
 
 .shuffle-deck__stage {
@@ -13,7 +15,7 @@
   align-items: center;
   justify-content: center;
   perspective: 1200px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .shuffle-deck__card {
@@ -28,6 +30,11 @@
   cursor: default;
   transform-origin: center center;
   transform-style: preserve-3d;
+  filter:
+    drop-shadow(0 52px 36px rgba(0, 0, 0, 0.62))
+    drop-shadow(0 32px 24px rgba(0, 0, 0, 0.42))
+    drop-shadow(0 14px 12px rgba(0, 0, 0, 0.28))
+    drop-shadow(0 0 4px rgba(201, 162, 39, 0.05));
 }
 
 .shuffle-deck__card--live {
@@ -52,35 +59,268 @@
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
+  border-radius: var(--radius-card, 10px);
 }
 
-.shuffle-deck__center-glow {
-  pointer-events: none;
+.shuffle-deck[data-shuffle-phase="selectable"] .shuffle-deck__flip {
+  animation: shuffle-card-settle-glow 0.42s ease-out 1;
+}
+
+@keyframes shuffle-card-settle-glow {
+  0% {
+    box-shadow:
+      0 0 0 1px rgba(212, 175, 55, 0.32),
+      0 0 18px rgba(201, 162, 39, 0.2);
+  }
+  100% {
+    box-shadow: none;
+  }
+}
+
+/* ── 대형 배경 나침반(ShuffleFx)의 후광 — glow + 동심원 궤도 링 4~5중 ── */
+.shuffle-deck__halo {
+  width: 0;
+  height: 0;
+}
+
+.shuffle-deck__halo-glow {
   position: absolute;
-  inset: -8%;
-  border-radius: inherit;
-  z-index: 0;
-  opacity: 0;
+  left: 50%;
+  top: 50%;
+  width: min(720px, 78vw, 78vh);
+  height: min(720px, 78vw, 78vh);
+  margin-left: calc(min(720px, 78vw, 78vh) / -2);
+  margin-top: calc(min(720px, 78vw, 78vh) / -2);
+  border-radius: 50%;
   background: radial-gradient(
-    ellipse 70% 55% at 50% 42%,
-    rgba(201, 162, 39, 0.22) 0%,
-    rgba(201, 162, 39, 0.06) 42%,
+    circle,
+    rgba(212, 175, 55, 0.22) 0%,
+    rgba(212, 175, 55, 0.07) 42%,
+    transparent 68%
+  );
+  filter: blur(3px);
+  opacity: 0.16;
+}
+
+.shuffle-deck__compass-core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(160px, 20vw, 20vh);
+  height: min(160px, 20vw, 20vh);
+  margin-left: calc(min(160px, 20vw, 20vh) / -2);
+  margin-top: calc(min(160px, 20vw, 20vh) / -2);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(232, 200, 106, 0.55) 0%,
+    rgba(212, 175, 55, 0.22) 38%,
     transparent 72%
   );
+  filter: blur(6px);
+  pointer-events: none;
 }
 
-.shuffle-deck__center-glow--pulse {
-  animation: shuffle-center-glow 2.4s ease-in-out infinite;
+.shuffle-deck__halo--idle .shuffle-deck__halo-ring--outer,
+.shuffle-deck__halo--idle .shuffle-deck__halo-ring--inner,
+.shuffle-deck__halo--fanning .shuffle-deck__halo-ring--outer,
+.shuffle-deck__halo--fanning .shuffle-deck__halo-ring--inner {
+  animation: none;
+  opacity: 0.1;
 }
 
-@keyframes shuffle-center-glow {
+.shuffle-deck__halo--shuffle .shuffle-deck__halo-ring--outer {
+  animation: shuffle-orbit-ring-ccw 28s linear infinite;
+  opacity: 0.38;
+}
+
+.shuffle-deck__halo--shuffle .shuffle-deck__halo-ring--inner {
+  animation: shuffle-orbit-ring-cw 20s linear infinite;
+  opacity: 0.48;
+}
+
+.shuffle-deck__compass-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(180px, 22vw);
+  height: min(180px, 22vw);
+  margin-left: calc(min(180px, 22vw) / -2);
+  margin-top: calc(min(180px, 22vw) / -2);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 248, 220, 0.95) 0%,
+    rgba(232, 200, 106, 0.55) 22%,
+    rgba(212, 175, 55, 0.18) 42%,
+    transparent 58%
+  );
+  pointer-events: none;
+}
+
+.shuffle-deck__compass-body {
+  pointer-events: none;
+}
+
+.shuffle-deck__compass-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(201, 162, 39, 0.1));
+}
+
+.shuffle-deck__halo--shuffle .shuffle-deck__compass-img,
+.shuffle-deck[data-shuffle-phase="gathering"] .shuffle-deck__compass-img,
+.shuffle-deck[data-shuffle-phase="crossing"] .shuffle-deck__compass-img,
+.shuffle-deck[data-shuffle-phase="mixing"] .shuffle-deck__compass-img,
+.shuffle-deck[data-shuffle-phase="restacking"] .shuffle-deck__compass-img {
+  filter: drop-shadow(0 0 28px rgba(201, 162, 39, 0.38));
+}
+
+@keyframes shuffle-halo-pulse {
   0%,
   100% {
-    opacity: 0.35;
+    opacity: 0.5;
+    transform: scale(1);
   }
   50% {
-    opacity: 0.72;
+    opacity: 1;
+    transform: scale(1.05);
   }
+}
+
+.shuffle-deck__halo-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+}
+
+.shuffle-deck__halo-ring--a {
+  width: min(660px, 78vw, 78vh);
+  height: min(660px, 78vw, 78vh);
+  opacity: 0.28;
+}
+
+.shuffle-deck__halo-ring--b {
+  width: min(500px, 62vw, 62vh);
+  height: min(500px, 62vw, 62vh);
+  border-style: dashed;
+  opacity: 0.7;
+  animation: shuffle-orbit-ring-ccw 30s linear infinite;
+}
+
+.shuffle-deck__halo-ring--c {
+  width: min(880px, 92vw, 92vh);
+  height: min(880px, 92vw, 92vh);
+  border-style: dotted;
+  opacity: 0.45;
+  animation: shuffle-orbit-ring-cw 58s linear infinite;
+}
+
+.shuffle-deck__halo-ring--d {
+  width: min(420px, 48vw, 48vh);
+  height: min(420px, 48vw, 48vh);
+  border: 1px solid rgba(232, 200, 106, 0.28);
+  opacity: 0.35;
+}
+
+.shuffle-deck__cardinals {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(720px, 84vw, 84vh);
+  height: min(720px, 84vw, 84vh);
+  margin-left: calc(min(720px, 84vw, 84vh) / -2);
+  margin-top: calc(min(720px, 84vw, 84vh) / -2);
+  pointer-events: none;
+}
+
+/* ── 링을 따라 흐르는 라이트 트레일 ── */
+.shuffle-deck__halo-trail-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: #f3e8c0;
+  box-shadow:
+    0 0 10px 3px rgba(216, 184, 74, 0.7),
+    0 0 22px 6px rgba(212, 175, 55, 0.35);
+  offset-path: circle(min(330px, 39vw, 39vh) at 50% 50%);
+  animation: shuffle-halo-trail 12s linear infinite;
+}
+
+@keyframes shuffle-halo-trail {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
+
+/* ── 미세한 별빛 ── */
+.shuffle-deck__stars {
+  pointer-events: none;
+  position: absolute;
+  inset: -4%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.shuffle-deck__star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(243, 234, 216, 0.85);
+  animation: shuffle-star-twinkle var(--s-dur, 4s) ease-in-out infinite;
+  animation-delay: var(--s-delay, 0s);
+}
+
+@keyframes shuffle-star-twinkle {
+  0%,
+  100% {
+    opacity: 0.06;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* ── 4방향 스파클 별 (일반 별 사이 간간이) ── */
+.shuffle-deck__star--sparkle {
+  width: 7px;
+  height: 7px;
+  background: radial-gradient(circle, #f8ecc9 0%, rgba(216, 184, 74, 0.5) 55%, transparent 100%);
+  clip-path: polygon(
+    50% 0%,
+    61% 39%,
+    100% 50%,
+    61% 61%,
+    50% 100%,
+    39% 61%,
+    0% 50%,
+    39% 39%
+  );
+  border-radius: 0;
+}
+
+/* ── 별을 잇는 희미한 별자리 선 ── */
+.shuffle-deck__constellation {
+  pointer-events: none;
+  position: absolute;
+  inset: -4%;
+  z-index: 0;
+  opacity: 0.45;
 }
 
 .shuffle-deck__orbit-layer {
@@ -103,13 +343,13 @@
 }
 
 .shuffle-deck__orbit--outer {
-  width: min(420px, 88vw);
-  height: min(240px, 52vw);
+  width: min(560px, 88vw);
+  height: min(300px, 52vw);
 }
 
 .shuffle-deck__orbit--inner {
-  width: min(300px, 68vw);
-  height: min(168px, 38vw);
+  width: min(400px, 68vw);
+  height: min(210px, 38vw);
   border-style: dashed;
   opacity: 0.75;
 }
@@ -144,10 +384,10 @@
 
 @keyframes shuffle-orbit-spin {
   from {
-    transform: rotate(0deg) translateX(calc(min(210px, 44vw))) rotate(0deg);
+    transform: rotate(0deg) translateX(calc(min(280px, 44vw))) rotate(0deg);
   }
   to {
-    transform: rotate(360deg) translateX(calc(min(210px, 44vw))) rotate(-360deg);
+    transform: rotate(360deg) translateX(calc(min(280px, 44vw))) rotate(-360deg);
   }
 }
 
@@ -157,10 +397,10 @@
 
 @keyframes shuffle-orbit-spin-inner {
   from {
-    transform: rotate(0deg) translateX(calc(min(150px, 34vw))) rotate(0deg);
+    transform: rotate(0deg) translateX(calc(min(200px, 34vw))) rotate(0deg);
   }
   to {
-    transform: rotate(360deg) translateX(calc(min(150px, 34vw))) rotate(-360deg);
+    transform: rotate(360deg) translateX(calc(min(200px, 34vw))) rotate(-360deg);
   }
 }
 
@@ -186,17 +426,17 @@
 .shuffle-deck__particles {
   pointer-events: none;
   position: absolute;
-  inset: 0;
+  inset: -4%;
   z-index: 0;
   overflow: hidden;
 }
 
 .shuffle-deck__particle {
   position: absolute;
-  width: 3px;
-  height: 3px;
+  width: 2px;
+  height: 2px;
   border-radius: 50%;
-  background: rgba(201, 162, 39, 0.35);
+  background: rgba(201, 162, 39, 0.28);
   animation: shuffle-particle-float var(--p-dur, 4s) ease-in-out infinite;
   animation-delay: var(--p-delay, 0s);
 }
@@ -205,11 +445,11 @@
   0%,
   100% {
     transform: translateY(0);
-    opacity: 0.2;
+    opacity: 0.12;
   }
   50% {
-    transform: translateY(-10px);
-    opacity: 0.55;
+    transform: translateY(-6px);
+    opacity: 0.38;
   }
 }
 
@@ -257,8 +497,26 @@
 
 /* ── hover: 금빛 테두리 + shine ── */
 .shuffle-deck__card--hover .shuffle-deck__flip {
-  box-shadow: 0 0 0 1.5px rgba(201, 162, 39, 0.55);
+  box-shadow:
+    0 0 0 1.5px rgba(212, 175, 55, 0.75),
+    0 0 14px rgba(212, 175, 55, 0.22);
   border-radius: var(--radius-card, 10px);
+  transition: box-shadow 0.2s ease;
+}
+
+/* ── 카드 뒤쪽 은은한 빛 번짐 ── */
+.shuffle-deck__bloom {
+  pointer-events: none;
+  position: absolute;
+  inset: -26%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse 62% 58% at 50% 50%,
+    rgba(216, 184, 74, 0.14) 0%,
+    rgba(212, 175, 55, 0.05) 55%,
+    transparent 74%
+  );
 }
 
 .shuffle-deck__shine {
@@ -415,7 +673,7 @@
 
 /* ── orbit mixing 강조 ── */
 .shuffle-deck__orbit-layer--mixing .shuffle-deck__orbit {
-  opacity: 0.55;
+  opacity: 0.32;
 }
 
 .shuffle-deck__orbit--outer {
@@ -471,11 +729,17 @@
     animation: none !important;
   }
 
-  .shuffle-deck__center-glow--pulse,
   .shuffle-deck__orbit-dot,
   .shuffle-deck__particle,
   .shuffle-deck__orbit--outer,
-  .shuffle-deck__orbit--inner {
+  .shuffle-deck__orbit--inner,
+  .shuffle-deck__halo-glow--pulse,
+  .shuffle-deck__halo-ring--a,
+  .shuffle-deck__halo-ring--b,
+  .shuffle-deck__halo-ring--c,
+  .shuffle-deck__halo-ring--d,
+  .shuffle-deck__halo-trail-dot,
+  .shuffle-deck__star {
     animation: none !important;
   }
 
@@ -484,5 +748,85 @@
   .shuffle-deck__card--trail .shuffle-deck__trail {
     animation: none !important;
     opacity: 0 !important;
+  }
+}
+
+/* ── Expedition 카드 프리미엄 glow + 힌트 ── */
+.expedition-card-art--featured {
+  box-shadow:
+    0 0 0 1px rgba(201, 162, 39, 0.45),
+    0 0 24px rgba(201, 162, 39, 0.18),
+    0 18px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+.expedition-card-art__glow {
+  pointer-events: none;
+  position: absolute;
+  inset: -8%;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse 70% 65% at 50% 45%,
+    rgba(216, 184, 74, 0.22) 0%,
+    rgba(212, 175, 55, 0.06) 55%,
+    transparent 72%
+  );
+}
+
+.expedition-card-art__hints {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(8px, 4%, 16px);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(6px, 3%, 10px);
+  padding: 0 8px;
+}
+
+.expedition-card-art__hint-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(28px, 14%, 36px);
+  height: clamp(28px, 14%, 36px);
+  border-radius: 50%;
+  font-size: clamp(12px, 5vw, 16px);
+  background: rgba(3, 16, 27, 0.55);
+  border: 1px solid rgba(212, 175, 55, 0.55);
+  box-shadow:
+    0 0 10px rgba(201, 162, 39, 0.2),
+    inset 0 0 8px rgba(201, 162, 39, 0.08);
+}
+
+.shuffle-deck[data-shuffle-phase="ready"] .shuffle-deck__card:nth-child(odd),
+.shuffle-deck[data-shuffle-phase="selectable"] .shuffle-deck__card:nth-child(odd) {
+  animation: shuffle-card-float-a 4.2s ease-in-out infinite;
+}
+
+.shuffle-deck[data-shuffle-phase="ready"] .shuffle-deck__card:nth-child(even),
+.shuffle-deck[data-shuffle-phase="selectable"] .shuffle-deck__card:nth-child(even) {
+  animation: shuffle-card-float-b 4.8s ease-in-out infinite;
+}
+
+@keyframes shuffle-card-float-a {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -5px;
+  }
+}
+
+@keyframes shuffle-card-float-b {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -7px;
   }
 }

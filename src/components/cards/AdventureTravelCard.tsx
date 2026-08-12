@@ -199,8 +199,7 @@ function HintFace({
   emphasized?: boolean;
 }) {
   const bg = PARCHMENT_TINTS[variant.parchmentShift] ?? ADVENTURE.parchmentLight;
-  const orbitHints = hints.slice(0, 5);
-  const angles = orbitHints.map((_, i) => -90 + (i * 360) / Math.max(orbitHints.length, 1));
+  const bottomHints = hints.slice(0, 3);
 
   return (
     <div
@@ -236,58 +235,14 @@ function HintFace({
         </p>
       </div>
 
-      <div className="relative z-10 mx-auto mt-1 flex h-[56%] w-[90%] items-center justify-center">
-        {orbitHints.map((emoji, i) => {
-          const rad = (angles[i]! * Math.PI) / 180;
-          const r = 52;
-          const x = Math.cos(rad) * r;
-          const y = Math.sin(rad) * r;
-          return (
-            <div
-              key={`${emoji}-${i}`}
-              className="absolute left-1/2 top-1/2"
-              style={{ transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))` }}
-            >
-              <span
-                className="flex h-9 w-9 items-center justify-center rounded-full text-[16px] shadow-sm sm:h-10 sm:w-10"
-                style={{
-                  background: ADVENTURE.parchmentLight,
-                  border: `1.5px solid ${ADVENTURE.brassLine}`,
-                }}
-                aria-hidden="true"
-              >
-                {emoji}
-              </span>
-              <svg
-                className="pointer-events-none absolute left-1/2 top-1/2 -z-10"
-                width="2"
-                height={r}
-                style={{
-                  transform: `translate(-50%, -100%) rotate(${angles[i]! + 90}deg)`,
-                  transformOrigin: "50% 100%",
-                  opacity: 0.35,
-                }}
-                aria-hidden="true"
-              >
-                <line
-                  x1="1"
-                  y1="0"
-                  x2="1"
-                  y2={r}
-                  stroke={ADVENTURE.forest}
-                  strokeWidth="1.2"
-                  strokeDasharray="2 3"
-                />
-              </svg>
-            </div>
-          );
-        })}
+      <div className="relative z-10 mx-auto mt-1 flex flex-1 items-center justify-center">
         <CompassGraphic
-          size={102}
+          size={92}
           needleDeg={needleDeg || 35}
           animateNeedle={animateNeedle}
           showLoop={false}
           pulse={animateNeedle}
+          emphasizeRim={emphasized}
         />
       </div>
 
@@ -298,9 +253,23 @@ function HintFace({
         >
           EXPEDITION
         </p>
-        <p className="mt-1 text-[12px] font-semibold leading-snug" style={{ color: ADVENTURE.ink }}>
-          이 신호가 가리키는 곳은 어디일까요?
-        </p>
+        {bottomHints.length > 0 ? (
+          <div className="mt-1.5 flex items-center justify-center gap-1.5">
+            {bottomHints.map((emoji, i) => (
+              <span
+                key={`${emoji}-${i}`}
+                className="flex h-6 w-6 items-center justify-center rounded-full text-[11px] shadow-sm"
+                style={{
+                  background: ADVENTURE.parchmentLight,
+                  border: `1.5px solid ${ADVENTURE.brassLine}`,
+                }}
+                aria-hidden="true"
+              >
+                {emoji}
+              </span>
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   );

@@ -76,6 +76,25 @@ export function LandingHero({ onStart }: { onStart: () => void }) {
 
       {/* Layer 2 — copy + CTA */}
       <div className="landing-hero__copy">
+        <div className="landing-hero__flourish" aria-hidden="true">
+          <svg width="26" height="14" viewBox="0 0 26 14" fill="none">
+            <path
+              d="M1 10 Q8 2 14 7 T25 4"
+              stroke="#D8B84A"
+              strokeWidth="1"
+              opacity="0.6"
+              fill="none"
+            />
+            <path
+              d="M22 1 L23 3.2 L25 4 L23 4.8 L22 7 L21 4.8 L19 4 L21 3.2 Z"
+              fill="#D8B84A"
+              opacity="0.85"
+            />
+          </svg>
+          <p className="landing-hero__flourish-text">
+            오늘의 여행지는 운명이 정해줄 거예요
+          </p>
+        </div>
         <HeroCopy
           onStart={handleStart}
           reduce={reduce}
@@ -97,7 +116,7 @@ export function LandingHero({ onStart }: { onStart: () => void }) {
         animate={{
           opacity: deckPhase === "exit" ? 0.85 : entered ? 1 : 0,
           y: entered ? 0 : 24,
-          scale: entered ? 0.7 : 1,
+          scale: entered ? 0.77 : 1,
         }}
         transition={{
           duration: reduce ? 0.2 : 0.9,

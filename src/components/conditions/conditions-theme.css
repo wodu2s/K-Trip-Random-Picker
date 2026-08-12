@@ -1,0 +1,10 @@
+/* 조건 설정 페이지 전용 다크 탐험실 톤 — 다른 페이지에 영향 없음 */
+.conditions-theme {
+  --bg: #04131f;
+  --panel: #071a29;
+  --panel-deep: #04111c;
+  --gold: #d4af37;
+  --gold-soft: rgba(212, 175, 55, 0.35);
+  --ivory: #f3ead8;
+  --ivory-muted: rgba(243, 234, 216, 0.6);
+}

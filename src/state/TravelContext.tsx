@@ -10,12 +10,23 @@ import {
 } from "react";
 import { recommendCards } from "../lib/recommend";
 import { preloadConditionsAssets } from "../lib/adventureAssets";
-import type { Duration, FlowPage, MysteryCardData, ThemeKey } from "../types/travel";
+import type {
+  CompanionKey,
+  DiscoveryKey,
+  Duration,
+  FlowPage,
+  MoodKey,
+  MysteryCardData,
+  ThemeKey,
+} from "../types/travel";
 
 type TravelState = {
   page: FlowPage;
   duration: Duration | null;
   themes: ThemeKey[];
+  companion: CompanionKey | null;
+  mood: MoodKey | null;
+  discovery: DiscoveryKey | null;
   cards: MysteryCardData[];
   selectedCardId: string | null;
   revealedDestinationId: string | null;
@@ -28,6 +39,9 @@ type TravelActions = {
   goToConditions: () => void;
   setDuration: (d: Duration) => void;
   toggleTheme: (theme: ThemeKey) => void;
+  setCompanion: (c: CompanionKey) => void;
+  setMood: (m: MoodKey) => void;
+  setDiscovery: (d: DiscoveryKey) => void;
   startShuffle: () => void;
   finishShuffle: () => void;
   reorderCards: (cards: MysteryCardData[]) => void;
@@ -44,6 +58,9 @@ const initialState: TravelState = {
   page: "landing",
   duration: null,
   themes: [],
+  companion: null,
+  mood: null,
+  discovery: null,
   cards: [],
   selectedCardId: null,
   revealedDestinationId: null,
@@ -92,6 +109,18 @@ export function TravelProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  const setCompanion = useCallback((companion: CompanionKey) => {
+    setState((s) => ({ ...s, companion }));
+  }, []);
+
+  const setMood = useCallback((mood: MoodKey) => {
+    setState((s) => ({ ...s, mood }));
+  }, []);
+
+  const setDiscovery = useCallback((discovery: DiscoveryKey) => {
+    setState((s) => ({ ...s, discovery }));
+  }, []);
+
   /** 조건 → 카드 드로우(셔플+선택 통합). 중복 진입 잠금. */
   const startShuffle = useCallback(() => {
     if (shuffleLock.current) return;
@@ -104,7 +133,11 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       return {
         ...s,
         page: "cards",
-        cards: recommendCards(s.themes),
+        cards: recommendCards(s.themes, {
+          companion: s.companion,
+          mood: s.mood,
+          discovery: s.discovery,
+        }),
         selectedCardId: null,
         revealedDestinationId: null,
         deckGeneration: s.deckGeneration + 1,
@@ -140,10 +173,11 @@ export function TravelProvider({ children }: { children: ReactNode }) {
   const redraw = useCallback(() => {
     shuffleLock.current = false;
     setState((s) => {
+      const recommendOptions = { companion: s.companion, mood: s.mood, discovery: s.discovery };
       const prevKey = s.cards.map((c) => c.destinationId).join(",");
-      let next = recommendCards(s.themes);
+      let next = recommendCards(s.themes, recommendOptions);
       for (let i = 0; i < 6 && next.map((c) => c.destinationId).join(",") === prevKey; i++) {
-        next = recommendCards(s.themes);
+        next = recommendCards(s.themes, recommendOptions);
       }
       return {
         ...s,
@@ -163,6 +197,9 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       page: "conditions",
       duration: s.duration,
       themes: s.themes,
+      companion: s.companion,
+      mood: s.mood,
+      discovery: s.discovery,
     }));
   }, []);
 
@@ -173,6 +210,9 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       goToConditions,
       setDuration,
       toggleTheme,
+      setCompanion,
+      setMood,
+      setDiscovery,
       startShuffle,
       finishShuffle,
       reorderCards,
@@ -188,6 +228,9 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       goToConditions,
       setDuration,
       toggleTheme,
+      setCompanion,
+      setMood,
+      setDiscovery,
       startShuffle,
       finishShuffle,
       reorderCards,

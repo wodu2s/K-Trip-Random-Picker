@@ -1,7 +1,7 @@
 import { MapPin } from "lucide-react";
 import { CardRoutePattern } from "./CardRoutePattern";
 import { CardHintWindow } from "./CardHintWindow";
-import { ExpeditionCardArt } from "./ExpeditionCardArt";
+import { ExpeditionCardArt, EXPEDITION_SLOT_HINTS } from "./ExpeditionCardArt";
 
 /**
  * 블루 여행 티켓 카드 뒷면.
@@ -32,7 +32,13 @@ export function TravelCardBack({
   expedition?: boolean;
 }) {
   if (expedition || serial != null) {
-    return <ExpeditionCardArt featured serial={serial} />;
+    return (
+      <ExpeditionCardArt
+        featured
+        serial={serial}
+        slotHints={serial != null ? EXPEDITION_SLOT_HINTS[serial - 1] : undefined}
+      />
+    );
   }
 
   const num = String(Math.max(1, index)).padStart(2, "0");

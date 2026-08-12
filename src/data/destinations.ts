@@ -1,4 +1,4 @@
-import type { Destination, ThemeKey } from "../types/travel";
+import type { CompanionKey, Destination, DiscoveryKey, MoodKey, ThemeKey } from "../types/travel";
 
 /** 테마 표시용 라벨/이모지 (조건 선택·태그에서 재사용) */
 export const THEME_META: Record<ThemeKey, { label: string; emoji: string }> = {
@@ -22,6 +22,49 @@ export const THEME_ORDER: ThemeKey[] = [
   "activity",
   "etc",
 ];
+
+/** 동행 표시용 라벨 (조건 선택에서 재사용) */
+export const COMPANION_META: Record<CompanionKey, { label: string }> = {
+  alone: { label: "혼자" },
+  couple: { label: "연인" },
+  friends: { label: "친구" },
+  family: { label: "가족" },
+};
+
+export const COMPANION_ORDER: CompanionKey[] = ["alone", "couple", "friends", "family"];
+
+/** 분위기 표시용 라벨 */
+export const MOOD_META: Record<MoodKey, { label: string }> = {
+  calm: { label: "조용한" },
+  lively: { label: "활기찬" },
+  emotional: { label: "감성적인" },
+};
+
+export const MOOD_ORDER: MoodKey[] = ["calm", "lively", "emotional"];
+
+/** 발견 성향 표시용 라벨 */
+export const DISCOVERY_META: Record<DiscoveryKey, { label: string }> = {
+  popular: { label: "유명 명소" },
+  balanced: { label: "적당히 알려진 곳" },
+  hidden: { label: "숨은 로컬" },
+};
+
+export const DISCOVERY_ORDER: DiscoveryKey[] = ["popular", "balanced", "hidden"];
+
+/** 동행 → 테마 힌트 (추천 시 부드러운 가중치로 사용, 하드 필터 아님) */
+export const COMPANION_THEME_HINTS: Record<CompanionKey, ThemeKey[]> = {
+  alone: ["nature", "local"],
+  couple: ["vibe", "sea"],
+  friends: ["activity", "food"],
+  family: ["history", "local"],
+};
+
+/** 분위기 → 테마 힌트 */
+export const MOOD_THEME_HINTS: Record<MoodKey, ThemeKey[]> = {
+  calm: ["nature", "local"],
+  lively: ["activity", "food"],
+  emotional: ["vibe", "history"],
+};
 
 /**
  * 샘플 여행지 데이터.

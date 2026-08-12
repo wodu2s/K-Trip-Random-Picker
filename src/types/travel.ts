@@ -12,6 +12,15 @@ export type ThemeKey =
   | "activity"
   | "etc";
 
+/** 동행 유형 */
+export type CompanionKey = "alone" | "couple" | "friends" | "family";
+
+/** 원하는 분위기 */
+export type MoodKey = "calm" | "lively" | "emotional";
+
+/** 발견 성향 — 유명 명소 ~ 숨은 로컬 */
+export type DiscoveryKey = "popular" | "balanced" | "hidden";
+
 /** 숨겨진 로컬 명소 (여행지 하위 추천) */
 export type HiddenPlace = {
   name: string;

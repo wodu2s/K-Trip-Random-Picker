@@ -1,0 +1,434 @@
+/* ── Pick&Go 프리미엄 카드 선택 — celestial expedition ── */
+.cards-page {
+  --cards-bg: #020a12;
+  --cards-navy: #03101b;
+  --cards-ivory: #f0e9da;
+  --cards-muted: #9e8f78;
+  --cards-brass: #c9a227;
+  --cards-gold: #e8c86a;
+  --cards-brass-line: rgba(201, 162, 39, 0.42);
+  --cards-forest: #1f3d2e;
+
+  position: relative;
+  min-height: calc(100svh - 86px);
+  overflow-x: clip;
+  overflow-y: visible;
+  color: var(--cards-ivory);
+  background:
+    radial-gradient(ellipse 120% 80% at 50% 20%, #0a1a2e 0%, transparent 55%),
+    radial-gradient(ellipse 90% 60% at 50% 55%, #071626 0%, var(--cards-navy) 50%, var(--cards-bg) 100%);
+  font-family: var(--font-family-base, "Maru Buri", "Noto Serif KR", Georgia, serif);
+}
+
+/* ── 대기층 ── */
+.cards-page__atmosphere {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.cards-page__nebula {
+  position: absolute;
+  inset: -10%;
+  background:
+    radial-gradient(ellipse 55% 45% at 50% 42%, rgba(201, 162, 39, 0.09) 0%, transparent 62%),
+    radial-gradient(ellipse 40% 30% at 30% 60%, rgba(31, 61, 46, 0.35) 0%, transparent 55%),
+    radial-gradient(ellipse 35% 25% at 72% 35%, rgba(201, 162, 39, 0.05) 0%, transparent 50%);
+}
+
+.cards-page__vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 75% 65% at 50% 45%, transparent 35%, rgba(2, 8, 18, 0.62) 100%),
+    linear-gradient(180deg, transparent 70%, rgba(2, 6, 14, 0.75) 100%);
+}
+
+.cards-page__mist {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 28%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(3, 16, 27, 0.35) 45%,
+    rgba(2, 8, 18, 0.72) 100%
+  );
+}
+
+.cards-page__chart {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: min(980px, 105vw);
+  height: min(980px, 105vw);
+  transform: translate(-50%, -50%);
+  opacity: 0.16;
+  animation: cards-chart-spin 120s linear infinite;
+}
+
+@keyframes cards-chart-spin {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+.cards-page__stars {
+  position: absolute;
+  inset: 0;
+}
+
+.cards-page__star {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(243, 234, 216, 0.75);
+  animation: cards-star-twinkle var(--star-dur, 4s) ease-in-out infinite;
+}
+
+.cards-page__star--bright {
+  background: radial-gradient(circle, #f8ecc9 0%, rgba(216, 184, 74, 0.4) 60%, transparent 100%);
+  box-shadow: 0 0 6px rgba(216, 184, 74, 0.35);
+}
+
+@keyframes cards-star-twinkle {
+  0%,
+  100% {
+    opacity: 0.12;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.15);
+  }
+}
+
+.cards-page__dust {
+  position: absolute;
+  inset: 0;
+}
+
+.cards-page__dust-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(216, 184, 74, 0.55);
+  box-shadow: 0 0 4px rgba(216, 184, 74, 0.35);
+  animation: cards-dust-float var(--dust-dur, 10s) ease-in-out infinite;
+}
+
+@keyframes cards-dust-float {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  15% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.35;
+    transform: translate(12px, -18px);
+  }
+  85% {
+    opacity: 0.5;
+    transform: translate(-8px, -32px);
+  }
+}
+
+.cards-page__orbit {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 162, 39, 0.1);
+  transform: translate(-50%, -50%);
+}
+
+.cards-page__orbit--a {
+  width: min(1100px, 115vw);
+  height: min(1100px, 115vw);
+  border-style: dashed;
+  opacity: 0.35;
+  animation: cards-orbit-cw 90s linear infinite;
+}
+
+.cards-page__orbit--b {
+  width: min(860px, 92vw);
+  height: min(860px, 92vw);
+  opacity: 0.22;
+  animation: cards-orbit-ccw 68s linear infinite;
+}
+
+@keyframes cards-orbit-cw {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes cards-orbit-ccw {
+  from {
+    rotate: 360deg;
+  }
+  to {
+    rotate: 0deg;
+  }
+}
+
+/* ── 레이아웃 ── */
+.cards-page__layout {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  min-height: calc(100svh - 86px);
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr;
+}
+
+.cards-page__aside {
+  padding: 1.25rem 1.5rem 0;
+  max-width: 22rem;
+}
+
+.cards-page__eyebrow {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  color: var(--cards-brass);
+  opacity: 0.85;
+}
+
+.cards-page__lead {
+  margin-top: 0.85rem;
+  font-family: var(--font-family-display, inherit);
+  font-size: clamp(1.75rem, 4.2vw, 2.65rem);
+  font-weight: 700;
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  color: var(--cards-ivory);
+  text-shadow: 0 2px 24px rgba(201, 162, 39, 0.12);
+}
+
+.cards-page__sub {
+  margin-top: 1rem;
+  font-size: clamp(0.88rem, 1.8vw, 1rem);
+  line-height: 1.65;
+  color: var(--cards-muted);
+}
+
+.cards-page__aside-rule {
+  margin-top: 1.35rem;
+  width: 3.5rem;
+  height: 1px;
+  background: linear-gradient(90deg, var(--cards-brass), transparent);
+  opacity: 0.55;
+}
+
+.cards-page__main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-height: 0;
+}
+
+.cards-page__stage-wrap {
+  position: relative;
+  width: min(1280px, 100%);
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: clamp(480px, 66vh, 860px);
+  padding: 0 0.5rem 0.75rem;
+  overflow: visible;
+}
+
+.cards-page__cta-bar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1rem 2.25rem;
+  gap: 0.85rem;
+}
+
+.cards-page__cta-guide {
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  color: rgba(240, 233, 218, 0.72);
+  text-align: center;
+}
+
+.cards-page__cta-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.cards-page__cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-width: min(100%, 300px);
+  padding: 1rem 2.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--cards-brass-line);
+  background:
+    linear-gradient(180deg, rgba(201, 162, 39, 0.28) 0%, rgba(201, 162, 39, 0.06) 100%),
+    rgba(3, 16, 27, 0.65);
+  color: var(--cards-ivory);
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  box-shadow:
+    0 0 0 1px rgba(201, 162, 39, 0.1),
+    0 0 28px rgba(201, 162, 39, 0.12),
+    0 12px 32px rgba(0, 0, 0, 0.45);
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease,
+    filter 0.28s ease;
+  overflow: hidden;
+}
+
+.cards-page__cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(232, 200, 106, 0.14) 50%,
+    transparent 62%
+  );
+  opacity: 0;
+  transition: opacity 0.28s ease;
+}
+
+.cards-page__cta:not(:disabled):hover {
+  transform: translateY(-3px);
+  border-color: rgba(232, 200, 106, 0.65);
+  box-shadow:
+    0 0 0 1px rgba(232, 200, 106, 0.25),
+    0 0 36px rgba(201, 162, 39, 0.28),
+    0 16px 40px rgba(0, 0, 0, 0.5);
+  filter: brightness(1.08);
+}
+
+.cards-page__cta:not(:disabled):hover::before {
+  opacity: 1;
+}
+
+.cards-page__cta:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cards-page__cta-hint {
+  font-size: 0.76rem;
+  color: var(--cards-muted);
+  letter-spacing: 0.03em;
+}
+
+/* ── Desktop: 좌측 카피 + 중앙 스테이지 ── */
+@media (min-width: 1024px) {
+  .cards-page__layout {
+    grid-template-columns: minmax(240px, 22vw) 1fr;
+    grid-template-rows: 1fr;
+    align-items: stretch;
+  }
+
+  .cards-page__aside {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem 0 2rem clamp(2rem, 4vw, 4.5rem);
+    max-width: none;
+  }
+
+  .cards-page__lead {
+    font-size: clamp(2rem, 2.8vw, 2.85rem);
+  }
+
+  .cards-page__main {
+    justify-content: flex-end;
+  }
+
+  /* 배경 장식(chart·orbit·nebula)이 첫 화면 밖으로 흘러 스크롤을 만들지 않게 */
+  .cards-page {
+    overflow: clip;
+  }
+
+  /* 무대 높이는 나침반 구성값이 결정한다 — 여분의 min-height 제거.
+     하단 여백은 원판이 무대 박스 아래로 걸치는 만큼만 남긴다 */
+  .cards-page__stage-wrap {
+    min-height: 0;
+    flex: 0 1 auto;
+    padding: 0 0.5rem 1.5rem;
+  }
+
+  /* CTA는 무대 아래 흐름에서 빼내 좌측 카피 컬럼 하단에 둔다 (원판과 겹치지 않음) */
+  .cards-page__cta-bar {
+    position: absolute;
+    left: clamp(2rem, 4vw, 4.5rem);
+    bottom: clamp(1.25rem, 3.5vh, 2.5rem);
+    z-index: 3;
+    width: min(300px, 22vw);
+    padding: 0;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+
+  .cards-page__cta-guide {
+    text-align: left;
+  }
+
+  .cards-page__cta-wrap {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .cards-page__cta {
+    min-width: 100%;
+    padding: 0.85rem 1.6rem;
+  }
+}
+
+@media (max-width: 1023px) {
+  .cards-page__aside {
+    text-align: center;
+    max-width: none;
+    margin: 0 auto;
+  }
+
+  .cards-page__aside-rule {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cards-page__chart,
+  .cards-page__orbit--a,
+  .cards-page__orbit--b,
+  .cards-page__star,
+  .cards-page__dust-particle {
+    animation: none !important;
+  }
+}

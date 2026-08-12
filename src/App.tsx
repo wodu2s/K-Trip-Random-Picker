@@ -62,7 +62,9 @@ function PersistentBackdrop() {
 
 function AppShell() {
   const { page } = useTravel();
-  const isLanding = page === "landing";
+  const active = page === "shuffle" ? "cards" : page;
+  const isLanding = active === "landing";
+  const isDark = active === "landing" || active === "conditions" || active === "cards";
 
   return (
     <div
@@ -72,13 +74,13 @@ function AppShell() {
           : "relative min-h-screen overflow-x-hidden"
       }
       style={{
-        background: isLanding ? "#03101B" : "var(--color-parchment-200)",
+        background: isDark ? "#03101B" : "var(--color-parchment-200)",
         transform: "none",
         zoom: "normal",
       }}
       data-landing-root={isLanding ? "true" : undefined}
     >
-      {!isLanding ? <PersistentBackdrop /> : null}
+      {!isDark ? <PersistentBackdrop /> : null}
       <Header />
       <PageSwitch />
     </div>

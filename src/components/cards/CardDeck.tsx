@@ -12,14 +12,23 @@ import {
 } from "../../lib/cardMotion";
 import {
   isSelectable,
-  isSelecting,
-  showsCardBack,
 } from "../../lib/cardPhaseUtils";
 import type { CardPhase, MysteryCardData } from "../../types/travel";
 import { AdventureTravelCard } from "./AdventureTravelCard";
 import { CardFx } from "./CardFx";
 import { TravelCardBack } from "./TravelCardBack";
 import "./shuffleDeck.css";
+
+const SCALE_LOCKED_PHASES = new Set<CardPhase>([
+  "gathering",
+  "crossing",
+  "mixing",
+  "restacking",
+  "fanOut",
+]);
+
+/** fan 상태 카드별 translateZ — 중앙이 가장 앞 */
+const FAN_DEPTH_Z = [20, 60, 100, 60, 20];
 
 const LIVE_PHASES = new Set<CardPhase>([
   "gathering",
@@ -71,8 +80,6 @@ export function CardDeck({
   const layoutScale = getLayoutScale(stageW, cardW);
   const [hintOnce, setHintOnce] = useState(false);
 
-  const showBack = showsCardBack(phase) && !isSelecting(phase) && phase !== "complete";
-
   useEffect(() => {
     setHintOnce(false);
   }, [phase, selectedId]);
@@ -100,6 +107,9 @@ export function CardDeck({
     [cards],
   );
 
+  /* 나침반 위에 떠 있는 느낌 — 카드가 멈춰 있는 구간에서만 미세하게 부유한다 */
+  const idleFloat = !reduce && (phase === "ready" || phase === "selectable");
+
   const deckClass = [
     "shuffle-deck",
     isMobile ? "shuffle-deck--mobile" : "",
@@ -111,22 +121,15 @@ export function CardDeck({
 
   return (
     <div className={deckClass} data-shuffle-phase={phase}>
-      <CardFx
-        phase={phase}
-        reduce={reduce}
-        isMobile={isMobile}
-        centerGlow={isSelectable(phase) && !selectedId}
-      />
+      <CardFx phase={phase} reduce={reduce} isMobile={isMobile} />
 
       <motion.div
         className="shuffle-deck__stage"
         aria-live="polite"
-        animate={
-          phase === "ready" && !reduce ? { y: [0, -4, 0] } : { y: 0 }
-        }
+        animate={idleFloat ? { y: [0, -5, 0] } : { y: 0 }}
         transition={
-          phase === "ready" && !reduce
-            ? { duration: 3.6, repeat: Infinity, ease: "easeInOut" }
+          idleFloat
+            ? { duration: 4.2, repeat: Infinity, ease: "easeInOut" }
             : { duration: 0.2 }
         }
       >
@@ -149,21 +152,13 @@ export function CardDeck({
             hoveredId === card.id &&
             !isMobile;
 
-          let { x, y, rotate, scale, opacity, z, rotateX = 0 } = pose;
+          let { x, y, rotate, scale, opacity, z } = pose;
 
           if (isHover) {
-            y -= 14;
-            scale = Math.min(scale + 0.04, 1.04);
+            y -= 12;
+            scale = 1.05;
             rotate *= 0.35;
             z = 18;
-          } else if (
-            isSelectable(phase) &&
-            hoveredId &&
-            hoveredId !== card.id &&
-            !selectedId &&
-            !isMobile
-          ) {
-            scale *= 0.99;
           }
 
           const duration = durationForShufflePhase(phase, reduce);
@@ -175,24 +170,19 @@ export function CardDeck({
             isSelected &&
             (phase === "selected" || phase === "revealing" || phase === "complete");
 
-          const showHintFace =
-            (isSelectable(phase) || isSelecting(phase) || phase === "complete") && !showBack;
           const showReveal = isSelected && flipped;
-          const rotateY = showReveal ? 180 : showHintFace ? 0 : showBack ? 180 : 0;
+          const showHintFace = isFocusSelected && !showReveal;
+          const rotateY = showReveal ? 180 : showHintFace ? 0 : 180;
 
           const faceTurnDuration =
             showReveal && flipped
               ? reduce
                 ? 0.18
                 : CARD_MOTION.flip
-              : showHintFace && isSelectable(phase)
-                ? reduce
-                  ? 0.14
-                  : CARD_MOTION.selectable
-                : 0;
+              : 0;
 
           const scaleAnim =
-            phase === "gathering"
+            SCALE_LOCKED_PHASES.has(phase)
               ? 1
               : phase === "ready" && i === 2 && !reduce
                 ? [1, 1.025, 1]
@@ -200,6 +190,26 @@ export function CardDeck({
 
           const showTrail = !reduce && (phase === "fanOut" || phase === "crossing");
           const liveMotion = LIVE_PHASES.has(phase) || phase === "ready";
+          const fanFloating =
+            phase === "ready" ||
+            phase === "fanOut" ||
+            phase === "selectable" ||
+            isFocusSelected;
+          const depthZ = fanFloating
+            ? isFocusSelected
+              ? 120
+              : (FAN_DEPTH_Z[i] ?? 20)
+            : 0;
+          const tiltX = fanFloating && !isFocusSelected && !isHover ? -5 : isHover ? -8 : 0;
+          /* 끝 카드만 안쪽으로 살짝 돌려 중앙 카드가 가장 앞에 있는 깊이감을 준다 */
+          const tiltY =
+            fanFloating && !isFocusSelected && !isHover
+              ? i === 0
+                ? 8
+                : i === 4
+                  ? -8
+                  : 0
+              : 0;
 
           const transition =
             phase === "selectable" && !reduce
@@ -234,8 +244,12 @@ export function CardDeck({
                 marginLeft: -cardW / 2,
                 marginTop: -cardH / 2,
                 filter: isFocusSelected
-                  ? "drop-shadow(0 16px 32px rgba(22,40,31,0.28))"
-                  : "drop-shadow(0 12px 24px rgba(22,40,31,0.16))",
+                  ? "drop-shadow(0 56px 40px rgba(0,0,0,0.62)) drop-shadow(0 28px 22px rgba(0,0,0,0.4)) drop-shadow(0 0 18px rgba(201,162,39,0.24))"
+                  : isHover
+                    ? "drop-shadow(0 48px 34px rgba(0,0,0,0.58)) drop-shadow(0 24px 18px rgba(0,0,0,0.38)) drop-shadow(0 0 12px rgba(201,162,39,0.16))"
+                    : fanFloating
+                      ? "drop-shadow(0 44px 30px rgba(0,0,0,0.52)) drop-shadow(0 18px 14px rgba(0,0,0,0.34))"
+                      : undefined,
               }}
               disabled={disabled}
               aria-disabled={disabled}
@@ -250,9 +264,11 @@ export function CardDeck({
                 x: reduce && selectedId && !isSelected ? x * 0.4 : x,
                 y,
                 rotate,
-                rotateX,
+                rotateX: tiltX,
+                rotateY: tiltY,
                 scale: scaleAnim,
                 opacity,
+                z: depthZ,
               }}
               transition={transition}
               onClick={() => {
@@ -271,13 +287,6 @@ export function CardDeck({
             >
               <div className="shuffle-deck__trail" aria-hidden="true" />
               <div className="shuffle-deck__shine" aria-hidden="true" />
-
-              {i === 2 && isSelectable(phase) && !selectedId ? (
-                <div
-                  className="shuffle-deck__center-glow shuffle-deck__center-glow--pulse"
-                  aria-hidden="true"
-                />
-              ) : null}
 
               <div className="shuffle-deck__flip perspective-1000 relative h-full w-full">
                 <motion.div

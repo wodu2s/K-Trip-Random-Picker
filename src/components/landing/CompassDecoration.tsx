@@ -1,7 +1,6 @@
 import { motion } from "motion/react";
-import { CompassGraphic } from "../cards/CompassGraphic";
 
-/** Previous brass CompassGraphic — decorative prop under the deck */
+/** 황금 나침반 엠블럼 — 카드 더미 아래 장식 프롭 */
 export function CompassDecoration({
   size = 140,
   parallax = { x: 0, y: 0 },
@@ -26,12 +25,12 @@ export function CompassDecoration({
           "drop-shadow(0 0 0 1.5px rgba(208,165,77,0.35)) drop-shadow(0 10px 22px rgba(0,0,0,0.5))",
       }}
     >
-      <CompassGraphic
-        size={size}
-        needleDeg={roseDeg}
-        animateNeedle={false}
-        needleDuration={reduce ? 0.2 : 0.85}
-        showLoop={false}
+      <motion.img
+        src="/assets/adventure/compass-gold-radiant.png"
+        alt=""
+        className="h-full w-full"
+        animate={{ rotate: roseDeg }}
+        transition={{ duration: reduce ? 0.2 : 0.85, ease: [0.22, 0.7, 0.2, 1] }}
       />
     </motion.div>
   );

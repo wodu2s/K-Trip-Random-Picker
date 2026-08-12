@@ -7,36 +7,53 @@ export type CardPose = {
   scale: number;
   opacity: number;
   z: number;
-  rotateX?: number;
 };
 
 export type LayoutPoint = Pick<CardPose, "x" | "y" | "rotate">;
 
-/** 선택·공개 부채꼴 — 데스크톱 기준 px */
+/** 초기·선택 fan — desktop 기준 px, 회전 [-16,-8,0,8,16] */
 export const SELECTABLE_LAYOUT: LayoutPoint[] = [
-  { x: -250, y: 30, rotate: -12 },
-  { x: -125, y: 5, rotate: -6 },
+  { x: -290, y: 26, rotate: -16 },
+  { x: -145, y: 7, rotate: -8 },
   { x: 0, y: -12, rotate: 0 },
-  { x: 125, y: 5, rotate: 6 },
-  { x: 250, y: 30, rotate: 12 },
+  { x: 145, y: 7, rotate: 8 },
+  { x: 290, y: 26, rotate: 16 },
 ];
 
-/** fanOut: 좌2·우3 분리 펼침 */
+/** fanOut: 셔플 후 fan 펼침 */
 export const FAN_LAYOUT: LayoutPoint[] = [
-  { x: -210, y: 48, rotate: -15 },
-  { x: -105, y: 18, rotate: -7 },
-  { x: 0, y: 4, rotate: 0 },
-  { x: 105, y: 18, rotate: 7 },
-  { x: 210, y: 48, rotate: 15 },
+  { x: -270, y: 22, rotate: -16 },
+  { x: -135, y: 5, rotate: -8 },
+  { x: 0, y: -10, rotate: 0 },
+  { x: 135, y: 5, rotate: 8 },
+  { x: 270, y: 22, rotate: 16 },
 ];
 
-/** crossing: 좌우 교차 후 위치 */
+/** crossing pass 1 — 좌우 교차 */
 export const CROSS_LAYOUT: LayoutPoint[] = [
-  { x: 210, y: 44, rotate: 15 },
-  { x: 105, y: 16, rotate: 7 },
-  { x: 0, y: -2, rotate: 0 },
-  { x: -105, y: 16, rotate: -7 },
-  { x: -210, y: 44, rotate: -15 },
+  { x: 100, y: -3, rotate: 8 },
+  { x: 60, y: 1, rotate: 5 },
+  { x: 0, y: -4, rotate: 0 },
+  { x: -60, y: 1, rotate: -5 },
+  { x: -100, y: -3, rotate: -8 },
+];
+
+/** mixing pass 2 — 반대 교차 */
+const MIX_PASS_B: LayoutPoint[] = [
+  { x: -95, y: 2, rotate: -7 },
+  { x: -55, y: -1, rotate: -4 },
+  { x: 0, y: -3, rotate: 0 },
+  { x: 55, y: -1, rotate: 4 },
+  { x: 95, y: 2, rotate: 7 },
+];
+
+/** mixing pass 3 — 마지막 교차 후 restack */
+const MIX_PASS_C: LayoutPoint[] = [
+  { x: 82, y: -2, rotate: 6 },
+  { x: 48, y: 2, rotate: 3 },
+  { x: 0, y: -3, rotate: 0 },
+  { x: -48, y: 2, rotate: -3 },
+  { x: -82, y: -2, rotate: -6 },
 ];
 
 /** @deprecated 레거시 fan 슬롯 */
@@ -45,15 +62,18 @@ export const FAN_SPACING = 110;
 
 /**
  * 스테이지 너비·카드 너비 기준 fan 스케일.
- * 좌우 끝 카드 최소 70%가 보이도록 max |x| 계산.
+ * fan이 스테이지 가로의 약 45~55%를 쓰도록 조정.
  */
 export function getLayoutScale(stageW: number, cardW: number): number {
-  const half = stageW / 2;
-  const margin = 10;
-  const maxCenterX = half - cardW * 0.2 - margin;
-  const desktopMax = 250;
-  return Math.min(1, Math.max(0.34, maxCenterX / desktopMax));
+  const targetHalfSpan = stageW * 0.26;
+  const baseOuterX = 290;
+  const maxFromStage = (stageW / 2 - cardW * 0.25) / baseOuterX;
+  const maxFromTarget = targetHalfSpan / baseOuterX;
+  return Math.min(1, Math.max(0.42, Math.min(maxFromStage, maxFromTarget)));
 }
+
+/** fan 펼침 시 가로 간격만 확대 (카드 scale/비율 유지) */
+const FAN_X_SPREAD = 1.12;
 
 export function scaleLayout(layout: LayoutPoint[], factor: number): LayoutPoint[] {
   return layout.map((p) => ({
@@ -63,28 +83,11 @@ export function scaleLayout(layout: LayoutPoint[], factor: number): LayoutPoint[
   }));
 }
 
-function mixEllipsePoint(i: number, total: number, rx: number, ry: number): LayoutPoint {
-  const start = -Math.PI * 0.78;
-  const sweep = Math.PI * 1.45;
-  const angle = start + (i / Math.max(total - 1, 1)) * sweep;
-  return {
-    x: Math.cos(angle) * rx,
-    y: Math.sin(angle) * ry,
-    rotate: Math.max(-9, Math.min(9, (angle * 180) / Math.PI * 0.06)),
-  };
-}
-
-function mixCenterPassPoint(i: number, total: number): LayoutPoint {
-  const mid = (total - 1) / 2;
-  const offset = i - mid;
-  const rush = [
-    { x: -28, y: -8, rotate: -4 },
-    { x: -12, y: 22, rotate: -2 },
-    { x: 0, y: -18, rotate: 0 },
-    { x: 14, y: 20, rotate: 2 },
-    { x: 32, y: -6, rotate: 5 },
-  ];
-  return rush[i] ?? { x: offset * 14, y: offset * 6, rotate: offset * 2 };
+function scaledFanLayout(layout: LayoutPoint[], layoutScale: number): LayoutPoint[] {
+  return scaleLayout(layout, layoutScale).map((p) => ({
+    ...p,
+    x: p.x * FAN_X_SPREAD,
+  }));
 }
 
 export function stackPose(i: number, total: number, gap = 2.8): CardPose {
@@ -106,13 +109,23 @@ function layoutPose(layout: LayoutPoint[], i: number, z = 5 + i): CardPose {
 
 function crossingPose(i: number, layout: LayoutPoint[]): CardPose {
   const base = layoutPose(layout, i);
-  if (i === 2) {
-    return { ...base, y: base.y - 8, scale: 0.94, z: 2, rotateX: -5 };
-  }
-  const z = i < 2 ? 9 + i : 8 + (4 - i);
-  const scale = i === 0 || i === 4 ? 1.02 : 0.98;
-  const rotateX = i < 2 ? 4 : -4;
-  return { ...base, scale, z, rotateX };
+  const zByCard = [9, 8, 11, 7, 8];
+  return { ...base, scale: 1, z: zByCard[i] ?? 8 };
+}
+
+function mixingPose(
+  mixStep: 0 | 1,
+  i: number,
+  layoutScale: number,
+): CardPose {
+  const layout = mixStep === 0 ? MIX_PASS_B : MIX_PASS_C;
+  const scaled = scaleLayout(layout, layoutScale);
+  const pt = scaled[i] ?? scaled[0]!;
+  const zByStep =
+    mixStep === 0
+      ? [7, 10, 11, 10, 7]
+      : [9, 8, 11, 8, 9];
+  return { ...pt, scale: 1, opacity: 1, z: zByStep[i] ?? 8 };
 }
 
 export function poseForCard(
@@ -124,11 +137,9 @@ export function poseForCard(
   selectedId: string | null,
   cardId: string,
 ): CardPose {
-  const selectable = scaleLayout(SELECTABLE_LAYOUT, layoutScale);
-  const fan = scaleLayout(FAN_LAYOUT, layoutScale);
+  const selectable = scaledFanLayout(SELECTABLE_LAYOUT, layoutScale);
+  const fan = scaledFanLayout(FAN_LAYOUT, layoutScale);
   const cross = scaleLayout(CROSS_LAYOUT, layoutScale);
-  const ellipseRx = 165 * layoutScale;
-  const ellipseRy = 78 * layoutScale;
 
   if (
     (phase === "selected" || phase === "revealing" || phase === "complete") &&
@@ -136,42 +147,31 @@ export function poseForCard(
   ) {
     const base = layoutPose(selectable, i);
     if (cardId === selectedId) {
-      if (phase === "complete") {
-        return { x: 0, y: -48, rotate: 0, scale: 1.6, opacity: 1, z: 30 };
-      }
-      return { x: 0, y: -48, rotate: 0, scale: 1.12, opacity: 1, z: 30 };
+      const pickScale = phase === "complete" ? 1.05 : 1.1;
+      return { x: 0, y: -20, rotate: 0, scale: pickScale, opacity: 1, z: 30 };
     }
     const dir = base.x >= 0 ? 1 : -1;
-    const push = 36 + Math.abs(base.x) * 0.08;
-    const fadeOpacity = phase === "complete" ? 0 : 0.38;
     return {
-      x: base.x + dir * push,
-      y: base.y + 12,
-      rotate: base.rotate * 0.35,
-      scale: 0.92,
-      opacity: fadeOpacity,
-      z: 2 + i,
+      x: base.x + dir * 100,
+      y: base.y + 10,
+      rotate: base.rotate * 0.25,
+      scale: 1,
+      opacity: 0.2,
+      z: 1 + i,
     };
   }
 
   switch (phase) {
     case "ready":
-      return { ...stackPose(i, total, 3.2), scale: i === 2 ? 1.02 : 1 };
+      return layoutPose(selectable, i, i === 2 ? 10 : 4 + i);
     case "gathering":
-      return { ...stackPose(i, total, 2.6), scale: 0.96 };
+      return stackPose(i, total, 4);
     case "fanOut":
       return layoutPose(fan, i);
     case "crossing":
       return crossingPose(i, cross);
-    case "mixing": {
-      const pt =
-        mixStep === 0
-          ? mixEllipsePoint(i, total, ellipseRx, ellipseRy)
-          : mixCenterPassPoint(i, total);
-      const scaled = scaleLayout([pt], 1)[0]!;
-      const z = mixStep === 0 ? 6 + i : 12 - Math.abs(i - 2);
-      return { ...scaled, scale: mixStep === 0 ? 0.98 : 1.01, opacity: 1, z };
-    }
+    case "mixing":
+      return mixingPose(mixStep, i, layoutScale);
     case "restacking":
       return stackPose(i, total, 3.6);
     case "selectable":

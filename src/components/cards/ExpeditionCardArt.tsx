@@ -1,6 +1,15 @@
 import { LANDING_ASSET_CONFIG } from "../landing/landingAssets";
 import { useLandingAsset } from "../landing/useLandingAsset";
 
+/** 카드 슬롯별 취향 힌트 이모지 (1–5) */
+export const EXPEDITION_SLOT_HINTS: readonly (readonly string[])[] = [
+  ["⛰️", "🌊", "🌙"],
+  ["🎈", "🌴", "📷"],
+  ["⛺", "🔥", "🎵"],
+  ["🌲", "🐻", "❄️"],
+  ["⛵", "⭐", "🍸"],
+];
+
 /**
  * Classic Expedition 카드 페이스 — 랜딩 덱·셔플 뒷면 공통.
  * 이미지 로드 실패 시 CSS/SVG 폴백.
@@ -10,6 +19,7 @@ export function ExpeditionCardArt({
   featured = true,
   showHints = false,
   serial,
+  slotHints,
 }: {
   className?: string;
   featured?: boolean;
@@ -17,12 +27,17 @@ export function ExpeditionCardArt({
   showHints?: boolean;
   /** Optional face number for fallback art (001–005). Image asset unchanged. */
   serial?: number;
+  /** Shuffle deck — slot-specific hint emojis overlay */
+  slotHints?: readonly string[];
 }) {
   const asset = useLandingAsset(LANDING_ASSET_CONFIG.cardBack.src);
+  const hints =
+    slotHints ??
+    (serial != null ? EXPEDITION_SLOT_HINTS[serial - 1] : undefined);
 
   return (
     <div
-      className={`relative h-full w-full overflow-hidden ${className}`}
+      className={`expedition-card-art relative h-full w-full overflow-hidden ${featured ? "expedition-card-art--featured" : ""} ${className}`}
       style={{
         borderRadius: "var(--radius-card)",
         background:
@@ -45,8 +60,19 @@ export function ExpeditionCardArt({
           featured={featured}
           showHints={showHints}
           serial={serial}
+          slotHints={hints}
         />
       )}
+      {hints && featured ? (
+        <div className="expedition-card-art__hints" aria-hidden="true">
+          {hints.map((emoji) => (
+            <span key={emoji} className="expedition-card-art__hint-chip">
+              {emoji}
+            </span>
+          ))}
+        </div>
+      ) : null}
+      {featured ? <div className="expedition-card-art__glow" aria-hidden="true" /> : null}
     </div>
   );
 }
@@ -55,12 +81,16 @@ function ExpeditionCardArtFallback({
   featured,
   showHints = false,
   serial,
+  slotHints,
 }: {
   featured: boolean;
   showHints?: boolean;
   serial?: number;
+  slotHints?: readonly string[];
 }) {
   const gold = "#D4AF37";
+  const hintEmojis = slotHints ?? (showHints && featured ? ["🌲", "🎧", "🚶"] : null);
+
   return (
     <>
       <div
@@ -99,7 +129,6 @@ function ExpeditionCardArtFallback({
           strokeWidth="0.65"
         />
         <ellipse cx="100" cy="145" rx="58" ry="42" stroke="#C9A227" strokeWidth="0.45" opacity="0.5" />
-        {/* Corner L-brackets */}
         <path d="M14 40 V18 H36" stroke={gold} strokeWidth="2.2" strokeLinecap="square" />
         <circle cx="18" cy="22" r="1.4" fill={gold} />
         <circle cx="22" cy="18" r="1.4" fill={gold} />
@@ -163,14 +192,7 @@ function ExpeditionCardArtFallback({
             <path d="M14 60 L60 54 L64 60 L60 66 Z" fill="#D8B84A" />
             <path d="M106 60 L60 54 L56 60 L60 66 Z" fill="#A8841C" />
             <circle cx="60" cy="60" r="6" fill={gold} />
-            <text
-              x="60"
-              y="28"
-              textAnchor="middle"
-              fill={gold}
-              fontSize="10"
-              fontFamily="serif"
-            >
+            <text x="60" y="28" textAnchor="middle" fill={gold} fontSize="10" fontFamily="serif">
               N
             </text>
           </svg>
@@ -185,9 +207,9 @@ function ExpeditionCardArtFallback({
         >
           EXPEDITION
         </p>
-        {showHints && featured ? (
+        {hintEmojis ? (
           <div className="mt-2.5 flex items-center justify-center gap-2">
-            {["🌲", "🎧", "🚶"].map((emoji) => (
+            {hintEmojis.map((emoji) => (
               <span
                 key={emoji}
                 className="flex h-7 w-7 items-center justify-center rounded-full text-[12px]"

@@ -5,8 +5,8 @@
   --hero-beige: #cfc4ae;
   --hero-muted: #9e8f78;
   --hero-green: #2f5340;
-  --font-family-base: "Pretendard Variable", "Pretendard", -apple-system, sans-serif;
-  --font-family-display: "Playfair Display", "Noto Serif KR", Georgia, serif;
+  --font-family-base: "Maru Buri", "Noto Serif KR", Georgia, serif;
+  --font-family-display: "Independent", "Maru Buri", "Noto Serif KR", Georgia, serif;
 
   position: relative;
   width: 100%;
@@ -63,6 +63,114 @@
   width: 100%;
   height: 100%;
   overflow: visible;
+}
+
+/* Slow, low-amplitude idle motion — must never out-shout the card deck */
+/* The compass rose is wider than the viewBox — let its axes run off the map */
+.landing-hero-map svg {
+  overflow: visible;
+}
+
+.landing-hero-map__halo {
+  animation: hero-map-halo 3.2s ease-in-out infinite;
+}
+
+/* Second ring — slower and dimmer, so the two never peak together */
+.landing-hero-map__halo--outer {
+  animation-duration: 4.4s;
+  animation-name: hero-map-halo-outer;
+}
+
+.landing-hero-map__star {
+  animation: hero-map-twinkle 5.5s ease-in-out infinite;
+}
+
+/* Travelling light on each dashed arc — positioned purely by offset-path */
+.landing-hero-map__spark {
+  offset-rotate: 0deg;
+  /* One trip per activation — `both` parks it invisible before and after */
+  animation: hero-map-spark 2.9s ease-in-out 0.35s 1 both;
+}
+
+.landing-hero-map__ripple {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hero-map-ripple 2.2s ease-out 1 both;
+}
+
+/* Opacity-only pulse — the ring never grows, so nodes stay pin-sharp */
+@keyframes hero-map-halo {
+  0%,
+  100% {
+    opacity: 0.16;
+  }
+  46% {
+    opacity: 0.2;
+  }
+  58% {
+    opacity: 0.62;
+  }
+  74% {
+    opacity: 0.22;
+  }
+}
+
+@keyframes hero-map-halo-outer {
+  0%,
+  100% {
+    opacity: 0.24;
+  }
+  50% {
+    opacity: 0.48;
+  }
+}
+
+@keyframes hero-map-twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes hero-map-spark {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  12%,
+  88% {
+    opacity: 0.85;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+/* Outer halo expanding once as a node takes its turn */
+@keyframes hero-map-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+/* Card shadows — ~15% weaker alpha than the component's inline values */
+[data-landing-card="center"] > div > div {
+  box-shadow:
+    0 34px 70px rgba(0, 0, 0, 0.48),
+    0 10px 28px rgba(0, 0, 0, 0.32) !important;
+}
+
+[data-landing-card^="back-"] > div > div {
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.38) !important;
 }
 
 .landing-hero-map__base,
@@ -137,20 +245,41 @@
 
 .landing-hero__eyebrow {
   margin: 0 0 20px;
-  font-family: var(--font-family-display);
-  font-size: 28px;
+  font-family: var(--font-family-base);
+  font-size: 26px;
   font-weight: 400;
   line-height: 1.35;
   color: #eee5d2;
 }
 
+/* Small decorative line above the title — does not shift existing copy layout */
+.landing-hero__flourish {
+  position: absolute;
+  top: -30px;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.landing-hero__flourish-text {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: #d8b84a;
+  opacity: 0.85;
+  white-space: nowrap;
+}
+
 .landing-hero__title {
   margin: 0;
   font-family: var(--font-family-display);
-  font-size: 64px;
-  font-weight: 600;
-  line-height: 0.98;
-  letter-spacing: -0.035em;
+  font-size: 80px;
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
   color: #f0e9da;
   white-space: nowrap;
   width: max-content;
@@ -196,7 +325,7 @@
   border-radius: 11px;
   background: linear-gradient(180deg, #c58a28 0%, #9d6619 48%, #754411 100%);
   color: #1a1208;
-  font: 700 20px/1 var(--font-family-base);
+  font: 600 20px/1 var(--font-family-base);
   box-shadow:
     inset 0 1px 0 rgba(255, 240, 196, 0.4),
     0 0 5px rgba(226, 158, 45, 0.16),
@@ -277,7 +406,7 @@
 .landing-hero__note {
   margin: 14px 0 0;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 400;
   color: var(--hero-muted);
 }
 
@@ -338,7 +467,7 @@
   }
 
   .landing-hero__title {
-    font-size: 78px;
+    font-size: 80px;
   }
 
   .landing-hero__desc {
@@ -395,10 +524,10 @@
   }
 
   .landing-hero__map-bleed {
-    left: 43%;
-    top: 7%;
-    width: 31%;
-    height: 78%;
+    left: 41%;
+    top: calc(5% - 12px);
+    width: 35%;
+    height: 81%;
     right: auto;
     bottom: auto;
   }
@@ -417,8 +546,8 @@
   }
 
   .landing-hero__title {
-    font-size: 92px;
-    letter-spacing: -0.035em;
+    font-size: 80px;
+    letter-spacing: -0.02em;
   }
 
   .landing-hero__desc {
@@ -446,7 +575,7 @@
   .landing-hero__visual {
     position: absolute;
     top: 15px;
-    right: 1.5%;
+    right: 20px;
     width: 940px;
     height: 700px;
     min-height: 0;
@@ -455,9 +584,14 @@
     align-items: flex-start;
   }
 
-  /* Compass — pulled clear of the map, sits left of the card cluster */
+  /* Compass — sits between the map's bottom-right and the card cluster */
   [data-landing-compass] {
-    left: 387px !important;
+    left: 339px !important;
+  }
+
+  /* Ticket — pulled in from the deck's own right edge to stay fully on-screen, clear of the compass */
+  [data-landing-ticket] {
+    right: 25px !important;
   }
 
   .landing-hero__steps {
@@ -475,12 +609,12 @@
 /* Wide screens — keep size, never shrink below locked desktop */
 @media (min-width: 1680px) and (min-height: 820px) {
   .landing-hero__visual {
-    right: 1.5%;
+    right: 20px;
     width: 960px;
   }
 
   .landing-hero__title {
-    font-size: 96px;
+    font-size: 80px;
   }
 }
 
@@ -515,7 +649,7 @@
 
   .landing-hero__map-bleed {
     top: 38%;
-    opacity: 0.45;
+    opacity: 0.35;
   }
 
   .landing-hero__copy {

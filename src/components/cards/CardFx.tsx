@@ -11,36 +11,69 @@ import {
 } from "../../lib/cardPhaseUtils";
 import "./shuffleDeck.css";
 
-const PARTICLE_SEEDS = Array.from({ length: 12 }, (_, i) => ({
-  left: `${8 + (i * 7.3) % 84}%`,
-  top: `${12 + (i * 11) % 76}%`,
-  delay: `${(i * 0.37) % 2.4}s`,
-  dur: `${3.2 + (i % 4) * 0.6}s`,
+const PARTICLE_SEEDS = Array.from({ length: 12 }, (_, i) => {
+  const angle = (i / 12) * Math.PI * 2 - Math.PI / 2;
+  const radius = 44 + (i % 3) * 3;
+  return {
+    left: `${50 + Math.cos(angle) * radius}%`,
+    top: `${50 + Math.sin(angle) * radius * 0.88}%`,
+    delay: `${(i * 0.37) % 2.4}s`,
+    dur: `${3.2 + (i % 4) * 0.6}s`,
+  };
+});
+
+const STAR_SEEDS = Array.from({ length: 16 }, (_, i) => {
+  const angle = (i / 16) * Math.PI * 2 + 0.4;
+  const radius = 46 + (i % 4) * 2.5;
+  return {
+    left: `${50 + Math.cos(angle) * radius}%`,
+    top: `${50 + Math.sin(angle) * radius * 0.9}%`,
+    delay: `${(i * 0.53) % 4}s`,
+    dur: `${3.6 + (i % 5) * 0.7}s`,
+    sparkle: i % 5 === 0,
+  };
+});
+
+const STAR_POINTS = STAR_SEEDS.map((s) => ({
+  x: Number.parseFloat(s.left),
+  y: Number.parseFloat(s.top),
 }));
+
+/** 별을 잇는 희미한 별자리 선 — STAR_SEEDS 인덱스 쌍 */
+const CONSTELLATION_LINES: readonly [number, number][] = [
+  [1, 5],
+  [5, 10],
+  [10, 3],
+  [8, 13],
+];
 
 const BURST_ANGLES = Array.from({ length: 10 }, (_, i) => (i / 10) * Math.PI * 2);
 
-/** 덱 뒤 글로우·orbit·spotlight·파티클·선택 burst */
+/** 무대 전체 분위기 — orbit·spotlight·별빛·파티클·선택 burst (나침반 자체 halo는 ShuffleFx가 담당) */
 export function CardFx({
   phase,
   reduce,
   isMobile,
-  centerGlow = false,
 }: {
   phase: CardPhase;
   reduce: boolean;
   isMobile: boolean;
-  centerGlow?: boolean;
 }) {
-  const showOrbit = showsDeckOrbit(phase);
+  const readyIdle = phase === "ready";
+  const settled = isSelectable(phase);
+
+  const showOrbit = showsDeckOrbit(phase) || readyIdle || settled;
   const showSpotlightFx = showsSpotlight(phase);
   const showReadyFx = showsReadyAmbience(phase);
   const showFlash = showsRestackFlash(phase);
   const showBurst = showsSelectBurst(phase);
   const completeFade = isComplete(phase);
 
-  const particleCount = reduce || !showReadyFx ? 0 : isMobile ? 4 : 7;
+  const ambientFx = (readyIdle || settled) && !completeFade;
+  const particleCount = reduce || !(showReadyFx || settled) ? 0 : isMobile ? 6 : 12;
   const particles = PARTICLE_SEEDS.slice(0, particleCount);
+  const starCount = reduce || !ambientFx ? 0 : isMobile ? 9 : 16;
+  const stars = STAR_SEEDS.slice(0, starCount);
 
   const orbitMixing = phase === "mixing";
   const orbitReveal = phase === "revealing";
@@ -68,6 +101,51 @@ export function CardFx({
         </div>
       ) : null}
 
+      {!reduce && stars.length > 0 ? (
+        <div className="shuffle-deck__stars" aria-hidden="true">
+          {stars.map((s, idx) => (
+            <span
+              key={idx}
+              className={`shuffle-deck__star${s.sparkle ? " shuffle-deck__star--sparkle" : ""}`}
+              style={
+                {
+                  left: s.left,
+                  top: s.top,
+                  "--s-delay": s.delay,
+                  "--s-dur": s.dur,
+                } as CSSProperties
+              }
+            />
+          ))}
+        </div>
+      ) : null}
+
+      {!reduce && ambientFx && !isMobile ? (
+        <svg
+          className="shuffle-deck__constellation"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          {CONSTELLATION_LINES.map(([a, b], idx) => {
+            const p1 = STAR_POINTS[a];
+            const p2 = STAR_POINTS[b];
+            if (!p1 || !p2) return null;
+            return (
+              <line
+                key={idx}
+                x1={p1.x}
+                y1={p1.y}
+                x2={p2.x}
+                y2={p2.y}
+                stroke="rgba(216,184,74,0.3)"
+                strokeWidth="0.15"
+              />
+            );
+          })}
+        </svg>
+      ) : null}
+
       {!reduce && particles.length > 0 ? (
         <div className="shuffle-deck__particles" aria-hidden="true">
           {particles.map((p, idx) => (
@@ -85,14 +163,6 @@ export function CardFx({
             />
           ))}
         </div>
-      ) : null}
-
-      {centerGlow && isSelectable(phase) ? (
-        <div
-          className="shuffle-deck__center-glow shuffle-deck__center-glow--pulse pointer-events-none absolute left-1/2 top-1/2 -z-10"
-          style={{ width: 120, height: 160, marginLeft: -60, marginTop: -80 }}
-          aria-hidden="true"
-        />
       ) : null}
 
       {showFlash && !reduce ? (

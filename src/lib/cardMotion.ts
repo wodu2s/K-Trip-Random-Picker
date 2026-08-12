@@ -4,13 +4,13 @@ import type { CardPhase } from "../types/travel";
 /** 셔플 단계별 duration (ms) — 단일 설정 원천 */
 export const SHUFFLE_TIMING_MS = {
   ready: 80,
-  gathering: 340,
-  fanOut: 480,
-  crossing: 560,
-  mixing: 680,
-  mixingHalf: 340,
-  restacking: 380,
-  selectable: 500,
+  gathering: 400,
+  fanOut: 450,
+  crossing: 340,
+  mixing: 560,
+  mixingHalf: 280,
+  restacking: 300,
+  selectable: 460,
 } as const;
 
 /** reduced-motion 셔플 단축 duration (ms) */
@@ -33,7 +33,7 @@ export const CARD_MOTION = {
   select: ADVENTURE_CARD_MOTION.select,
   stamp: ADVENTURE_CARD_MOTION.stamp,
   focusPause: ADVENTURE_CARD_MOTION.pause,
-  flip: 0.72,
+  flip: 0.6,
   revealHold: ADVENTURE_CARD_MOTION.revealHold,
   revealStagger: ADVENTURE_CARD_MOTION.revealStagger,
   pageExit: 0.2,
@@ -118,15 +118,15 @@ export function cardStaggerDelay(
   if (reduce) return 0;
   switch (phase) {
     case "gathering":
-      return cardIndex * 0.038;
-    case "fanOut":
-      return orderIndex(FAN_STAGGER_ORDER, cardIndex) * 0.052;
-    case "crossing":
-      return cardIndex * 0.032;
-    case "mixing":
       return cardIndex * 0.028;
+    case "fanOut":
+      return orderIndex(FAN_STAGGER_ORDER, cardIndex) * 0.045;
+    case "crossing":
+      return cardIndex * 0.022;
+    case "mixing":
+      return cardIndex * 0.02;
     case "restacking":
-      return orderIndex(RESTACK_STAGGER_ORDER, cardIndex) * 0.042;
+      return orderIndex(RESTACK_STAGGER_ORDER, cardIndex) * 0.028;
     case "selectable":
       return orderIndex(FAN_STAGGER_ORDER, cardIndex) * 0.04;
     default:
@@ -135,7 +135,6 @@ export function cardStaggerDelay(
 }
 
 export function transitionEaseForPhase(phase: CardPhase): [number, number, number, number] {
-  if (phase === "gathering" || phase === "restacking") return SHUFFLE_EASE_OVERSHOOT;
   if (phase === "selectable") return SHUFFLE_EASE_SETTLE;
   return SHUFFLE_EASE;
 }

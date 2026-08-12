@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, User, X } from "lucide-react";
 import { Logo } from "./Logo";
+import { JourneySteps } from "./JourneySteps";
 import { useTravel } from "../../state/TravelContext";
 import { cn } from "../../utils/cn";
 
@@ -13,7 +14,10 @@ const NAV_ITEMS = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const { page, goToLanding, goToConditions } = useTravel();
-  const dark = page === "landing";
+  const dark = page === "landing" || page === "conditions" || page === "cards" || page === "shuffle";
+  const showJourney = page === "cards" || page === "conditions" || page === "destination";
+  const journeyActive =
+    page === "conditions" ? 1 : page === "cards" || page === "shuffle" ? 2 : page === "destination" ? 3 : 0;
 
   function handleNav(target: "landing" | "conditions") {
     setOpen(false);
@@ -48,90 +52,113 @@ export function Header() {
         />
 
         <nav
-          className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-[48px] md:flex"
-          aria-label={"\uC8FC\uC694 \uBA54\uB274"}
+          className="absolute left-1/2 hidden -translate-x-1/2 items-center md:flex"
+          aria-label={showJourney ? "탐험 진행 단계" : "주요 메뉴"}
           style={{ fontFamily: "var(--font-family-base)" }}
         >
-          {NAV_ITEMS.map((item) => {
-            const active = page === item.page;
-            return (
-              <button
-                key={item.label}
-                type="button"
-                onClick={() => handleNav(item.page)}
-                className={cn(
-                  "relative font-medium transition-colors",
-                  dark ? "text-[16.5px]" : "text-[16px]",
-                  dark
-                    ? active
-                      ? "text-[#F0E9DA]"
-                      : "text-[#F0E9DA]/75 hover:text-[#F0E9DA]"
-                    : active
-                      ? "text-[var(--color-forest-800)]"
-                      : "text-[var(--color-text-headline)]/80 hover:text-[var(--color-forest-800)]",
-                )}
-              >
-                {item.label}
-                {active ? (
-                  <span
-                    className="absolute -bottom-1 left-1/2 h-[2px] w-[72%] -translate-x-1/2 rounded-full"
-                    style={{ background: dark ? "#C5A059" : "var(--color-brass-500)" }}
-                    aria-hidden="true"
-                  />
-                ) : null}
-              </button>
-            );
-          })}
+          {showJourney ? (
+            <JourneySteps activeIndex={journeyActive} />
+          ) : (
+            <div className="flex items-center gap-[48px]">
+              {NAV_ITEMS.map((item) => {
+                const active = page === item.page;
+                return (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => handleNav(item.page)}
+                    className={cn(
+                      "relative font-medium transition-colors",
+                      dark ? "text-[16.5px]" : "text-[16px]",
+                      dark
+                        ? active
+                          ? "text-[#F0E9DA]"
+                          : "text-[#F0E9DA]/75 hover:text-[#F0E9DA]"
+                        : active
+                          ? "text-[var(--color-forest-800)]"
+                          : "text-[var(--color-text-headline)]/80 hover:text-[var(--color-forest-800)]",
+                    )}
+                  >
+                    {item.label}
+                    {active ? (
+                      <span
+                        className="absolute -bottom-1 left-1/2 h-[2px] w-[72%] -translate-x-1/2 rounded-full"
+                        style={{ background: dark ? "#C5A059" : "var(--color-brass-500)" }}
+                        aria-hidden="true"
+                      />
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </nav>
 
         <div className="hidden items-center gap-3.5 md:flex">
-          <button
-            type="button"
-            className={cn(
-              "inline-flex items-center justify-center rounded-[8px] border text-[15px] font-semibold transition-colors",
-              dark ? "h-[50px] px-6" : "h-11 px-5",
-            )}
-            style={
-              dark
-                ? {
-                    background: "transparent",
-                    borderColor: "rgba(208,165,77,0.55)",
-                    color: "#F0E9DA",
-                    fontFamily: "var(--font-family-base)",
-                  }
-                : {
-                    background: "var(--color-parchment-100)",
-                    borderColor: "rgba(43,35,24,0.35)",
-                    color: "var(--color-text-headline)",
-                    fontFamily: "var(--font-family-base)",
-                  }
-            }
-          >
-            {"\uB85C\uADF8\uC778"}
-          </button>
-          <button
-            type="button"
-            className={cn(
-              "inline-flex items-center justify-center rounded-[8px] text-[15px] font-semibold transition-colors",
-              dark ? "h-[50px] px-6" : "h-11 px-5",
-            )}
-            style={
-              dark
-                ? {
-                    background: "#1F3D2E",
-                    color: "#F0E6C8",
-                    fontFamily: "var(--font-family-base)",
-                    border: "1px solid rgba(208,165,77,0.35)",
-                  }
-                : {
-                    background: "var(--color-forest-800)",
-                    color: "var(--color-text-on-forest)",
-                    fontFamily: "var(--font-family-base)",
-                  }
-            }
-          >
-            {"\uD68C\uC6D0\uAC00\uC785"}
-          </button>
+          {page === "cards" || page === "shuffle" ? (
+            <button
+              type="button"
+              className="inline-flex h-[46px] w-[46px] items-center justify-center rounded-full border transition-colors hover:border-[rgba(208,165,77,0.75)]"
+              style={{
+                borderColor: "rgba(208,165,77,0.45)",
+                color: "#F0E9DA",
+                background: "rgba(201,162,39,0.06)",
+              }}
+              aria-label="마이페이지"
+            >
+              <User size={20} strokeWidth={1.8} aria-hidden="true" />
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                className={cn(
+                  "inline-flex items-center justify-center rounded-[8px] border text-[15px] font-semibold transition-colors",
+                  dark ? "h-[50px] px-6" : "h-11 px-5",
+                )}
+                style={
+                  dark
+                    ? {
+                        background: "transparent",
+                        borderColor: "rgba(208,165,77,0.55)",
+                        color: "#F0E9DA",
+                        fontFamily: "var(--font-family-base)",
+                      }
+                    : {
+                        background: "var(--color-parchment-100)",
+                        borderColor: "rgba(43,35,24,0.35)",
+                        color: "var(--color-text-headline)",
+                        fontFamily: "var(--font-family-base)",
+                      }
+                }
+              >
+                {"\uB85C\uADF8\uC778"}
+              </button>
+              <button
+                type="button"
+                className={cn(
+                  "inline-flex items-center justify-center rounded-[8px] text-[15px] font-semibold transition-colors",
+                  dark ? "h-[50px] px-6" : "h-11 px-5",
+                )}
+                style={
+                  dark
+                    ? {
+                        background: "#1F3D2E",
+                        color: "#F0E6C8",
+                        fontFamily: "var(--font-family-base)",
+                        border: "1px solid rgba(208,165,77,0.35)",
+                      }
+                    : {
+                        background: "var(--color-forest-800)",
+                        color: "var(--color-text-on-forest)",
+                        fontFamily: "var(--font-family-base)",
+                      }
+                }
+              >
+                {"\uD68C\uC6D0\uAC00\uC785"}
+              </button>
+            </>
+          )}
         </div>
 
         <button
