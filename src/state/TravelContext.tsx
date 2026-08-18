@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { recommendCards } from "../lib/recommend";
+import { prefetchPool, fetchDestinationPool } from "../api/tour";
 import { preloadConditionsAssets } from "../lib/adventureAssets";
 import type {
   CompanionKey,
@@ -90,6 +91,8 @@ export function TravelProvider({ children }: { children: ReactNode }) {
   const goToConditions = useCallback(() => {
     shuffleLock.current = false;
     preloadConditionsAssets();
+    // 조건 선택 동안 실데이터 여행지 풀을 미리 채운다 (실패 시 mock 폴백)
+    void prefetchPool();
     setState((s) => ({
       ...s,
       page: "conditions",
@@ -172,6 +175,8 @@ export function TravelProvider({ children }: { children: ReactNode }) {
 
   const redraw = useCallback(() => {
     shuffleLock.current = false;
+    // 다시 뽑기 때마다 풀을 조금씩 키워 변화를 준다 (비차단)
+    void fetchDestinationPool();
     setState((s) => {
       const recommendOptions = { companion: s.companion, mood: s.mood, discovery: s.discovery };
       const prevKey = s.cards.map((c) => c.destinationId).join(",");

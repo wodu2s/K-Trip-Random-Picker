@@ -66,6 +66,11 @@ export type Destination = {
   reviewCount: number;
   /** 여행지 공개 화면 히어로 일러스트(이미지 대체용) 분위기 */
   scene: SceneVariant;
+  /** TourAPI 콘텐츠 ID (상세조회 키). 실데이터일 때만 존재 */
+  contentId?: string;
+  /** TourAPI 좌표 (주변 명소 조회용). 실데이터일 때만 존재 */
+  mapx?: number;
+  mapy?: number;
 };
 
 /** 카드 선택 화면에 뿌리는 미스터리 카드. 실제 정보는 destinationId로 조회한다. */

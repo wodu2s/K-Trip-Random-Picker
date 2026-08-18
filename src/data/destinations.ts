@@ -1,4 +1,5 @@
 import type { CompanionKey, Destination, DiscoveryKey, MoodKey, ThemeKey } from "../types/travel";
+import { getRuntimeDestination } from "../api/registry";
 
 /** 테마 표시용 라벨/이모지 (조건 선택·태그에서 재사용) */
 export const THEME_META: Record<ThemeKey, { label: string; emoji: string }> = {
@@ -306,5 +307,6 @@ export const DESTINATIONS: Destination[] = [
 ];
 
 export function getDestinationById(id: string): Destination | undefined {
-  return DESTINATIONS.find((d) => d.id === id);
+  // 실데이터(런타임 저장소) 우선, 없으면 mock 폴백
+  return getRuntimeDestination(id) ?? DESTINATIONS.find((d) => d.id === id);
 }

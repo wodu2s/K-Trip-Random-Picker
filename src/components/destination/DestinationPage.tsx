@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { Compass, Gem, MapPin } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageContainer } from "../layout/PageContainer";
 import { StepProgress } from "../layout/StepProgress";
 import { AdventurePageShell } from "../layout/AdventurePageShell";
@@ -12,13 +12,33 @@ import { ScheduleTimeline } from "./ScheduleTimeline";
 import { THEME_META } from "../../data/destinations";
 import { useTravel } from "../../state/TravelContext";
 import { getDestinationById } from "../../data/destinations";
+import { fetchDestinationDetail } from "../../api/tour";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { CARD_MOTION } from "../../lib/cardMotion";
 
 /** 탐험 결과 — 중복 제목 없이 2열 hero */
 export function DestinationPage() {
   const { revealedDestinationId, restart } = useTravel();
-  const destination = revealedDestinationId ? getDestinationById(revealedDestinationId) : undefined;
+  const [destination, setDestination] = useState(() =>
+    revealedDestinationId ? getDestinationById(revealedDestinationId) : undefined,
+  );
+
+  // 공개된 여행지의 실제 개요·주변 명소를 비동기로 보강한다 (실데이터일 때만 호출됨)
+  useEffect(() => {
+    const base = revealedDestinationId ? getDestinationById(revealedDestinationId) : undefined;
+    setDestination(base);
+    if (!base) return;
+    if (!base.contentId && !base.mapx) return;
+    let cancelled = false;
+    void fetchDestinationDetail(base).then((patch) => {
+      if (cancelled || Object.keys(patch).length === 0) return;
+      setDestination((prev) => (prev ? { ...prev, ...patch } : prev));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [revealedDestinationId]);
+
   const reduce = useReducedMotion();
   const stagger = reduce ? 0 : CARD_MOTION.revealStagger;
   const [imgError, setImgError] = useState(false);

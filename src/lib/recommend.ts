@@ -1,5 +1,11 @@
 import { DESTINATIONS, COMPANION_THEME_HINTS, MOOD_THEME_HINTS } from "../data/destinations";
+import { getRuntimePool, hasRuntimePool } from "../api/registry";
 import type { CompanionKey, DiscoveryKey, Destination, MoodKey, MysteryCardData, ThemeKey } from "../types/travel";
+
+/** 실데이터가 등록돼 있으면 실데이터 풀, 없으면 mock 풀 사용 */
+function basePool(): Destination[] {
+  return hasRuntimePool() ? getRuntimePool() : [...DESTINATIONS];
+}
 
 /** Fisher-Yates 셔플 (원본 배열은 변경하지 않는다) */
 export function shuffle<T>(arr: readonly T[]): T[] {
@@ -34,10 +40,11 @@ export type RecommendOptions = {
  */
 export function recommendCards(themes: ThemeKey[], options: RecommendOptions = {}): MysteryCardData[] {
   const { companion, mood, discovery } = options;
+  const pool0 = basePool();
 
   let matched = themes.length
-    ? DESTINATIONS.filter((d) => d.themes.some((t) => themes.includes(t)))
-    : [...DESTINATIONS];
+    ? pool0.filter((d) => d.themes.some((t) => themes.includes(t)))
+    : [...pool0];
 
   if (companion) {
     const hints = COMPANION_THEME_HINTS[companion];
@@ -56,7 +63,7 @@ export function recommendCards(themes: ThemeKey[], options: RecommendOptions = {
   let pool = shuffle(matched);
   if (pool.length < 5) {
     const matchedIds = new Set(matched.map((d) => d.id));
-    const rest = shuffle(DESTINATIONS.filter((d) => !matchedIds.has(d.id)));
+    const rest = shuffle(pool0.filter((d) => !matchedIds.has(d.id)));
     pool = [...pool, ...rest];
   }
 
