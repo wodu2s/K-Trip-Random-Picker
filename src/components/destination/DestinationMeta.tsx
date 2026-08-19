@@ -23,8 +23,9 @@ export function DestinationMeta({ destination }: { destination: Destination }) {
     },
     {
       title: "여행자 평점",
-      value: rating.toFixed(1),
-      note: `리뷰 ${reviewCount.toLocaleString()}개`,
+      // 실제 API(KTO)에는 평점이 없어 값이 없으면 그대로 비워 둔다
+      value: reviewCount > 0 ? rating.toFixed(1) : "정보 없음",
+      note: reviewCount > 0 ? `리뷰 ${reviewCount.toLocaleString()}개` : "관광공사 데이터 기준",
       Icon: Star,
     },
     {

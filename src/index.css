@@ -78,7 +78,7 @@
   --color-text-on-forest: #f0e6c8;
   --color-text-on-brass-btn: #f5ebc8;
 
-  --font-family-display: "Playfair Display", "Noto Serif KR", serif;
+  --font-family-display: "Noto Serif KR Variable", "Noto Serif KR", Georgia, serif;
   --font-family-base: "Pretendard Variable", "Pretendard", -apple-system, sans-serif;
 
   --radius-card: 10px;
@@ -141,10 +141,12 @@
   max-height: 99px;
   align-items: center;
   padding: 20px 36px;
-  border-radius: 4px;
-  background: rgba(5, 18, 30, 0.9);
-  border: 1px solid rgba(197, 160, 89, 0.5);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+  border-radius: 0;
+  /* 박스가 아니라 단계 사이 route line 이 중심 — 배경/테두리는 최소로 */
+  background: transparent;
+  border: 0;
+  border-top: 1px solid rgba(197, 160, 89, 0.22);
+  box-shadow: none;
   overflow: hidden;
   transform: none;
 }

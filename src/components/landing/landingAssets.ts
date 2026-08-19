@@ -5,7 +5,16 @@
 
 export const LANDING_ASSET_PATHS = {
   classicTarget: "/assets/adventure/landing-classic-target.png",
-  cardBack: "/assets/adventure/expedition-card-back.png",
+  /**
+   * 카드 뒷면 — 원본 1024×1536은 표시 크기(140~300px)의 4~7배라 브라우저 축소 과정에서
+   * 뭉개진다. 같은 디자인의 Lanczos 축소본을 기본값으로 쓰고 고DPR만 큰 소스로 올린다.
+   */
+  cardBack: "/assets/adventure/expedition-card-back-512.png",
+  cardBackSrcSet:
+    "/assets/adventure/expedition-card-back-384.png 384w," +
+    "/assets/adventure/expedition-card-back-512.png 512w," +
+    "/assets/adventure/expedition-card-back-768.png 768w," +
+    "/assets/adventure/expedition-card-back.png 1024w",
   compass: "/assets/adventure/prop-brass-compass.png?v=4",
   ticket: "/assets/adventure/prop-expedition-ticket.png?v=2",
   koreaNightMap: "/assets/adventure/night-korea-map.webp?v=3",

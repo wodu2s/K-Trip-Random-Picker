@@ -1,15 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { CompassGraphic } from "../cards/CompassGraphic";
 import { ExpeditionCardArt } from "../cards/ExpeditionCardArt";
-import {
-  DECK_CARDS,
-  DECK_OPACITY,
-  LANDING_ASSET_CONFIG,
-  type DeckCardToken,
-} from "./landingAssets";
+import { DECK_CARDS, DECK_OPACITY, type DeckCardToken } from "./landingAssets";
 import type { DemoBeat, HeroMotionPhase, PreviewBeat } from "./landingHeroMotion";
-import { useLandingAsset } from "./useLandingAsset";
 
 const EASE = [0.22, 0.8, 0.2, 1] as const;
 const EASE_INOUT = "easeInOut" as const;
@@ -22,9 +15,6 @@ const CARD_IDLE = [
   { dx: 0, dy: -4.2, dr: 0, dur: 7, delay: 0.45 },
   { dx: 0, dy: -4, dr: 0, dur: 7, delay: 0.55 },
 ] as const;
-
-/** Values pre-scaled for BrassCompass's ×0.12 damping — net idle sway stays within ±4° */
-const ROSE_IDLE = [-25, 25, -17, 33, -25, 17, -17] as const;
 
 /** Pixel-locked desktop poses — tightened fan gap around the center card */
 const LOCKED_CARDS = [
@@ -41,9 +31,6 @@ type DeckLayout = {
   backW: number;
   deckW: number;
   deckH: number;
-  compass: number;
-  ticketW: number;
-  ticketH: number;
   /** locked = pixel-perfect desktop; full = mid; peek = mobile */
   mode: "locked" | "full" | "peek";
   peekPx: number;
@@ -56,9 +43,6 @@ function useDeckLayout(): DeckLayout {
     backW: 340,
     deckW: 940,
     deckH: 700,
-    compass: 240,
-    ticketW: 300,
-    ticketH: 120,
     mode: "locked",
     peekPx: 12,
   });
@@ -74,9 +58,6 @@ function useDeckLayout(): DeckLayout {
           backW: 190,
           deckW: Math.min(w - 16, 360),
           deckH: 400,
-          compass: 140,
-          ticketW: 170,
-          ticketH: 70,
           mode: "peek",
           peekPx: 10,
         });
@@ -87,9 +68,6 @@ function useDeckLayout(): DeckLayout {
           backW: 255,
           deckW: 620,
           deckH: 520,
-          compass: 190,
-          ticketW: 220,
-          ticketH: 90,
           mode: "peek",
           peekPx: 12,
         });
@@ -100,9 +78,6 @@ function useDeckLayout(): DeckLayout {
           backW: 305,
           deckW: 820,
           deckH: 640,
-          compass: 220,
-          ticketW: 270,
-          ticketH: 110,
           mode: "full",
           peekPx: 12,
         });
@@ -113,9 +88,6 @@ function useDeckLayout(): DeckLayout {
           backW: 340,
           deckW: 940,
           deckH: 700,
-          compass: 240,
-          ticketW: 300,
-          ticketH: 120,
           mode: "locked",
           peekPx: 12,
         });
@@ -161,7 +133,6 @@ export function LandingCardDeck({
 }) {
   const layout = useDeckLayout();
   const [beat, setBeat] = useState<Beat>("settle");
-  const [roseDeg, setRoseDeg] = useState(0);
 
   useEffect(() => {
     if (reduce) {
@@ -192,40 +163,6 @@ export function LandingCardDeck({
     setBeat("settle");
   }, [phase, motionKey, reduce]);
 
-  useEffect(() => {
-    if (reduce) {
-      setRoseDeg(0);
-      return;
-    }
-    if (phase === "demo") {
-      if (beat === "gather") setRoseDeg(12);
-      else if (beat === "split") setRoseDeg(44);
-      else if (beat === "cross") setRoseDeg(-48);
-      else if (beat === "fan") setRoseDeg(30);
-      else if (beat === "focus" || beat === "pointCta") setRoseDeg(0);
-      else setRoseDeg(0);
-      return;
-    }
-    if (phase === "preview") {
-      if (beat === "rise") setRoseDeg(14);
-      else if (beat === "cross") setRoseDeg(-36);
-      else setRoseDeg(0);
-      return;
-    }
-    if (phase === "exit") {
-      setRoseDeg(0);
-      return;
-    }
-    let i = 0;
-    setRoseDeg(ROSE_IDLE[0]!);
-    const id = window.setInterval(() => {
-      i = (i + 1) % ROSE_IDLE.length;
-      setRoseDeg(ROSE_IDLE[i]!);
-    }, 2100);
-    return () => window.clearInterval(id);
-  }, [phase, beat, reduce]);
-
-  // Needle reacts; body stays put (no chase)
   const activeMotion = phase === "demo" || phase === "preview" || phase === "exit";
   const deckFloat =
     reduce
@@ -307,59 +244,6 @@ export function LandingCardDeck({
           );
         })}
 
-        <motion.div
-          className="pointer-events-none absolute"
-          data-landing-compass="true"
-          style={{
-            left: locked ? 110 : layout.mode === "peek" ? "4%" : "8%",
-            bottom: locked ? 18 : layout.mode === "peek" ? "2%" : "4%",
-            zIndex: 8,
-          }}
-          initial={false}
-          animate={{
-            opacity: entered ? 1 : 0,
-            scale: 1,
-            x: entered ? 0 : -12,
-            y: entered ? 0 : 15,
-            rotate: -8,
-          }}
-          transition={{
-            duration: reduce ? 0.2 : 0.8,
-            delay: reduce || !entered ? 0 : 0.45,
-            ease: EASE,
-          }}
-        >
-          <BrassCompass size={layout.compass} roseDeg={roseDeg} reduce={reduce} />
-        </motion.div>
-
-        <motion.div
-          className="pointer-events-none absolute"
-          data-landing-ticket="true"
-          style={{
-            right: locked ? 35 : layout.mode === "peek" ? "2%" : "4%",
-            bottom: locked ? 28 : layout.mode === "peek" ? "6%" : "8%",
-            zIndex: 9,
-          }}
-          initial={false}
-          animate={{
-            opacity: entered ? 1 : 0,
-            scale: 1,
-            x: entered ? 0 : 16,
-            y: entered ? 0 : 12,
-          }}
-          transition={{
-            duration: reduce ? 0.2 : 0.8,
-            delay: reduce || !entered ? 0 : 0.55,
-            ease: EASE,
-          }}
-        >
-          <ExpeditionTicket
-            width={layout.ticketW}
-            height={layout.ticketH}
-            reduce={reduce}
-            phase={phase}
-          />
-        </motion.div>
       </motion.div>
     </div>
   );
@@ -430,7 +314,7 @@ function DeckCardLayer({
         r = left ? -10 : right ? 10 : 0;
         z = featured ? 5 : 2;
       } else if (beat === "cross") {
-        // Behind compass (z < 8)
+        // Outer pair dips behind the featured card (z < 8)
         if (index === 0 || index === 1) {
           x = 40 + index * 8;
           y = baseY + 10;
@@ -762,165 +646,3 @@ function BrassEdgeSweep() {
   );
 }
 
-function BrassCompass({
-  size,
-  roseDeg,
-  reduce,
-}: {
-  size: number;
-  roseDeg: number;
-  reduce: boolean;
-}) {
-  const asset = useLandingAsset(LANDING_ASSET_CONFIG.compass.src);
-
-  return (
-    <div
-      className="pointer-events-none relative flex items-center justify-center bg-transparent"
-      style={{
-        width: size,
-        height: size,
-        filter:
-          "brightness(0.98) contrast(1.06) saturate(0.92) drop-shadow(0 24px 28px rgba(0,0,0,0.55))",
-      }}
-    >
-      {asset.ready ? (
-        <motion.img
-          src={LANDING_ASSET_CONFIG.compass.src}
-          alt=""
-          draggable={false}
-          className="h-full w-full object-contain"
-          style={{ transformOrigin: "50% 50%" }}
-          animate={reduce ? { rotate: 0 } : { rotate: roseDeg * 0.12 }}
-          transition={{ duration: reduce ? 0.2 : 0.85, ease: EASE }}
-          onError={asset.fail}
-        />
-      ) : (
-        <CompassGraphic
-          size={size}
-          needleDeg={roseDeg}
-          animateNeedle={false}
-          needleDuration={reduce ? 0.2 : 0.85}
-          showLoop={false}
-        />
-      )}
-    </div>
-  );
-}
-
-function ExpeditionTicket({
-  width,
-  height,
-  reduce,
-  phase,
-}: {
-  width: number;
-  height: number;
-  reduce: boolean;
-  phase: HeroMotionPhase;
-}) {
-  const asset = useLandingAsset(LANDING_ASSET_CONFIG.ticket.src);
-  const [ticketNo] = useState(() => String(Math.floor(10000 + Math.random() * 90000)));
-  const stubW = Math.max(22, Math.round(width * 0.16));
-  const idleOn = !reduce && phase === "idle";
-
-  return (
-    <motion.div
-      className="pointer-events-none relative"
-      style={{
-        width,
-        height,
-        filter:
-          "brightness(0.94) saturate(0.9) drop-shadow(0 18px 30px rgba(0,0,0,0.42))",
-      }}
-      animate={
-        idleOn
-          ? { rotate: [-6, -5.2, -6], y: [0, -1.5, 0] }
-          : { rotate: -6, y: 0 }
-      }
-      transition={
-        idleOn
-          ? { duration: 4.8, ease: EASE_INOUT, repeat: Infinity }
-          : { duration: 0.3, ease: EASE }
-      }
-    >
-      <div
-        className="relative h-full w-full overflow-hidden"
-        style={{
-          borderRadius: "6px",
-          isolation: "isolate",
-          background:
-            "linear-gradient(155deg, #F8F2E3 0%, var(--color-parchment-100) 42%, var(--color-parchment-300) 100%)",
-          border: "1px solid var(--color-brass-line)",
-          boxShadow:
-            "inset 0 1px 0 rgba(255,255,255,0.55), inset 0 -10px 18px rgba(184,149,46,0.08), 0 1px 0 rgba(43,35,24,0.06)",
-        }}
-      >
-        {asset.ready ? (
-          <img
-            src={LANDING_ASSET_CONFIG.ticket.src}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover opacity-25 mix-blend-multiply"
-            draggable={false}
-            onError={asset.fail}
-          />
-        ) : null}
-        <div
-          className="pointer-events-none absolute inset-[5px] rounded-[3px]"
-          style={{ boxShadow: "inset 0 0 0 1px rgba(184,149,46,0.55)" }}
-          aria-hidden="true"
-        />
-        <div
-          className="pointer-events-none absolute bottom-[10%] top-[10%] border-l border-dashed"
-          style={{ left: stubW, borderColor: "rgba(184,149,46,0.55)" }}
-          aria-hidden="true"
-        />
-        <span
-          className="absolute left-0 top-1/2 z-[3] h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-black [mix-blend-mode:destination-out]"
-          aria-hidden="true"
-        />
-        <span
-          className="absolute right-0 top-1/2 z-[3] h-3.5 w-3.5 translate-x-1/2 -translate-y-1/2 rounded-full bg-black [mix-blend-mode:destination-out]"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute left-0 top-0 flex h-full items-center justify-center"
-          style={{ width: stubW }}
-          aria-hidden="true"
-        >
-          <span
-            className="font-landing-display rotate-[-90deg] text-[9px] font-bold tracking-[0.18em]"
-            style={{ color: "var(--color-brass-500)" }}
-          >
-            PICK&GO
-          </span>
-        </div>
-        <div
-          className="relative z-[1] flex h-full flex-col justify-center pr-3"
-          style={{ paddingLeft: stubW + 10 }}
-        >
-          <p
-            className="font-landing-display text-[10px] font-bold leading-tight tracking-[0.14em]"
-            style={{ color: "var(--color-brass-line)" }}
-          >
-            ADVENTURE
-          </p>
-          <p
-            className="font-landing-display mt-0.5 text-[14px] font-bold leading-tight tracking-[0.04em] sm:text-[15px]"
-            style={{ color: "var(--color-text-headline)" }}
-          >
-            EXPEDITION TICKET
-          </p>
-          <p
-            className="mt-1.5 text-[11px] font-medium tracking-[0.06em]"
-            style={{
-              color: "var(--color-text-body-muted)",
-              fontFamily: "var(--font-family-base)",
-            }}
-          >
-            NO. {ticketNo}
-          </p>
-        </div>
-      </div>
-    </motion.div>
-  );
-}

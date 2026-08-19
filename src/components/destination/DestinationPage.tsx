@@ -8,6 +8,7 @@ import { Button } from "../ui/Button";
 import { DestinationMeta } from "./DestinationMeta";
 import { DestinationActions } from "./DestinationActions";
 import { HiddenPlaceCards } from "./HiddenPlaceCards";
+import { DestinationMap } from "./DestinationMap";
 import { ScheduleTimeline } from "./ScheduleTimeline";
 import { THEME_META } from "../../data/destinations";
 import { useTravel } from "../../state/TravelContext";
@@ -134,31 +135,48 @@ export function DestinationPage() {
           </div>
         </motion.section>
 
-        <motion.div
-          id="schedule-timeline"
-          className="mt-10 scroll-mt-24"
-          initial={reduce ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: stagger * 4 }}
-        >
-          <p className="font-expedition text-center text-[11px] font-bold tracking-[0.16em] text-brass">
-            EXPEDITION ROUTE
-          </p>
-          <h2 className="font-expedition mt-1 text-center text-xl font-bold text-ink">탐험 경로</h2>
-          <p className="mt-1 text-center text-sm text-muted">출발부터 저녁까지, 오늘의 코스를 따라가 보세요</p>
-          <div className="mx-auto mt-5 max-w-[820px]">
-            <ScheduleTimeline schedule={destination.schedule} />
-          </div>
-        </motion.div>
+        {destination.lat && destination.lng ? (
+          <motion.div
+            className="mt-10"
+            initial={reduce ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: stagger * 3 }}
+          >
+            <DestinationMap destination={destination} />
+          </motion.div>
+        ) : null}
 
-        <motion.div
-          className="mt-10"
+        {destination.schedule.length > 0 ? (
+          <motion.div
+            id="schedule-timeline"
+            className="mt-10 scroll-mt-24"
           initial={reduce ? false : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35, delay: stagger * 5 }}
-        >
-          <HiddenPlaceCards places={destination.hiddenPlaces} />
-        </motion.div>
+            transition={{ duration: 0.35, delay: stagger * 4 }}
+          >
+            <p className="font-expedition text-center text-[11px] font-bold tracking-[0.16em] text-brass">
+              EXPEDITION ROUTE
+            </p>
+            <h2 className="font-expedition mt-1 text-center text-xl font-bold text-ink">탐험 경로</h2>
+            <p className="mt-1 text-center text-sm text-muted">
+              출발부터 저녁까지, 오늘의 코스를 따라가 보세요
+            </p>
+            <div className="mx-auto mt-5 max-w-[820px]">
+              <ScheduleTimeline schedule={destination.schedule} />
+            </div>
+          </motion.div>
+        ) : null}
+
+        {destination.hiddenPlaces.length > 0 ? (
+          <motion.div
+            className="mt-10"
+            initial={reduce ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: stagger * 5 }}
+          >
+            <HiddenPlaceCards places={destination.hiddenPlaces} />
+          </motion.div>
+        ) : null}
       </PageContainer>
     </AdventurePageShell>
   );

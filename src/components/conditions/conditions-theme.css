@@ -1,10 +1,618 @@
-/* 조건 설정 페이지 전용 다크 탐험실 톤 — 다른 페이지에 영향 없음 */
+/* ═══════════════════════════════════════════════════
+   조건 설정 페이지 — 통합 Expedition Dossier
+   ═══════════════════════════════════════════════════ */
+
 .conditions-theme {
   --bg: #04131f;
-  --panel: #071a29;
   --panel-deep: #04111c;
-  --gold: #d4af37;
-  --gold-soft: rgba(212, 175, 55, 0.35);
+  --gold: #c9a227;
+  --brass: rgba(196, 156, 92, 0.55);
   --ivory: #f3ead8;
   --ivory-muted: rgba(243, 234, 216, 0.6);
+  --forest: #16281f;
+}
+
+/* ── Page shell ── */
+.conditions-page {
+  position: relative;
+  min-height: calc(100vh - 86px);
+  background: var(--bg);
+  font-family: "Noto Sans KR Variable", sans-serif;
+}
+
+.conditions-page__veil {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 65% at 50% 35%, transparent 55%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+.conditions-page__main {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem 1.25rem;
+}
+
+.conditions-page__panel {
+  min-height: 0;
+}
+
+/* ═══════════════════════════════════════════════════
+   Dossier: dark leather outer frame + antique brass
+   ═══════════════════════════════════════════════════ */
+.dossier {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
+  border: 1.5px solid rgba(148, 116, 48, 0.45);
+  border-radius: 5px;
+  background: #100d08;
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.55),
+    0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+/* dark leather grain */
+.dossier::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  opacity: 0.1;
+}
+
+/* thin brass inner pinstripe */
+.dossier::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  pointer-events: none;
+  z-index: 0;
+  border: 1px solid rgba(148, 116, 48, 0.25);
+  border-radius: 2px;
+}
+
+.dossier-corners {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.dossier-corners img {
+  position: absolute;
+  width: 2rem;
+  height: 2rem;
+  opacity: 0.5;
+}
+
+.dossier-corners img:nth-child(1) { top: 3px; left: 3px; }
+.dossier-corners img:nth-child(2) { top: 3px; right: 3px; transform: scaleX(-1); }
+.dossier-corners img:nth-child(3) { bottom: 3px; left: 3px; transform: scaleY(-1); }
+.dossier-corners img:nth-child(4) { right: 3px; bottom: 3px; transform: scale(-1, -1); }
+
+/* ═══════════════════════════════════════════════════
+   Dossier body: warm aged parchment interior
+   Contains header + I~V + dark inset panel
+   ═══════════════════════════════════════════════════ */
+.dossier-body {
+  --ivory: #2c2012;
+  --ivory-muted: rgba(46, 34, 16, 0.72);
+  --gold: #8a6a16;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0%;
+  min-height: 0;
+  margin: 8px 8px 0;
+  padding: 1rem 1.2rem 0.85rem;
+  border-radius: 2px;
+  background:
+    radial-gradient(ellipse 58% 45% at 50% 28%, rgba(200, 178, 132, 0.12) 0%, transparent 72%),
+    linear-gradient(180deg, #9e8a64 0%, #917e58 28%, #84724e 60%, #786844 100%);
+}
+
+/* parchment grain + age vignette */
+.dossier-body::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image:
+    radial-gradient(ellipse 72% 62% at 50% 36%, transparent 38%, rgba(22, 14, 6, 0.26) 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: auto, 140px 140px;
+  opacity: 0.26;
+}
+
+/* ── Header ── */
+.dossier-header,
+.dossier-fields {
+  position: relative;
+  z-index: 1;
+}
+
+.dossier-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(100, 78, 26, 0.24);
+}
+
+.dossier-header__eyebrow {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--gold);
+}
+
+.dossier-header__title {
+  margin: 0.2rem 0 0;
+  color: var(--ivory);
+  font-family: "Noto Serif KR Variable", serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.dossier-header__aside {
+  max-width: 10.5rem;
+  margin: 0;
+  color: var(--ivory-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* 고지도 결 — 등고선·경위선·컴퍼스 원. 가독성을 위해 아주 옅게만 */
+.dossier-body::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0.07;
+  background-repeat: no-repeat, repeat;
+  background-position: 82% 62%, 0 0;
+  background-size: 46% auto, 168px 168px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='%233b2a10' stroke-width='1.4'%3E%3Ccircle cx='100' cy='100' r='86'/%3E%3Ccircle cx='100' cy='100' r='64'/%3E%3Cpath d='M100 6 L112 100 L100 194 L88 100 Z'/%3E%3Cpath d='M6 100 L100 88 L194 100 L100 112 Z'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='168' height='168' fill='none' stroke='%233b2a10' stroke-width='1'%3E%3Cpath d='M-8 24 C30 6 58 44 96 22 C132 2 152 40 176 20'/%3E%3Cpath d='M-8 60 C34 40 62 82 100 58 C136 36 156 76 176 56'/%3E%3Cpath d='M-8 100 C28 82 60 120 98 98 C134 78 158 114 176 96'/%3E%3Cpath d='M-8 140 C32 120 64 158 102 136 C138 116 158 152 176 134'/%3E%3Cpath d='M0 0 V168 M84 0 V168 M168 0 V168 M0 0 H168 M0 84 H168 M0 168 H168' stroke-width='0.5' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* ── Condition rows I~V — 세로 expedition route ── */
+.dossier-fields {
+  display: flex;
+  flex: 1 1 0%;
+  flex-direction: column;
+  min-height: 0;
+  padding-top: 0.15rem;
+}
+
+/* 남는 세로 공간을 다섯 줄이 나눠 갖는다 */
+.dossier-row {
+  display: grid;
+  grid-template-columns: 30px 104px 1fr;
+  align-items: center;
+  gap: 0 0.6rem;
+  flex: 1 1 0%;
+  min-height: 50px;
+  border-top: 1px dotted rgba(100, 78, 26, 0.3);
+}
+
+.dossier-row:first-child {
+  border-top: none;
+}
+
+/* waypoint — 원형 brass 마커 + 위아래 dotted route */
+.dossier-waypoint {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: stretch;
+}
+
+.dossier-waypoint::before,
+.dossier-waypoint::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 0;
+  border-left: 1px dotted rgba(120, 94, 34, 0.45);
+}
+
+.dossier-waypoint::before {
+  top: 0;
+  bottom: calc(50% + 11px);
+}
+
+.dossier-waypoint::after {
+  top: calc(50% + 11px);
+  bottom: 0;
+}
+
+.dossier-row:first-child .dossier-waypoint::before,
+.dossier-row:last-child .dossier-waypoint::after {
+  content: none;
+}
+
+.dossier-waypoint__mark {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(128, 102, 38, 0.5);
+  border-radius: 50%;
+  background: rgba(240, 228, 200, 0.16);
+  color: rgba(84, 64, 24, 0.78);
+  font-family: "Noto Serif KR Variable", serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+/* 선택 완료된 구간만 gold로 활성화 */
+.dossier-row[data-active="true"] .dossier-waypoint__mark {
+  border-color: rgba(180, 144, 42, 0.9);
+  background: linear-gradient(180deg, #d3b04a 0%, #b08f22 100%);
+  color: #2a2008;
+}
+
+.dossier-row[data-active="true"] .dossier-waypoint::before,
+.dossier-row[data-active="true"] .dossier-waypoint::after {
+  border-left-style: dashed;
+  border-left-color: rgba(178, 143, 44, 0.8);
+}
+
+.dossier-row__label {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.dossier-row__note {
+  color: rgba(76, 58, 22, 0.42);
+  font-family: "Noto Serif KR Variable", serif;
+  font-size: 9px;
+  font-style: italic;
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+
+/* Chips: flat parchment + brass border */
+.dossier-choice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid rgba(128, 102, 38, 0.42);
+  border-radius: 2px;
+  background: rgba(245, 235, 215, 0.06);
+  color: rgba(44, 34, 18, 0.82);
+  font-family: "Noto Sans KR Variable", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.dossier-choice:hover {
+  border-color: rgba(164, 134, 62, 0.6);
+}
+
+/* Selected: forest green + gold, 끝에 작은 gold diamond */
+.dossier-choice[aria-pressed="true"] {
+  color: #dfc05a;
+  font-weight: 700;
+  border-color: rgba(180, 144, 42, 0.65);
+  background: linear-gradient(180deg, #1e3426 0%, #16281f 100%);
+}
+
+.dossier-choice[aria-pressed="true"]::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  margin-left: 7px;
+  background: #d3b04a;
+  transform: rotate(45deg);
+}
+
+.dossier-choice:focus-visible {
+  outline: 3px solid #c9a227;
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════════
+   PREPARE THE DECK — dossier 하단 navy 영역 (약 43%)
+   ═══════════════════════════════════════════════════ */
+.shuffle-launch {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  min-height: 0;
+  margin: 8px;
+  padding: 0.85rem 1.1rem 0.8rem;
+  border-radius: 3px;
+  border-top: 1px solid rgba(148, 116, 48, 0.55);
+  background: linear-gradient(180deg, #0b1d2c 0%, #081824 55%, #071522 100%);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* subtle grain on dark inset */
+.shuffle-launch::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 140px 140px;
+  opacity: 0.05;
+}
+
+.shuffle-launch__scene {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1 1 0%;
+  min-height: 0;
+}
+
+.shuffle-launch__copy {
+  position: relative;
+  z-index: 1;
+}
+
+.shuffle-launch__eyebrow {
+  margin: 0 0 0.15rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: rgba(201, 162, 39, 0.85);
+}
+
+.shuffle-launch__heading {
+  margin: 0;
+  color: #f3ead8;
+  font-family: "Noto Serif KR Variable", serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.shuffle-launch__lead {
+  margin: 0.3rem 0 0;
+  color: rgba(243, 234, 216, 0.72);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+/* Fan: 기존 대비 약 28% 확대 (111→142, 166→212) */
+.shuffle-launch__fan {
+  position: relative;
+  width: 400px;
+  height: 228px;
+  transform: translateY(-8px);
+}
+
+.shuffle-launch__fan-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 142px;
+  height: 212px;
+}
+
+.shuffle-launch__fan-card .expedition-card-art {
+  width: 100%;
+  height: 100%;
+}
+
+/* CTA: full-width antique gold at inset bottom */
+.shuffle-launch__cta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 0.5rem;
+  padding: 0 1.15rem;
+  border: 1px solid rgba(148, 116, 48, 0.6);
+  border-radius: 3px;
+  background: rgba(38, 30, 12, 0.4);
+  color: rgba(201, 162, 39, 0.75);
+  font-family: "Noto Sans KR Variable", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.22s ease, border-color 0.22s ease, color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.shuffle-launch__cta:focus-visible {
+  outline: 3px solid #c9a227;
+  outline-offset: 2px;
+}
+
+.shuffle-launch__cta--ready {
+  border-color: rgba(180, 144, 42, 0.55);
+  background: linear-gradient(180deg, #ae8c22 0%, #947820 52%, #7a6014 100%);
+  color: #16120a;
+}
+
+.shuffle-launch__cta--ready:not(:disabled):hover {
+  border-color: #c4a23a;
+  background: linear-gradient(180deg, #c29e2c 0%, #ae8c22 48%, #947820 100%);
+  color: #16120a;
+  box-shadow: 0 2px 10px rgba(180, 144, 42, 0.18);
+}
+
+.shuffle-launch__hint {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  margin: 0.3rem 0 0;
+  color: rgba(243, 234, 216, 0.6);
+  font-size: 0.74rem;
+  text-align: center;
+}
+
+.shuffle-launch__hint-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+/* ═══════════════════════════════════════════════════
+   Right panel: image frame (unchanged)
+   ═══════════════════════════════════════════════════ */
+.dossier-frame {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  padding: 0.75rem;
+  border: 1px solid var(--brass);
+  border-radius: 4px;
+  background: linear-gradient(180deg, #14110c 0%, #100e0a 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+/* ═══════════════════════════════════════════════════
+   Desktop: 60:40 / 100dvh
+   ═══════════════════════════════════════════════════ */
+@media (min-width: 1024px) {
+  .conditions-page {
+    height: calc(100dvh - 86px);
+    max-height: calc(100dvh - 86px);
+    overflow: hidden;
+  }
+
+  .conditions-page__main {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0.75rem 2rem 0.75rem;
+  }
+
+  .conditions-page__panel {
+    height: 100%;
+  }
+
+  .dossier {
+    height: 100%;
+  }
+
+  /* 상단 parchment 약 57% / 하단 navy 약 43% 고정 */
+  .shuffle-launch {
+    flex: 0 0 43%;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   Mobile
+   ═══════════════════════════════════════════════════ */
+@media (max-width: 1023px) {
+  .dossier-body {
+    margin: 6px 6px 0;
+    padding: 0.85rem 1rem 0.6rem;
+  }
+
+  .dossier-header__aside {
+    display: none;
+  }
+
+  .dossier-row {
+    grid-template-columns: 26px 1fr;
+    flex: 0 0 auto;
+    min-height: 0;
+    padding: 0.5rem 0;
+    gap: 0.35rem 0.5rem;
+  }
+
+  .dossier-row__label {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.45rem;
+  }
+
+  .dossier-row > .flex.flex-wrap {
+    grid-column: 2;
+  }
+
+  .shuffle-launch {
+    margin: 6px;
+  }
+
+  .shuffle-launch__scene {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .shuffle-launch__fan {
+    width: 330px;
+    height: 196px;
+    transform: none;
+  }
+
+  .shuffle-launch__fan-card {
+    width: 126px;
+    height: 188px;
+  }
+}
+
+@media (max-width: 639px) {
+  .shuffle-launch__fan {
+    width: 300px;
+    height: 178px;
+  }
+
+  .shuffle-launch__fan-card {
+    width: 114px;
+    height: 170px;
+  }
 }

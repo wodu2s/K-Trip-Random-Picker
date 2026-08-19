@@ -1,4 +1,4 @@
-import { LANDING_ASSET_CONFIG } from "../landing/landingAssets";
+import { LANDING_ASSET_CONFIG, LANDING_ASSET_PATHS } from "../landing/landingAssets";
 import { useLandingAsset } from "../landing/useLandingAsset";
 
 /** 카드 슬롯별 취향 힌트 이모지 (1–5) */
@@ -50,8 +50,11 @@ export function ExpeditionCardArt({
       {asset.ready ? (
         <img
           src={LANDING_ASSET_CONFIG.cardBack.src}
+          srcSet={LANDING_ASSET_PATHS.cardBackSrcSet}
+          sizes="(max-width: 1023px) 45vw, 300px"
           alt=""
           draggable={false}
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover"
           onError={asset.fail}
         />

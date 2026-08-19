@@ -66,6 +66,9 @@ export type Destination = {
   reviewCount: number;
   /** 여행지 공개 화면 히어로 일러스트(이미지 대체용) 분위기 */
   scene: SceneVariant;
+  /** 실제 API 응답에만 있는 좌표 (지도·주변 장소용) */
+  lat?: number | null;
+  lng?: number | null;
 };
 
 /** 카드 선택 화면에 뿌리는 미스터리 카드. 실제 정보는 destinationId로 조회한다. */

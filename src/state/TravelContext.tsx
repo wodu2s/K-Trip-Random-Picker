@@ -9,6 +9,8 @@ import {
   type ReactNode,
 } from "react";
 import { recommendCards } from "../lib/recommend";
+import { fetchRecommendations } from "../lib/api";
+import { registerDestinations } from "../data/destinations";
 import { preloadConditionsAssets } from "../lib/adventureAssets";
 import type {
   CompanionKey,
@@ -42,13 +44,13 @@ type TravelActions = {
   setCompanion: (c: CompanionKey) => void;
   setMood: (m: MoodKey) => void;
   setDiscovery: (d: DiscoveryKey) => void;
-  startShuffle: () => void;
+  startShuffle: () => Promise<void>;
   finishShuffle: () => void;
   reorderCards: (cards: MysteryCardData[]) => void;
   selectCard: (cardId: string, destinationId: string) => void;
   clearSelection: () => void;
   goToDestination: () => void;
-  redraw: () => void;
+  redraw: () => Promise<void>;
   restart: () => void;
 };
 
@@ -77,10 +79,43 @@ function scrollTop() {
 export function TravelProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<TravelState>(initialState);
   const shuffleLock = useRef(false);
+  const stateRef = useRef(state);
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   useEffect(() => {
     scrollTop();
   }, [state.page]);
+
+  /**
+   * 조건값으로 카드 5장을 만든다.
+   * 백엔드(KTO) 추천을 우선 사용하고, 호출이 실패할 때만 로컬 mock으로 대체한다.
+   */
+  const drawCards = useCallback(async (s: TravelState): Promise<MysteryCardData[]> => {
+    try {
+      const destinations = await fetchRecommendations({
+        duration: s.duration,
+        themes: s.themes,
+        companion: s.companion,
+        mood: s.mood,
+        discovery: s.discovery,
+      });
+      registerDestinations(destinations);
+      return destinations.slice(0, 5).map((d, i) => ({
+        id: `card-${i + 1}-${d.id}`,
+        destinationId: d.id,
+      }));
+    } catch (err) {
+      console.warn("[recommend] API 실패 — 로컬 데이터로 대체합니다.", err);
+      return recommendCards(s.themes, {
+        companion: s.companion,
+        mood: s.mood,
+        discovery: s.discovery,
+      });
+    }
+  }, []);
 
   const goToLanding = useCallback(() => {
     shuffleLock.current = false;
@@ -122,28 +157,22 @@ export function TravelProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /** 조건 → 카드 드로우(셔플+선택 통합). 중복 진입 잠금. */
-  const startShuffle = useCallback(() => {
+  const startShuffle = useCallback(async () => {
     if (shuffleLock.current) return;
+    const s = stateRef.current;
+    if (!s.duration || s.themes.length === 0) return;
+
     shuffleLock.current = true;
-    setState((s) => {
-      if (!s.duration || s.themes.length === 0) {
-        shuffleLock.current = false;
-        return s;
-      }
-      return {
-        ...s,
-        page: "cards",
-        cards: recommendCards(s.themes, {
-          companion: s.companion,
-          mood: s.mood,
-          discovery: s.discovery,
-        }),
-        selectedCardId: null,
-        revealedDestinationId: null,
-        deckGeneration: s.deckGeneration + 1,
-      };
-    });
-  }, []);
+    const cards = await drawCards(s);
+    setState((prev) => ({
+      ...prev,
+      page: "cards",
+      cards,
+      selectedCardId: null,
+      revealedDestinationId: null,
+      deckGeneration: prev.deckGeneration + 1,
+    }));
+  }, [drawCards]);
 
   const finishShuffle = useCallback(() => {
     shuffleLock.current = false;
@@ -170,25 +199,25 @@ export function TravelProvider({ children }: { children: ReactNode }) {
     setState((s) => (s.revealedDestinationId ? { ...s, page: "destination" } : s));
   }, []);
 
-  const redraw = useCallback(() => {
+  const redraw = useCallback(async () => {
     shuffleLock.current = false;
-    setState((s) => {
-      const recommendOptions = { companion: s.companion, mood: s.mood, discovery: s.discovery };
-      const prevKey = s.cards.map((c) => c.destinationId).join(",");
-      let next = recommendCards(s.themes, recommendOptions);
-      for (let i = 0; i < 6 && next.map((c) => c.destinationId).join(",") === prevKey; i++) {
-        next = recommendCards(s.themes, recommendOptions);
-      }
-      return {
-        ...s,
-        page: "cards",
-        cards: next,
-        selectedCardId: null,
-        revealedDestinationId: null,
-        deckGeneration: s.deckGeneration + 1,
-      };
-    });
-  }, []);
+    const s = stateRef.current;
+    const prevKey = s.cards.map((c) => c.destinationId).join(",");
+
+    let next = await drawCards(s);
+    if (next.map((c) => c.destinationId).join(",") === prevKey) {
+      next = await drawCards(s);
+    }
+
+    setState((prev) => ({
+      ...prev,
+      page: "cards",
+      cards: next,
+      selectedCardId: null,
+      revealedDestinationId: null,
+      deckGeneration: prev.deckGeneration + 1,
+    }));
+  }, [drawCards]);
 
   const restart = useCallback(() => {
     shuffleLock.current = false;
