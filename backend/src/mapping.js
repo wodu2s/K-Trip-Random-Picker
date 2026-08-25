@@ -55,12 +55,16 @@ export const AREA_CODES = {
   39: { name: "제주", time: "약 1시간 20분 (항공)" },
 };
 
-/** 당일치기는 수도권·근교 위주, 1박 이상은 전국 */
-const DAY_TRIP_AREAS = [1, 2, 31, 32, 33, 34];
 const ALL_AREAS = Object.keys(AREA_CODES).map(Number);
 
-export function areaPool(duration) {
-  return duration === "day-trip" ? DAY_TRIP_AREAS : ALL_AREAS;
+/**
+ * 조회할 지역 코드 목록 — 항상 전국 17개 시도.
+ *
+ * 어디로 갈지 모를 때 뽑아주는 서비스라 지역은 조건으로 좁히지 않는다.
+ * 실제 순서는 호출부(kto.js)에서 pickRandom으로 섞는다.
+ */
+export function areaPool() {
+  return ALL_AREAS;
 }
 
 /**

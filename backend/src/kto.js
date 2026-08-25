@@ -154,10 +154,11 @@ async function fillOverview(destination) {
 /**
  * 조건값으로 실제 여행지 후보 5개 생성.
  * 테마별로 서로 다른 지역을 조회해 중복 없이 섞는다.
+ * 지역은 전국에서 무작위로 고른다 — duration(여행 기간)은 지역 선정에 쓰지 않는다.
  */
-export async function recommendDestinations({ duration, themes, companion, mood, discovery }) {
+export async function recommendDestinations({ themes, companion, mood, discovery }) {
   const pool = themePool(themes, companion, mood);
-  const areas = pickRandom(areaPool(duration));
+  const areas = pickRandom(areaPool());
 
   const results = await Promise.allSettled(
     pool.map((theme, i) =>
