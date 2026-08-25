@@ -1,5 +1,6 @@
 import {
   AREA_CODES,
+  DEFAULT_THEME,
   THEME_LABEL,
   THEME_QUERY,
   areaPool,
@@ -74,7 +75,7 @@ function firstSentences(text, count) {
 function toDestination(item, theme) {
   const area = AREA_CODES[Number(item.areacode)] ?? { name: "전국", time: "약 2시간" };
   const themeLabel = THEME_LABEL[theme] ?? "여행";
-  const query = THEME_QUERY[theme] ?? THEME_QUERY.etc;
+  const query = THEME_QUERY[theme] ?? THEME_QUERY[DEFAULT_THEME];
 
   return {
     id: `kto-${item.contentid}`,
@@ -102,7 +103,7 @@ function toDestination(item, theme) {
 
 /** 지역·테마별 목록 조회 */
 async function listByTheme(theme, areaCode, discovery) {
-  const query = THEME_QUERY[theme] ?? THEME_QUERY.etc;
+  const query = THEME_QUERY[theme] ?? THEME_QUERY[DEFAULT_THEME];
   const { arrange, pageNo } = discoveryQuery(discovery);
 
   const items = await callKto("areaBasedList2", {

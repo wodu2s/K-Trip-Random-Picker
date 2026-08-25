@@ -1,16 +1,12 @@
 /** 여행 기간 */
 export type Duration = "day-trip" | "overnight";
 
-/** 여행 테마 키 */
-export type ThemeKey =
-  | "sea"
-  | "nature"
-  | "food"
-  | "vibe"
-  | "history"
-  | "local"
-  | "activity"
-  | "etc";
+/**
+ * 여행 테마 키.
+ * 맛집(food)·로컬(local)·기타(etc)는 추천 대상에서 제외했다.
+ * 주변 맛집은 결과 화면에서 Kakao Local(FD6)로 계속 제공한다.
+ */
+export type ThemeKey = "sea" | "nature" | "vibe" | "history" | "activity";
 
 /** 동행 유형 */
 export type CompanionKey = "alone" | "couple" | "friends" | "family";

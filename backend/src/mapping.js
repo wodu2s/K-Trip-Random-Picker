@@ -4,36 +4,33 @@
 export const THEME_QUERY = {
   sea: { contentTypeId: "12", cat1: "A01", cat2: "A0101", cat3: "A01011200", scene: "sea" },
   nature: { contentTypeId: "12", cat1: "A01", cat2: "A0101", scene: "mountain" },
-  food: { contentTypeId: "39", cat1: "A05", scene: "town" },
   vibe: { contentTypeId: "14", cat1: "A02", cat2: "A0206", scene: "town" },
   history: { contentTypeId: "12", cat1: "A02", cat2: "A0201", scene: "town" },
-  local: { contentTypeId: "38", cat1: "A04", cat2: "A0401", scene: "town" },
   activity: { contentTypeId: "28", cat1: "A03", scene: "mountain" },
-  etc: { contentTypeId: "12", scene: "town" },
 };
+
+/** THEME_QUERY에 없는 값이 들어왔을 때 쓰는 기본 조회 조건 */
+export const DEFAULT_THEME = "nature";
 
 export const THEME_LABEL = {
   sea: "바다",
   nature: "자연",
-  food: "맛집",
   vibe: "감성",
   history: "역사/문화",
-  local: "로컬",
   activity: "액티비티",
-  etc: "기타",
 };
 
 /** 동행·분위기 → 테마 힌트 (프런트 recommend.ts와 같은 성향) */
 export const COMPANION_THEME_HINTS = {
-  alone: ["nature", "vibe", "local"],
-  couple: ["vibe", "sea", "food"],
-  friends: ["activity", "food", "sea"],
+  alone: ["nature", "vibe"],
+  couple: ["vibe", "sea"],
+  friends: ["activity", "sea"],
   family: ["nature", "history", "activity"],
 };
 
 export const MOOD_THEME_HINTS = {
-  calm: ["nature", "local"],
-  lively: ["activity", "food"],
+  calm: ["nature", "history"],
+  lively: ["activity", "sea"],
   emotional: ["vibe", "history"],
 };
 
@@ -83,7 +80,7 @@ export function themePool(themes = [], companion, mood) {
   const hints = [...(COMPANION_THEME_HINTS[companion] ?? []), ...(MOOD_THEME_HINTS[mood] ?? [])];
   const preferred = picked.filter((t) => hints.includes(t));
   const ordered = [...new Set([...preferred, ...picked, ...hints.filter((t) => THEME_QUERY[t])])];
-  return ordered.length ? ordered.slice(0, 3) : ["nature"];
+  return ordered.length ? ordered.slice(0, 3) : [DEFAULT_THEME];
 }
 
 export function pickRandom(arr, n) {

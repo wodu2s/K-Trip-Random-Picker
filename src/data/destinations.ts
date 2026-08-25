@@ -4,24 +4,12 @@ import type { CompanionKey, Destination, DiscoveryKey, MoodKey, ThemeKey } from 
 export const THEME_META: Record<ThemeKey, { label: string; emoji: string }> = {
   sea: { label: "바다", emoji: "🌊" },
   nature: { label: "자연", emoji: "⛰️" },
-  food: { label: "맛집", emoji: "🍜" },
   vibe: { label: "감성", emoji: "📷" },
   history: { label: "역사/문화", emoji: "🏛️" },
-  local: { label: "로컬", emoji: "📍" },
   activity: { label: "액티비티", emoji: "🚴" },
-  etc: { label: "기타", emoji: "✨" },
 };
 
-export const THEME_ORDER: ThemeKey[] = [
-  "sea",
-  "nature",
-  "food",
-  "vibe",
-  "history",
-  "local",
-  "activity",
-  "etc",
-];
+export const THEME_ORDER: ThemeKey[] = ["sea", "nature", "vibe", "history", "activity"];
 
 /** 동행 표시용 라벨 (조건 선택에서 재사용) */
 export const COMPANION_META: Record<CompanionKey, { label: string }> = {
@@ -53,16 +41,16 @@ export const DISCOVERY_ORDER: DiscoveryKey[] = ["popular", "balanced", "hidden"]
 
 /** 동행 → 테마 힌트 (추천 시 부드러운 가중치로 사용, 하드 필터 아님) */
 export const COMPANION_THEME_HINTS: Record<CompanionKey, ThemeKey[]> = {
-  alone: ["nature", "local"],
+  alone: ["nature", "vibe"],
   couple: ["vibe", "sea"],
-  friends: ["activity", "food"],
-  family: ["history", "local"],
+  friends: ["activity", "sea"],
+  family: ["history", "nature"],
 };
 
 /** 분위기 → 테마 힌트 */
 export const MOOD_THEME_HINTS: Record<MoodKey, ThemeKey[]> = {
-  calm: ["nature", "local"],
-  lively: ["activity", "food"],
+  calm: ["nature", "history"],
+  lively: ["activity", "sea"],
   emotional: ["vibe", "history"],
 };
 
@@ -76,7 +64,7 @@ export const DESTINATIONS: Destination[] = [
     name: "울릉도",
     region: "경북 울릉군 울릉읍",
     image: "/images/destinations/ulleungdo.jpg",
-    themes: ["nature", "sea", "local"],
+    themes: ["nature", "sea"],
     tags: ["섬", "절벽", "트레킹"],
     shortDescription: "아직 많이 알려지지 않은, 시간이 느리게 흐르는 섬.",
     tagline: "숨겨진 자연의 보석",
@@ -105,7 +93,7 @@ export const DESTINATIONS: Destination[] = [
     name: "강릉 안목해변",
     region: "강원 강릉시",
     image: "/images/destinations/gangneung-beach.jpg",
-    themes: ["sea", "vibe", "food"],
+    themes: ["sea", "vibe"],
     tags: ["바다", "카페", "감성"],
     shortDescription: "파도 소리와 커피 향이 함께 흐르는 바닷가.",
     tagline: "커피 향 가득한 바닷가",
@@ -134,7 +122,7 @@ export const DESTINATIONS: Destination[] = [
     name: "전주 한옥마을",
     region: "전북 전주시 완산구",
     image: "/images/destinations/jeonju-hanok.jpg",
-    themes: ["history", "food", "local"],
+    themes: ["history", "vibe"],
     tags: ["한옥", "전통", "골목"],
     shortDescription: "골목마다 전통의 온기가 배어 있는 마을.",
     tagline: "골목마다 스민 전통의 온기",
@@ -192,7 +180,7 @@ export const DESTINATIONS: Destination[] = [
     name: "태안 청포대 해변",
     region: "충남 태안군",
     image: "/images/destinations/taean-beach.jpg",
-    themes: ["sea", "local"],
+    themes: ["sea", "nature"],
     tags: ["해변", "노을", "한적함"],
     shortDescription: "인파 없이 조용히 노을을 담을 수 있는 해변.",
     tagline: "노을이 조용히 지는 해변",
@@ -221,7 +209,7 @@ export const DESTINATIONS: Destination[] = [
     name: "담양 죽녹원",
     region: "전남 담양군",
     image: "/images/destinations/damyang-forest.jpg",
-    themes: ["nature", "vibe", "local"],
+    themes: ["nature", "vibe"],
     tags: ["대숲", "산책", "힐링"],
     shortDescription: "대숲 사이로 바람이 지나는 초록빛 산책길.",
     tagline: "바람이 지나는 초록빛 대숲",
@@ -250,7 +238,7 @@ export const DESTINATIONS: Destination[] = [
     name: "여수 이순신광장",
     region: "전남 여수시",
     image: "/images/destinations/yeosu-night.jpg",
-    themes: ["vibe", "food", "sea"],
+    themes: ["vibe", "sea"],
     tags: ["밤바다", "야경", "낭만"],
     shortDescription: "밤바다 위로 반짝이는 불빛이 낭만을 더하는 항구.",
     tagline: "밤바다에 스며드는 낭만",
@@ -279,7 +267,7 @@ export const DESTINATIONS: Destination[] = [
     name: "보성 대한다원",
     region: "전남 보성군",
     image: "/images/destinations/boseong-tea.jpg",
-    themes: ["nature", "vibe", "local"],
+    themes: ["nature", "vibe"],
     tags: ["차밭", "초록", "고요함"],
     shortDescription: "초록빛 차밭 능선이 끝없이 펼쳐지는 고요한 아침.",
     tagline: "초록빛 능선의 고요한 아침",
