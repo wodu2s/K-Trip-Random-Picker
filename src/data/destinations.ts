@@ -62,7 +62,7 @@ export const DESTINATIONS: Destination[] = [
   {
     id: "ulleungdo",
     name: "울릉도",
-    region: "경북 울릉군 울릉읍",
+    region: "경상북도 울릉군",
     image: "/images/destinations/ulleungdo.jpg",
     themes: ["nature", "sea"],
     tags: ["섬", "절벽", "트레킹"],
@@ -91,7 +91,7 @@ export const DESTINATIONS: Destination[] = [
   {
     id: "gangneung-beach",
     name: "강릉 안목해변",
-    region: "강원 강릉시",
+    region: "강원도 강릉시",
     image: "/images/destinations/gangneung-beach.jpg",
     themes: ["sea", "vibe"],
     tags: ["바다", "카페", "감성"],
@@ -120,7 +120,7 @@ export const DESTINATIONS: Destination[] = [
   {
     id: "jeonju-hanok",
     name: "전주 한옥마을",
-    region: "전북 전주시 완산구",
+    region: "전라북도 전주시",
     image: "/images/destinations/jeonju-hanok.jpg",
     themes: ["history", "vibe"],
     tags: ["한옥", "전통", "골목"],
@@ -149,7 +149,7 @@ export const DESTINATIONS: Destination[] = [
   {
     id: "seoraksan",
     name: "설악산 울산바위",
-    region: "강원 속초시",
+    region: "강원도 속초시",
     image: "/images/destinations/seoraksan.jpg",
     themes: ["nature", "activity"],
     tags: ["산", "트레킹", "전망"],
@@ -178,7 +178,7 @@ export const DESTINATIONS: Destination[] = [
   {
     id: "taean-beach",
     name: "태안 청포대 해변",
-    region: "충남 태안군",
+    region: "충청남도 태안군",
     image: "/images/destinations/taean-beach.jpg",
     themes: ["sea", "nature"],
     tags: ["해변", "노을", "한적함"],
@@ -207,7 +207,7 @@ export const DESTINATIONS: Destination[] = [
   {
     id: "damyang-forest",
     name: "담양 죽녹원",
-    region: "전남 담양군",
+    region: "전라남도 담양군",
     image: "/images/destinations/damyang-forest.jpg",
     themes: ["nature", "vibe"],
     tags: ["대숲", "산책", "힐링"],
@@ -236,7 +236,7 @@ export const DESTINATIONS: Destination[] = [
   {
     id: "yeosu-night",
     name: "여수 이순신광장",
-    region: "전남 여수시",
+    region: "전라남도 여수시",
     image: "/images/destinations/yeosu-night.jpg",
     themes: ["vibe", "sea"],
     tags: ["밤바다", "야경", "낭만"],
@@ -265,7 +265,7 @@ export const DESTINATIONS: Destination[] = [
   {
     id: "boseong-tea",
     name: "보성 대한다원",
-    region: "전남 보성군",
+    region: "전라남도 보성군",
     image: "/images/destinations/boseong-tea.jpg",
     themes: ["nature", "vibe"],
     tags: ["차밭", "초록", "고요함"],

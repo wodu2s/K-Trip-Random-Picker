@@ -8,6 +8,7 @@ import {
   pickRandom,
   themePool,
 } from "./mapping.js";
+import { normalizeRegion } from "./region.js";
 
 const TIMEOUT_MS = 7000;
 
@@ -82,7 +83,7 @@ function toDestination(item, theme) {
     contentId: String(item.contentid),
     contentTypeId: String(item.contenttypeid ?? query.contentTypeId),
     name: stripHtml(item.title),
-    region: stripHtml(item.addr1) || area.name,
+    region: normalizeRegion(stripHtml(item.addr1), area.name),
     image: item.firstimage || item.firstimage2 || "",
     themes: [theme],
     tags: [themeLabel, area.name, item.cat3 ? "추천" : "탐험"].slice(0, 3),
