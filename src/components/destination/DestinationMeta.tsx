@@ -1,12 +1,30 @@
-import { Clock, MapPin, Star, Backpack } from "lucide-react";
-import type { Destination } from "../../types/travel";
+import { Clock, MapPin, Star, Backpack, Clock3 } from "lucide-react";
+import type { Destination, DestinationInfo } from "../../types/travel";
 import { cn } from "../../utils/cn";
 
 /**
  * 탐험 도구 카드 — 핵심 메타 정보 최대 4개.
  */
-export function DestinationMeta({ destination }: { destination: Destination }) {
+export function DestinationMeta({
+  destination,
+  info,
+}: {
+  destination: Destination;
+  info?: DestinationInfo;
+}) {
   const { rating, reviewCount, travelTimeText, region, isHiddenGem, hiddenPlaces } = destination;
+
+  /**
+   * KTO에는 평점·리뷰가 없다. 목데이터(reviewCount > 0)일 때만 평점을 보여주고,
+   * 실제 API 여행지는 detailIntro2의 운영 시간으로 대체한다.
+   * 둘 다 없을 때만 "정보 없음"을 남긴다.
+   */
+  const ratingCard =
+    reviewCount > 0
+      ? { title: "여행자 평점", value: rating.toFixed(1), note: `리뷰 ${reviewCount.toLocaleString()}개`, Icon: Star }
+      : info?.usetime
+        ? { title: "운영 시간", value: info.usetime, note: "관광공사 제공", Icon: Clock3 }
+        : { title: "여행자 평점", value: "정보 없음", note: "관광공사 데이터 기준", Icon: Star };
 
   const cards = [
     {
@@ -21,13 +39,7 @@ export function DestinationMeta({ destination }: { destination: Destination }) {
       note: "탐험 좌표",
       Icon: MapPin,
     },
-    {
-      title: "여행자 평점",
-      // 실제 API(KTO)에는 평점이 없어 값이 없으면 그대로 비워 둔다
-      value: reviewCount > 0 ? rating.toFixed(1) : "정보 없음",
-      note: reviewCount > 0 ? `리뷰 ${reviewCount.toLocaleString()}개` : "관광공사 데이터 기준",
-      Icon: Star,
-    },
+    ratingCard,
     {
       title: "여행 유형",
       value: isHiddenGem ? "숨은 명소" : "추천 코스",

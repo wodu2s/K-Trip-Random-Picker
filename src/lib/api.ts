@@ -1,4 +1,4 @@
-import type { Destination, HiddenPlace } from "../types/travel";
+import type { Destination, DestinationInfo, HiddenPlace } from "../types/travel";
 
 const BASE = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
 
@@ -50,4 +50,15 @@ export async function fetchNearbyPlaces(
   lng: number,
 ): Promise<{ spots: NearbyPlace[]; foods: NearbyPlace[]; cafes: NearbyPlace[]; hiddenPlaces: HiddenPlace[] }> {
   return request(`/api/places/nearby?lat=${lat}&lng=${lng}`);
+}
+
+/** 선택한 여행지 1곳의 이용 정보·추가 사진 (실패 시 throw, 호출부에서 무시) */
+export async function fetchDestinationDetail(
+  contentId: string,
+  contentTypeId: string,
+): Promise<{ info: DestinationInfo; gallery: string[] }> {
+  return request(
+    `/api/destination/detail?contentId=${encodeURIComponent(contentId)}` +
+      `&contentTypeId=${encodeURIComponent(contentTypeId)}`,
+  );
 }

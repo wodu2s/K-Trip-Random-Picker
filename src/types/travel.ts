@@ -65,6 +65,22 @@ export type Destination = {
   /** 실제 API 응답에만 있는 좌표 (지도·주변 장소용) */
   lat?: number | null;
   lng?: number | null;
+  /** TourAPI 식별자 — 상세 조회(detailIntro2·detailImage2)에 사용. 목데이터에는 없다. */
+  contentId?: string;
+  contentTypeId?: string;
+  /** 카드 선택 후 detailIntro2로 채우는 이용 정보 (KTO에 평점이 없어 이 값들로 대체) */
+  info?: DestinationInfo;
+  /** 카드 선택 후 detailImage2로 채우는 추가 사진 */
+  gallery?: string[];
+};
+
+/** 관광공사 이용 정보 — 값이 없는 항목은 아예 내려오지 않는다 */
+export type DestinationInfo = {
+  usetime?: string;
+  restdate?: string;
+  fee?: string;
+  parking?: string;
+  infocenter?: string;
 };
 
 /** 카드 선택 화면에 뿌리는 미스터리 카드. 실제 정보는 destinationId로 조회한다. */

@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { Compass, Gem, MapPin } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PageContainer } from "../layout/PageContainer";
 import { StepProgress } from "../layout/StepProgress";
 import { AdventurePageShell } from "../layout/AdventurePageShell";
@@ -9,12 +9,16 @@ import { DestinationMeta } from "./DestinationMeta";
 import { DestinationActions } from "./DestinationActions";
 import { HiddenPlaceCards } from "./HiddenPlaceCards";
 import { DestinationMap } from "./DestinationMap";
+import { DestinationInfoList } from "./DestinationInfoList";
+import { DestinationGallery } from "./DestinationGallery";
 import { ScheduleTimeline } from "./ScheduleTimeline";
 import { THEME_META } from "../../data/destinations";
 import { useTravel } from "../../state/TravelContext";
 import { getDestinationById } from "../../data/destinations";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { CARD_MOTION } from "../../lib/cardMotion";
+import { fetchDestinationDetail } from "../../lib/api";
+import type { DestinationInfo } from "../../types/travel";
 
 /** 탐험 결과 — 중복 제목 없이 2열 hero */
 export function DestinationPage() {
@@ -23,6 +27,32 @@ export function DestinationPage() {
   const reduce = useReducedMotion();
   const stagger = reduce ? 0 : CARD_MOTION.revealStagger;
   const [imgError, setImgError] = useState(false);
+  const [info, setInfo] = useState<DestinationInfo>({});
+  const [gallery, setGallery] = useState<string[]>([]);
+
+  const contentId = destination?.contentId;
+  const contentTypeId = destination?.contentTypeId;
+
+  // 카드를 고른 뒤 선택한 1곳만 상세 조회한다 (목데이터에는 contentId가 없어 건너뛴다)
+  useEffect(() => {
+    setInfo({});
+    setGallery([]);
+    if (!contentId || !contentTypeId) return;
+
+    let alive = true;
+    fetchDestinationDetail(contentId, contentTypeId)
+      .then((detail) => {
+        if (!alive) return;
+        setInfo(detail.info ?? {});
+        setGallery(detail.gallery ?? []);
+      })
+      .catch(() => {
+        /* 상세 정보는 실패해도 나머지 화면은 그대로 보여준다 */
+      });
+    return () => {
+      alive = false;
+    };
+  }, [contentId, contentTypeId]);
 
   if (!destination) {
     return (
@@ -85,7 +115,7 @@ export function DestinationPage() {
               ))}
             </div>
 
-            <DestinationMeta destination={destination} />
+            <DestinationMeta destination={destination} info={info} />
             <DestinationActions destination={destination} />
           </div>
 
@@ -134,6 +164,28 @@ export function DestinationPage() {
             <p className="mt-3 text-sm leading-relaxed text-muted lg:px-1">{destination.story}</p>
           </div>
         </motion.section>
+
+        {Object.keys(info).length > 0 ? (
+          <motion.div
+            className="mt-10"
+            initial={reduce ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: stagger * 2 }}
+          >
+            <DestinationInfoList info={info} />
+          </motion.div>
+        ) : null}
+
+        {gallery.length > 0 ? (
+          <motion.div
+            className="mt-10"
+            initial={reduce ? false : { opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: stagger * 2 }}
+          >
+            <DestinationGallery images={gallery} name={destination.name} />
+          </motion.div>
+        ) : null}
 
         {destination.lat && destination.lng ? (
           <motion.div

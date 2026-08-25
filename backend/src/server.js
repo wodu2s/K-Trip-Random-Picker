@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { recommendDestinations } from "./kto.js";
+import { fetchDestinationDetail, recommendDestinations } from "./kto.js";
 import { buildSchedule, nearbyPlaces, toHiddenPlaces } from "./kakao.js";
 
 const app = express();
@@ -57,6 +57,26 @@ app.post("/api/recommend", async (req, res) => {
     res.json({ destinations });
   } catch (err) {
     console.error("[recommend]", err);
+    res.status(502).json({ error: String(err.message ?? err) });
+  }
+});
+
+/**
+ * 선택한 여행지 한 곳의 이용 정보·추가 사진.
+ * 카드 5장 전부가 아니라 사용자가 고른 뒤 1건만 호출해 TourAPI 호출량을 아낀다.
+ */
+app.get("/api/destination/detail", async (req, res) => {
+  const contentId = String(req.query.contentId ?? "").trim();
+  const contentTypeId = String(req.query.contentTypeId ?? "").trim();
+  if (!contentId || !contentTypeId) {
+    res.status(400).json({ error: "contentId, contentTypeId가 필요합니다." });
+    return;
+  }
+
+  try {
+    res.json(await fetchDestinationDetail(contentId, contentTypeId));
+  } catch (err) {
+    console.error("[detail]", err);
     res.status(502).json({ error: String(err.message ?? err) });
   }
 });

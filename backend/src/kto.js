@@ -209,3 +209,73 @@ export async function recommendDestinations({ duration, themes, companion, mood,
   await Promise.all(chosen.map(fillOverview));
   return chosen;
 }
+
+/**
+ * detailIntro2 필드명은 contentTypeId마다 다르다.
+ * (관광지 usetime / 문화시설 usetimeculture / 레포츠 usetimeleports …)
+ * 타입별 분기 대신 후보 키를 순서대로 훑어 처음 채워진 값을 쓴다.
+ */
+const INTRO_FIELDS = {
+  usetime: ["usetime", "usetimeculture", "usetimeleports", "usetimefestival", "opentime"],
+  restdate: ["restdate", "restdateculture", "restdateleports"],
+  fee: ["usefee", "usefeeculture", "usefeeleports", "admission"],
+  parking: ["parking", "parkingculture", "parkingleports"],
+  infocenter: ["infocenter", "infocenterculture", "infocenterleports"],
+};
+
+/** 후보 키 중 처음으로 값이 있는 것을 반환 (없으면 빈 문자열) */
+function pickField(item, keys) {
+  for (const key of keys) {
+    const value = stripHtml(item?.[key] ?? "");
+    if (value) return value;
+  }
+  return "";
+}
+
+/** 이용 정보 — 운영시간·휴무일·요금·주차·문의 (KTO에 평점이 없어 이 값들로 대체한다) */
+async function fetchIntro(contentId, contentTypeId) {
+  const [item] = await callKto("detailIntro2", {
+    contentId: String(contentId),
+    contentTypeId: String(contentTypeId),
+    numOfRows: "1",
+    pageNo: "1",
+  });
+  if (!item) return {};
+
+  const info = {};
+  for (const [field, keys] of Object.entries(INTRO_FIELDS)) {
+    const value = pickField(item, keys);
+    if (value) info[field] = value;
+  }
+  return info;
+}
+
+/** 추가 사진 — 대표 이미지(firstimage) 외 갤러리용 */
+async function fetchImages(contentId) {
+  const items = await callKto("detailImage2", {
+    contentId: String(contentId),
+    imageYN: "Y",
+    numOfRows: "10",
+    pageNo: "1",
+  });
+  return items
+    .map((i) => i.originimgurl || i.smallimageurl || "")
+    .filter(Boolean)
+    .slice(0, 8);
+}
+
+/**
+ * 카드를 고른 뒤 선택한 한 곳에만 호출한다.
+ * 둘 중 하나가 실패해도 나머지는 그대로 반환한다.
+ */
+export async function fetchDestinationDetail(contentId, contentTypeId) {
+  const [intro, images] = await Promise.allSettled([
+    fetchIntro(contentId, contentTypeId),
+    fetchImages(contentId),
+  ]);
+
+  return {
+    info: intro.status === "fulfilled" ? intro.value : {},
+    gallery: images.status === "fulfilled" ? images.value : [],
+  };
+}
