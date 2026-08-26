@@ -1,4 +1,3 @@
-import { useRef, useState } from "react";
 import { motion } from "motion/react";
 import { ArrowRight, CalendarDays, Compass, Smile, Sparkles, Tags, Users } from "lucide-react";
 import {
@@ -97,16 +96,15 @@ export function ConditionsControls({ hideHeader = false, className = "" }: Props
     setMood,
     setDiscovery,
     startShuffle,
+    recommendationLoading,
+    recommendationError,
   } = useTravel();
   const reduce = useReducedMotion();
   const ready = !!duration && themes.length > 0;
-  const [starting, setStarting] = useState(false);
-  const startLock = useRef(false);
+  const starting = recommendationLoading;
 
   function handleStart() {
-    if (!ready || startLock.current) return;
-    startLock.current = true;
-    setStarting(true);
+    if (!ready || starting) return;
     startShuffle();
   }
 
@@ -263,6 +261,16 @@ export function ConditionsControls({ hideHeader = false, className = "" }: Props
           />
         </motion.button>
 
+        {recommendationError && (
+          <p
+            className="flex items-center justify-center gap-1.5 text-center text-xs"
+            style={{ color: "var(--ivory-muted)" }}
+            role="alert"
+          >
+            <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: "var(--gold)" }} aria-hidden="true" />
+            {recommendationError}
+          </p>
+        )}
         {!ready && (
           <p
             className="flex items-center justify-center gap-1.5 text-center text-xs"

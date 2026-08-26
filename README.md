@@ -5,45 +5,74 @@
 
 ## 기술 스택
 
-- React 19 + Vite + TypeScript (strict, `any` 미사용)
+- React 19 + Vite + TypeScript
 - Tailwind CSS v4 (`@tailwindcss/vite`)
-- [motion](https://motion.dev/) (`motion/react`)
-- lucide-react
-- SVG `path` + CSS 3D transform 기반의 지도/카드 연출 (Three.js 미사용)
+- motion (`motion/react`), lucide-react
+- Flask 백엔드 → 한국관광공사 TourAPI (`KorService2`)
+- SVG + CSS 3D transform (Three.js 미사용)
 
-## 시작하기
+## 로컬 실행
 
 ```bash
 npm install
-npm run dev      # 개발 서버 (http://localhost:5173)
-npm run build    # 타입체크 + 프로덕션 빌드
-npm run preview  # 빌드 결과 미리보기
-npm run lint     # oxlint
+npm run setup:api
+copy .env.example .env
 ```
+
+`.env`의 `TOUR_API_SERVICE_KEY`에 [data.go.kr](https://www.data.go.kr/) 서비스키를 넣습니다. 키가 없어도 앱은 뜨고, 추천은 샘플 데이터로 동작합니다.
+
+프론트만:
+
+```bash
+npm run dev          # http://localhost:5173
+```
+
+프론트 + TourAPI 프록시:
+
+```bash
+npm run dev:all      # Vite 5173 + Flask 5000
+```
+
+따로 띄울 때:
+
+```bash
+npm run dev:api      # Flask http://127.0.0.1:5000
+npm run dev          # 다른 터미널
+```
+
+```bash
+npm run build        # 타입체크 + 프로덕션 빌드
+npm run preview
+npm run lint
+```
+
+## 환경변수
+
+| 변수 | 위치 | 설명 |
+|---|---|---|
+| `TOUR_API_SERVICE_KEY` | 루트 `.env` 또는 `backend/.env` | TourAPI 키. 프론트에 넣지 말 것 |
+| `VITE_API_BASE_URL` | 루트 `.env` | 비우면 `/api` → `http://127.0.0.1:5000` |
+
+배포(Vercel)에서는 대시보드 Environment Variable로 `TOUR_API_SERVICE_KEY`를 넣습니다.
 
 ## 폴더 구조
 
 ```
+api/                # Vercel Python 엔트리 (Flask 앱 재사용)
+backend/           # TourAPI 프록시
 src/
-  components/
-    hero/           # Hero 섹션과 3D 지도 데코 아트
-    map/            # SVG 지도/선로/기차 렌더링 로직
-    interaction/    # 조건 설정 ~ 카드 셔플/선택/결과 핵심 인터랙션
-    sections/       # 이용 방법 / 공개된 여행지 / 서비스 특징
-    layout/         # Header / Footer / Section / Modal / Toast
-  data/             # 여행지 목데이터, 조건 옵션
-  hooks/            # 핵심 상태머신 (useJourney)
-  types/            # 도메인 타입 정의
-  utils/            # Fisher-Yates 셔플, 경로 계산 등 유틸
+  api/              # 프론트 → 백엔드 클라이언트
+  components/       # landing / conditions / cards / destination / layout
+  data/             # 테마 옵션 + 샘플 여행지 (API fallback)
+  hooks/
+  lib/              # 추천, 카드 모션
+  state/            # TravelContext
+  types/
+  utils/
 ```
 
-## 핵심 로직 메모
+## 핵심 로직
 
-- 여행지 후보 5개는 `pickUniqueCandidates`로 조건(테마)에 맞는 풀에서 중복 없이 선택하며,
-  후보가 5개 미만이면 전체 데이터에서 중복 없이 보충합니다.
-- 카드 셔플은 Fisher-Yates 알고리즘(`fisherYatesShuffle`)으로 순서를 결정하고,
-  결과는 `gather → split → interleave → merge → fan` 단계로 시각화됩니다.
-- 랜덤 선택/셔플은 모두 사용자 이벤트 핸들러 내부에서만 실행되며, `useEffect`는 타이머 정리(cleanup)를
-  철저히 수행해 React StrictMode의 이중 실행에도 결과가 중복되지 않도록 설계했습니다.
-- 카드 선택 전에는 여행지명·지역명이 화면에 노출되지 않으며(카드 뒷면은 모든 카드가 동일한 디자인),
-  선택 후 Y축 3D 플립으로 앞면이 공개됩니다.
+- 추천: TourAPI 후보 → 테마/동행/분위기 필터 → contentid 중복 제거 → Fisher-Yates → 최대 5장
+- API 실패 시 `src/data/destinations.ts` 샘플로 fallback
+- 카드 선택 전에는 여행지명을 노출하지 않음

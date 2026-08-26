@@ -7,8 +7,18 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   // Reference-only design asset; avoid watcher EBUSY when the file is locked by OS/viewer
   server: {
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:5000",
+        changeOrigin: true,
+      },
+    },
     watch: {
-      ignored: ["**/public/assets/adventure/landing-classic-target.png"],
+      ignored: [
+        "**/public/assets/adventure/landing-classic-target.png",
+        "**/backend/**/__pycache__/**",
+        "**/.venv/**",
+      ],
     },
   },
 })

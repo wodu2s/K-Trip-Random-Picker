@@ -10,7 +10,7 @@ import { StampBadge } from "../layout/AdventurePageShell";
  */
 export function DestinationActions({ destination }: { destination: Destination }) {
   const [saved, setSaved] = useState(false);
-  const { startShuffle, restart } = useTravel();
+  const { startShuffle, restart, recommendationLoading } = useTravel();
 
   function scrollToSchedule() {
     document.getElementById("schedule-timeline")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -49,7 +49,7 @@ export function DestinationActions({ destination }: { destination: Destination }
         </p>
       )}
 
-      <Button variant="accent" size="lg" className="w-full" onClick={startShuffle}>
+      <Button variant="accent" size="lg" className="w-full" onClick={startShuffle} disabled={recommendationLoading}>
         <Shuffle className="h-5 w-5 text-primary" strokeWidth={2.2} aria-hidden="true" />새 여행 카드 받기
       </Button>
 

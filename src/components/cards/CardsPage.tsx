@@ -140,7 +140,7 @@ function CardsAtmosphere() {
  * 프리미엄 카드 선택/셔플 — 천문 나침반 중심의 운명 선택 의식.
  */
 export function CardsPage() {
-  const { cards, redraw, selectedCardId, deckGeneration, goToDestination } = useTravel();
+  const { cards, redraw, selectedCardId, deckGeneration, goToDestination, recommendationLoading } = useTravel();
   const [phase, setPhase] = useState<CardPhase>("ready");
   const controlsRef = useRef<CardDrawControls | null>(null);
 
@@ -148,7 +148,7 @@ export function CardsPage() {
   const selecting = isSelecting(phase);
   const complete = isComplete(phase);
   const selectable = isSelectable(phase);
-  const busy = Boolean(selectedCardId) || shuffling || selecting;
+  const busy = Boolean(selectedCardId) || shuffling || selecting || recommendationLoading;
 
   const copy = useMemo(
     () =>

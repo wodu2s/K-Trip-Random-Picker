@@ -68,7 +68,8 @@ export const MOOD_THEME_HINTS: Record<MoodKey, ThemeKey[]> = {
 
 /**
  * 샘플 여행지 데이터.
- * 실제 API 없이 로컬 데이터로 카드 뽑기/공개를 시연한다.
+ * TourAPI 정상 응답이 있으면 추천은 API 데이터를 우선 사용하고,
+ * API 실패·빈 응답 시에만 이 목록으로 fallback 한다.
  */
 export const DESTINATIONS: Destination[] = [
   {
@@ -305,6 +306,19 @@ export const DESTINATIONS: Destination[] = [
   },
 ];
 
+/** 이번 추천에서 고른 TourAPI 여행지. 샘플 DESTINATIONS보다 우선한다. */
+const recommendedById = new Map<string, Destination>();
+
+export function registerRecommendedDestinations(list: Destination[]): void {
+  for (const dest of list) {
+    recommendedById.set(dest.id, dest);
+  }
+}
+
+export function clearRecommendedDestinations(): void {
+  recommendedById.clear();
+}
+
 export function getDestinationById(id: string): Destination | undefined {
-  return DESTINATIONS.find((d) => d.id === id);
+  return recommendedById.get(id) ?? DESTINATIONS.find((d) => d.id === id);
 }

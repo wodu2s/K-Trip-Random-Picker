@@ -147,7 +147,13 @@ export function DestinationPage() {
           <h2 className="font-expedition mt-1 text-center text-xl font-bold text-ink">탐험 경로</h2>
           <p className="mt-1 text-center text-sm text-muted">출발부터 저녁까지, 오늘의 코스를 따라가 보세요</p>
           <div className="mx-auto mt-5 max-w-[820px]">
-            <ScheduleTimeline schedule={destination.schedule} />
+            {destination.schedule.length > 0 ? (
+              <ScheduleTimeline schedule={destination.schedule} />
+            ) : (
+              <p className="rounded-[10px] border border-brass/25 bg-[var(--color-parchment-100)] px-4 py-6 text-center text-sm text-muted">
+                상세 코스는 다음 단계에서 제공됩니다.
+              </p>
+            )}
           </div>
         </motion.div>
 
@@ -157,7 +163,11 @@ export function DestinationPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: stagger * 5 }}
         >
-          <HiddenPlaceCards places={destination.hiddenPlaces} />
+          {destination.hiddenPlaces.length > 0 ? (
+            <HiddenPlaceCards places={destination.hiddenPlaces} />
+          ) : (
+            <p className="text-center text-sm text-muted">주변 숨은 장소 정보는 다음 단계에서 제공됩니다.</p>
+          )}
         </motion.div>
       </PageContainer>
     </AdventurePageShell>

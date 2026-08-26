@@ -1,10 +1,13 @@
 {
-  "name": "new",
+  "name": "k-trip-random-picker",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "python backend/app.py",
+    "dev:all": "node scripts/dev-all.mjs",
+    "setup:api": "python -m pip install -r requirements.txt",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview"

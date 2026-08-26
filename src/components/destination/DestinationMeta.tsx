@@ -7,30 +7,32 @@ import { cn } from "../../utils/cn";
  */
 export function DestinationMeta({ destination }: { destination: Destination }) {
   const { rating, reviewCount, travelTimeText, region, isHiddenGem, hiddenPlaces } = destination;
+  const hasRating = typeof rating === "number" && Number.isFinite(rating);
+  const hasReviews = typeof reviewCount === "number" && Number.isFinite(reviewCount);
 
   const cards = [
     {
       title: "이동 시간",
       value: travelTimeText,
-      note: "대중교통 기준",
+      note: destination.source === "tourapi" ? "직선거리 (도보·차량 경로 아님)" : "대중교통 기준",
       Icon: Clock,
     },
     {
       title: "위치",
-      value: region.split(" ").slice(0, 2).join(" "),
+      value: region.split(" ").slice(0, 2).join(" ") || "정보 없음",
       note: "탐험 좌표",
       Icon: MapPin,
     },
     {
       title: "여행자 평점",
-      value: rating.toFixed(1),
-      note: `리뷰 ${reviewCount.toLocaleString()}개`,
+      value: hasRating && rating != null ? rating.toFixed(1) : "—",
+      note: hasReviews && reviewCount != null ? `리뷰 ${reviewCount.toLocaleString()}개` : "상세 정보 준비 중",
       Icon: Star,
     },
     {
       title: "여행 유형",
       value: isHiddenGem ? "숨은 명소" : "추천 코스",
-      note: `주변 ${hiddenPlaces.length}곳`,
+      note: hiddenPlaces.length > 0 ? `주변 ${hiddenPlaces.length}곳` : "주변 정보 준비 중",
       Icon: Backpack,
     },
   ] as const;

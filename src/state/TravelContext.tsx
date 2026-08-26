@@ -8,8 +8,15 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { recommendCards } from "../lib/recommend";
+import {
+  clearRecommendCache,
+  hasApiCandidateCache,
+  recommendCardsAsync,
+  reshuffleCachedCards,
+} from "../lib/recommend";
+import { clearRecommendedDestinations } from "../data/destinations";
 import { preloadConditionsAssets } from "../lib/adventureAssets";
+import { useGeolocation } from "../hooks/useGeolocation";
 import type {
   CompanionKey,
   DiscoveryKey,
@@ -32,6 +39,9 @@ type TravelState = {
   revealedDestinationId: string | null;
   /** 다시 뽑기·재시작 시 카드 스테이지를 완전 리마운트하기 위한 세대 */
   deckGeneration: number;
+  recommendationLoading: boolean;
+  recommendationError: string | null;
+  usedSampleFallback: boolean;
 };
 
 type TravelActions = {
@@ -65,6 +75,9 @@ const initialState: TravelState = {
   selectedCardId: null,
   revealedDestinationId: null,
   deckGeneration: 0,
+  recommendationLoading: false,
+  recommendationError: null,
+  usedSampleFallback: false,
 };
 
 const TravelContext = createContext<TravelContextValue | null>(null);
@@ -77,13 +90,24 @@ function scrollTop() {
 export function TravelProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<TravelState>(initialState);
   const shuffleLock = useRef(false);
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
+  const geo = useGeolocation(true);
 
   useEffect(() => {
     scrollTop();
   }, [state.page]);
 
+  const geoCoords = useCallback(() => {
+    if (geo.status !== "success" || geo.latitude == null || geo.longitude == null) return null;
+    return { latitude: geo.latitude, longitude: geo.longitude };
+  }, [geo.latitude, geo.longitude, geo.status]);
+
   const goToLanding = useCallback(() => {
     shuffleLock.current = false;
+    clearRecommendCache();
+    clearRecommendedDestinations();
     setState(initialState);
   }, []);
 
@@ -95,6 +119,7 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       page: "conditions",
       selectedCardId: null,
       revealedDestinationId: null,
+      recommendationError: null,
     }));
   }, []);
 
@@ -121,29 +146,60 @@ export function TravelProvider({ children }: { children: ReactNode }) {
     setState((s) => ({ ...s, discovery }));
   }, []);
 
-  /** 조건 → 카드 드로우(셔플+선택 통합). 중복 진입 잠금. */
+  /** 조건 → TourAPI 후보 → 카드 드로우. 중복 진입 잠금. */
   const startShuffle = useCallback(() => {
     if (shuffleLock.current) return;
+    const snapshot = stateRef.current;
+    if (!snapshot.duration || snapshot.themes.length === 0) return;
+
     shuffleLock.current = true;
-    setState((s) => {
-      if (!s.duration || s.themes.length === 0) {
+    setState((s) => ({
+      ...s,
+      recommendationLoading: true,
+      recommendationError: null,
+    }));
+
+    const recommendOptions = {
+      companion: snapshot.companion,
+      mood: snapshot.mood,
+      discovery: snapshot.discovery,
+    };
+
+    void recommendCardsAsync(snapshot.themes, recommendOptions, geoCoords(), {
+      reuseCache: hasApiCandidateCache(),
+    })
+      .then((result) => {
+        if (result.cards.length === 0) {
+          shuffleLock.current = false;
+          setState((s) => ({
+            ...s,
+            recommendationLoading: false,
+            recommendationError: result.errorMessage ?? "추천 후보를 만들지 못했습니다.",
+          }));
+          return;
+        }
+        setState((s) => ({
+          ...s,
+          page: "cards",
+          cards: result.cards,
+          selectedCardId: null,
+          revealedDestinationId: null,
+          deckGeneration: s.deckGeneration + 1,
+          recommendationLoading: false,
+          recommendationError: null,
+          usedSampleFallback: !result.fromApi,
+        }));
         shuffleLock.current = false;
-        return s;
-      }
-      return {
-        ...s,
-        page: "cards",
-        cards: recommendCards(s.themes, {
-          companion: s.companion,
-          mood: s.mood,
-          discovery: s.discovery,
-        }),
-        selectedCardId: null,
-        revealedDestinationId: null,
-        deckGeneration: s.deckGeneration + 1,
-      };
-    });
-  }, []);
+      })
+      .catch(() => {
+        shuffleLock.current = false;
+        setState((s) => ({
+          ...s,
+          recommendationLoading: false,
+          recommendationError: "추천 요청 중 오류가 발생했습니다.",
+        }));
+      });
+  }, [geoCoords]);
 
   const finishShuffle = useCallback(() => {
     shuffleLock.current = false;
@@ -171,24 +227,68 @@ export function TravelProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const redraw = useCallback(() => {
-    shuffleLock.current = false;
-    setState((s) => {
-      const recommendOptions = { companion: s.companion, mood: s.mood, discovery: s.discovery };
-      const prevKey = s.cards.map((c) => c.destinationId).join(",");
-      let next = recommendCards(s.themes, recommendOptions);
-      for (let i = 0; i < 6 && next.map((c) => c.destinationId).join(",") === prevKey; i++) {
-        next = recommendCards(s.themes, recommendOptions);
-      }
-      return {
+    if (shuffleLock.current) return;
+    const snapshot = stateRef.current;
+    shuffleLock.current = true;
+    setState((s) => ({ ...s, recommendationLoading: true, recommendationError: null }));
+
+    const recommendOptions = {
+      companion: snapshot.companion,
+      mood: snapshot.mood,
+      discovery: snapshot.discovery,
+    };
+    const prevKey = snapshot.cards.map((c) => c.destinationId).join(",");
+
+    const cached = reshuffleCachedCards(snapshot.themes, recommendOptions, prevKey);
+    if (cached && cached.cards.length > 0) {
+      setState((s) => ({
         ...s,
         page: "cards",
-        cards: next,
+        cards: cached.cards,
         selectedCardId: null,
         revealedDestinationId: null,
         deckGeneration: s.deckGeneration + 1,
-      };
-    });
-  }, []);
+        recommendationLoading: false,
+        recommendationError: null,
+        usedSampleFallback: !cached.fromApi,
+      }));
+      shuffleLock.current = false;
+      return;
+    }
+
+    void recommendCardsAsync(snapshot.themes, recommendOptions, geoCoords())
+      .then((result) => {
+        if (result.cards.length === 0) {
+          shuffleLock.current = false;
+          setState((s) => ({
+            ...s,
+            recommendationLoading: false,
+            recommendationError: result.errorMessage ?? "다시 뽑기에 실패했습니다.",
+          }));
+          return;
+        }
+        setState((s) => ({
+          ...s,
+          page: "cards",
+          cards: result.cards,
+          selectedCardId: null,
+          revealedDestinationId: null,
+          deckGeneration: s.deckGeneration + 1,
+          recommendationLoading: false,
+          recommendationError: null,
+          usedSampleFallback: !result.fromApi,
+        }));
+        shuffleLock.current = false;
+      })
+      .catch(() => {
+        shuffleLock.current = false;
+        setState((s) => ({
+          ...s,
+          recommendationLoading: false,
+          recommendationError: "다시 뽑기에 실패했습니다.",
+        }));
+      });
+  }, [geoCoords]);
 
   const restart = useCallback(() => {
     shuffleLock.current = false;
