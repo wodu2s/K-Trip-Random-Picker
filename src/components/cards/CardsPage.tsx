@@ -6,132 +6,29 @@ import type { CardPhase } from "../../types/travel";
 import { isComplete, isSelectable, isShuffling, isSelecting } from "../../lib/cardPhaseUtils";
 import "./cards-page.css";
 
-const ASIDE_COPY: Partial<
-  Record<CardPhase, { lead: string; sub: string }>
-> = {
-  ready: {
-    lead: "운명의 방향,\n당신의 다음 여정은?",
-    sub: "5장의 탐험 카드 중\n끌리는 카드를 선택해 보세요.",
-  },
-  selectable: {
-    lead: "운명의 방향,\n당신의 다음 여정은?",
-    sub: "5장의 탐험 카드 중\n끌리는 카드를 선택해 보세요.",
-  },
-  gathering: { lead: "카드가\n운명의 중심으로", sub: "모이고 있습니다…" },
-  fanOut: { lead: "카드가\n운명의 중심으로", sub: "모이고 있습니다…" },
-  crossing: { lead: "항로가\n교차합니다", sub: "운명의 카드를 섞는 중…" },
-  mixing: { lead: "항로가\n교차합니다", sub: "운명의 카드를 섞는 중…" },
-  restacking: { lead: "다시\n한 덱으로", sub: "카드가 정렬됩니다…" },
-  selected: { lead: "선택한\n카드를 확인", sub: "당신의 여정이 시작됩니다." },
-  revealing: { lead: "목적지\n공개 중", sub: "별자리가 길을 비춥니다…" },
-  complete: { lead: "목적지를\n찾았어요", sub: "탐험 결과를 확인해 보세요." },
+/** 메인 제목은 단계와 무관하게 고정한다 */
+const ASIDE_LEAD = "운명의 방향,\n당신의 다음 여정은?";
+
+const ASIDE_SUB: Partial<Record<CardPhase, string>> = {
+  ready: "5장의 탐험 카드 중\n끌리는 카드를 선택해 보세요.",
+  gathering: "여행 후보를\n섞는 중…",
+  crossing: "여행 후보를\n섞는 중…",
+  selectable: "마음이 가는 카드\n한 장을 선택하세요",
+  selected: "선택한 카드를 확인합니다.\n당신의 여정이 시작됩니다.",
+  revealing: "목적지 공개 중…\n별자리가 길을 비춥니다.",
+  complete: "목적지를 찾았어요.\n탐험 결과를 확인해 보세요.",
 };
 
-const STAR_SEEDS = Array.from({ length: 56 }, (_, i) => ({
-  left: `${(i * 19.7 + 3) % 98}%`,
-  top: `${(i * 13.3 + 5) % 82}%`,
-  delay: `${(i * 0.37) % 5.2}s`,
-  dur: `${2.8 + (i % 6) * 0.55}s`,
-  size: i % 7 === 0 ? 3 : i % 3 === 0 ? 2 : 1.5,
-  bright: i % 11 === 0,
-}));
-
-const DUST_SEEDS = Array.from({ length: 18 }, (_, i) => ({
-  left: `${12 + (i * 23.1) % 76}%`,
-  top: `${18 + (i * 17.9) % 64}%`,
-  delay: `${(i * 0.62) % 6}s`,
-  dur: `${8 + (i % 4) * 2.5}s`,
-}));
-
+/**
+ * 배경 해도 위 가독성 레이어 — 카드·좌측 카피·CTA 대비만 만든다.
+ * 지형·나침반·항로는 배경 이미지가 담당한다.
+ */
 function CardsAtmosphere() {
   return (
     <div className="cards-page__atmosphere" aria-hidden="true">
-      <div className="cards-page__nebula" />
+      <div className="cards-page__spotlight" />
+      <div className="cards-page__grain" />
       <div className="cards-page__vignette" />
-      <div className="cards-page__mist" />
-
-      <svg className="cards-page__chart" viewBox="0 0 800 800" fill="none">
-        <circle cx="400" cy="400" r="360" stroke="#c9a227" strokeOpacity="0.14" strokeWidth="0.7" />
-        <circle cx="400" cy="400" r="300" stroke="#c9a227" strokeOpacity="0.1" strokeWidth="0.6" strokeDasharray="4 8" />
-        <circle cx="400" cy="400" r="240" stroke="#d8b84a" strokeOpacity="0.08" strokeWidth="0.5" />
-        <circle cx="400" cy="400" r="180" stroke="#c9a227" strokeOpacity="0.12" strokeWidth="0.55" strokeDasharray="2 6" />
-        {Array.from({ length: 12 }, (_, i) => {
-          const a = (i / 12) * Math.PI * 2 - Math.PI / 2;
-          const x1 = 400 + Math.cos(a) * 180;
-          const y1 = 400 + Math.sin(a) * 180;
-          const x2 = 400 + Math.cos(a) * 360;
-          const y2 = 400 + Math.sin(a) * 360;
-          return (
-            <line
-              key={i}
-              x1={x1}
-              y1={y1}
-              x2={x2}
-              y2={y2}
-              stroke="#c9a227"
-              strokeOpacity="0.07"
-              strokeWidth="0.45"
-            />
-          );
-        })}
-        {[
-          [400, 52, "N"],
-          [748, 400, "E"],
-          [400, 748, "S"],
-          [52, 400, "W"],
-        ].map(([x, y, label]) => (
-          <text
-            key={label}
-            x={x}
-            y={y}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fill="#c9a227"
-            fillOpacity="0.35"
-            fontSize="14"
-            fontFamily="serif"
-            letterSpacing="0.2em"
-          >
-            {label}
-          </text>
-        ))}
-        <circle cx="400" cy="400" r="3" fill="#e8c86a" fillOpacity="0.5" />
-      </svg>
-
-      <div className="cards-page__stars">
-        {STAR_SEEDS.map((s, i) => (
-          <span
-            key={i}
-            className={`cards-page__star${s.bright ? " cards-page__star--bright" : ""}`}
-            style={{
-              left: s.left,
-              top: s.top,
-              width: s.size,
-              height: s.size,
-              animationDelay: s.delay,
-              animationDuration: s.dur,
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="cards-page__dust">
-        {DUST_SEEDS.map((d, i) => (
-          <span
-            key={i}
-            className="cards-page__dust-particle"
-            style={{
-              left: d.left,
-              top: d.top,
-              animationDelay: d.delay,
-              animationDuration: d.dur,
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="cards-page__orbit cards-page__orbit--a" />
-      <div className="cards-page__orbit cards-page__orbit--b" />
     </div>
   );
 }
@@ -151,11 +48,10 @@ export function CardsPage() {
   const busy = Boolean(selectedCardId) || shuffling || selecting;
 
   const copy = useMemo(
-    () =>
-      ASIDE_COPY[phase] ?? {
-        lead: "운명의 방향,\n당신의 다음 여정은?",
-        sub: "5장의 탐험 카드 중\n끌리는 카드를 선택해 보세요.",
-      },
+    () => ({
+      lead: ASIDE_LEAD,
+      sub: ASIDE_SUB[phase] ?? ASIDE_SUB.ready!,
+    }),
     [phase],
   );
 
@@ -165,7 +61,7 @@ export function CardsPage() {
 
   useEffect(() => {
     if (!complete) return;
-    const id = window.setTimeout(() => goToDestination(), 1400);
+    const id = window.setTimeout(() => goToDestination(), 900);
     return () => window.clearTimeout(id);
   }, [complete, goToDestination, deckGeneration]);
 

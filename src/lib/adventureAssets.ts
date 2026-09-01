@@ -15,9 +15,14 @@ export const ADVENTURE_IMAGES = {
   compassCelestial: "/assets/adventure/compass-celestial-gold.png",
   /** @deprecated cards 페이지는 compassStage 단일 이미지 사용 */
   compassGold: "/assets/adventure/compass-gold-radiant.png",
-  /** 조건 설정 — 오른쪽 "미지의 여정" 세로형 프리뷰 (4:5) */
-  journeyPreview: "/assets/adventure/journey-preview.webp",
-  /** @deprecated 조건 설정 우측은 journeyPreview 사용 */
+  /** 조건 설정 — 오른쪽 랜덤 여행 미리보기. 실제 국내 여행지 사진 (바다·산·한옥·도시) */
+  journeyPhotos: [
+    "/images/journey/sea.webp",
+    "/images/journey/mountain.webp",
+    "/images/journey/hanok.webp",
+    "/images/journey/city.webp",
+  ],
+  /** @deprecated 조건 설정 우측은 journeyPhotos 사용 */
   conditionsScene: encodeURI(
     "/assets/backgrounds/ChatGPT Image 2026년 8월 5일 오후 02_17_19.png",
   ),
@@ -42,5 +47,5 @@ export function preloadAdventureImage(src: string): Promise<void> {
 }
 
 export function preloadConditionsAssets(): void {
-  void preloadAdventureImage(ADVENTURE_IMAGES.journeyPreview);
+  ADVENTURE_IMAGES.journeyPhotos.forEach((src) => void preloadAdventureImage(src));
 }

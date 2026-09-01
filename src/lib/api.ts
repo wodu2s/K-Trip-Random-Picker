@@ -1,4 +1,4 @@
-import type { Destination, HiddenPlace } from "../types/travel";
+import type { Destination, HiddenPlace, ImageCredit } from "../types/travel";
 
 const BASE = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
 
@@ -18,6 +18,25 @@ export type NearbyPlace = {
   lat: number;
   lng: number;
   distance: number | null;
+  url: string;
+  /** 카카오 로컬에는 사진이 없어, 앞쪽 몇 곳만 이미지 검색으로 채운다 (없으면 사진 생략) */
+  image?: string;
+  thumbnailUrl?: string;
+  thumbnail?: string;
+  imageCredit?: ImageCredit;
+};
+
+export type StayPlace = {
+  contentId: string;
+  name: string;
+  tag: string;
+  address: string;
+  tel: string;
+  lat: number | null;
+  lng: number | null;
+  distance: number | null;
+  /** KTO 대표 이미지 — 없으면 빈 문자열 */
+  image: string;
   url: string;
 };
 
@@ -44,10 +63,21 @@ export async function fetchRecommendations(payload: RecommendPayload): Promise<D
   return data.destinations;
 }
 
-/** 결과 페이지 — 목적지 주변 장소 */
+/** 결과 페이지 — 목적지 주변 장소. 1박 이상일 때만 숙박까지 함께 받는다 */
 export async function fetchNearbyPlaces(
   lat: number,
   lng: number,
-): Promise<{ spots: NearbyPlace[]; foods: NearbyPlace[]; cafes: NearbyPlace[]; hiddenPlaces: HiddenPlace[] }> {
-  return request(`/api/places/nearby?lat=${lat}&lng=${lng}`);
+  withStays = false,
+  region = "",
+): Promise<{
+  spots: NearbyPlace[];
+  foods: NearbyPlace[];
+  cafes: NearbyPlace[];
+  stays?: StayPlace[];
+  hiddenPlaces: HiddenPlace[];
+}> {
+  const query = new URLSearchParams({ lat: String(lat), lng: String(lng) });
+  if (withStays) query.set("stay", "1");
+  if (region) query.set("region", region);
+  return request(`/api/places/nearby?${query}`);
 }

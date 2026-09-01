@@ -14,7 +14,14 @@ const NAV_ITEMS = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const { page, goToLanding, goToConditions } = useTravel();
-  const dark = page === "landing" || page === "conditions" || page === "cards" || page === "shuffle";
+  const dest = page === "destination";
+  const darkH = dest ? 72 : 86;
+  const dark =
+    page === "landing" ||
+    page === "conditions" ||
+    page === "cards" ||
+    page === "shuffle" ||
+    dest;
   const showJourney = page === "cards" || page === "conditions" || page === "destination";
   const journeyActive =
     page === "conditions" ? 1 : page === "cards" || page === "shuffle" ? 2 : page === "destination" ? 3 : 0;
@@ -31,7 +38,7 @@ export function Header() {
       data-landing-header={dark ? "true" : undefined}
       style={
         dark
-          ? { minHeight: 86, height: 86 }
+          ? { minHeight: darkH, height: darkH }
           : {
               background: "var(--color-parchment-100)",
               borderBottom: "1px solid var(--color-parchment-line)",
@@ -42,7 +49,9 @@ export function Header() {
         className={cn(
           "relative flex w-full items-center justify-between",
           dark
-            ? "h-[86px] min-h-[86px] max-w-none pl-8 pr-[30px]"
+            ? dest
+              ? "h-[72px] min-h-[72px] max-w-none pl-8 pr-[30px]"
+              : "h-[86px] min-h-[86px] max-w-none pl-8 pr-[30px]"
             : "mx-auto h-16 max-w-[1200px] gap-6 px-5 sm:px-8 lg:gap-10",
         )}
       >

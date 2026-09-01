@@ -10,7 +10,8 @@ import {
 } from "react";
 import { recommendCards } from "../lib/recommend";
 import { fetchRecommendations } from "../lib/api";
-import { registerDestinations } from "../data/destinations";
+import { getDestinationById, registerDestinations, updateDestination } from "../data/destinations";
+import { buildFallbackHints } from "../lib/icons";
 import { preloadConditionsAssets } from "../lib/adventureAssets";
 import type {
   CompanionKey,
@@ -109,11 +110,17 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       }));
     } catch (err) {
       console.warn("[recommend] API 실패 — 로컬 데이터로 대체합니다.", err);
-      return recommendCards(s.themes, {
+      const cards = recommendCards(s.themes, {
         companion: s.companion,
         mood: s.mood,
         discovery: s.discovery,
       });
+      /* mock도 API와 같은 hints 3개 구조를 갖도록 조건값으로 채운다 */
+      cards.forEach((card) => {
+        const d = getDestinationById(card.destinationId);
+        if (d) updateDestination(d.id, { hints: buildFallbackHints(d, { mood: s.mood }) });
+      });
+      return cards;
     }
   }, []);
 

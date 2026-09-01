@@ -1,4 +1,5 @@
-/* ── 단일 나침반 장면 이미지 무대 (compass-astral-stage → cards) ── */
+/* ── 카드 무대 — 배경 나침반/항로선은 페이지 배경(cards-page__chart)이 담당하고
+      여기서는 카드 fan이 놓이는 원근 무대만 잡는다 ── */
 
 .compass-stage {
   position: relative;
@@ -6,241 +7,12 @@
   overflow: visible;
 }
 
-.compass-stage__anchor {
-  position: absolute;
-  left: 0;
-  /* 무대 전체를 살짝 내려 원판이 카드 아래로 드러나게.
-     transform을 쓰면 stacking context가 생겨 screen 합성이 죽으므로 bottom으로 내린다 */
-  bottom: calc(var(--compass-stage-offset, 0px) * -1);
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.compass-stage__apparatus {
-  position: absolute;
-  left: 50%;
-  bottom: var(--compass-pivot-bottom, 8px);
-  width: 0;
-  height: 0;
-  z-index: 1;
-}
-
-/* 같은 이미지를 두 겹으로 쓴다.
-   - aura: 천문도 고리·빛만 screen으로 은은하게 (뒤)
-   - disc: 원판 본체는 normal 합성 그대로 — 황동 두께와 어두운 면이 선명하게 (앞)
-   폭 0인 apparatus 안에서 preflight의 max-width:100%가 이미지를 0으로 접는다 */
-.compass-stage__scene {
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  display: block;
-  width: var(--compass-stage-width, 1010px);
-  height: var(--compass-stage-width, 1010px);
-  max-width: none;
-  margin-left: calc(var(--compass-stage-width, 1010px) / -2);
-  object-fit: contain;
-  pointer-events: none;
-}
-
-.compass-stage__scene--aura {
-  opacity: 0.54;
-  mix-blend-mode: screen;
-  /* 원판 중심 바로 위에만 밝은 영역을 두고, 위·좌우로는 빠르게 소멸시킨다 —
-     끝 카드 뒤까지 번지지 않게 */
-  mask-image: radial-gradient(
-    ellipse 52% 46% at 50% 59%,
-    #000 36%,
-    rgba(0, 0, 0, 0.3) 58%,
-    transparent 74%
-  );
-}
-
-.compass-stage__scene--disc {
-  opacity: var(--compass-image-opacity, 0.96);
-  /* 원판 실루엣만 남기고 주변 어두운 배경은 흘려보낸다 */
-  mask-image: radial-gradient(
-    ellipse 44% 25% at 50% 70.5%,
-    #000 60%,
-    rgba(0, 0, 0, 0.55) 80%,
-    transparent 100%
-  );
-}
-
-/* 원판 중심 광점 — 이미지는 고정, 이 glow만 약하게 맥동한다 */
-.compass-stage__core {
-  position: absolute;
-  left: 50%;
-  bottom: var(--compass-disc-center, 355px);
-  width: calc(var(--compass-disc-width, 667px) * 0.34);
-  height: calc(var(--compass-disc-width, 667px) * 0.34);
-  margin-left: calc(var(--compass-disc-width, 667px) * -0.17);
-  margin-bottom: calc(var(--compass-disc-width, 667px) * -0.17);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 244, 214, 0.5) 0%,
-    rgba(232, 200, 106, 0.24) 34%,
-    rgba(201, 162, 39, 0.08) 58%,
-    transparent 74%
-  );
-  mix-blend-mode: screen;
-  filter: blur(6px);
-  pointer-events: none;
-  animation: compass-core-pulse 5.2s ease-in-out infinite;
-}
-
-.compass-stage__core--active {
-  animation-duration: 2.4s;
-}
-
-@keyframes compass-core-pulse {
-  0%,
-  100% {
-    opacity: 0.63;
-    transform: scale(0.94);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.06);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .compass-stage__core {
-    animation: none;
-  }
-}
-
-.compass-stage__burst {
-  position: absolute;
-  left: 50%;
-  bottom: var(--compass-disc-center, 355px);
-  width: calc(var(--compass-disc-width, 667px) * 0.52);
-  height: calc(var(--compass-disc-width, 667px) * 0.52);
-  margin-left: calc(var(--compass-disc-width, 667px) * -0.26);
-  margin-bottom: calc(var(--compass-disc-width, 667px) * -0.26);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 248, 220, 0.95) 0%,
-    rgba(232, 200, 106, 0.55) 24%,
-    rgba(212, 175, 55, 0.18) 44%,
-    transparent 60%
-  );
-  mix-blend-mode: screen;
-  pointer-events: none;
-}
-
-/* selectable 진입 순간 중심광이 짧게 한 번 밝아진다 — burst보다 작고 부드럽게 */
-.compass-stage__burst--soft {
-  width: calc(var(--compass-disc-width, 717px) * 0.36);
-  height: calc(var(--compass-disc-width, 717px) * 0.36);
-  margin-left: calc(var(--compass-disc-width, 717px) * -0.18);
-  margin-bottom: calc(var(--compass-disc-width, 717px) * -0.18);
-  filter: blur(4px);
-}
-
-/* 원판 중심에서 카드 밑면까지 올라오는 아주 약한 금빛 — 나침반이 카드를 띄우는 연결감 */
-.compass-stage__lift {
-  position: absolute;
-  left: 50%;
-  bottom: var(--compass-disc-center, 381px);
-  width: calc(var(--compass-disc-width, 717px) * 0.48);
-  height: calc(var(--compass-card-lift, 306px) + 40px);
-  margin-left: calc(var(--compass-disc-width, 717px) * -0.24);
-  z-index: 3;
-  /* 중심(하단)만 밝고 위로 갈수록 빠르게 사라진다 — 빛기둥이 아니라 떠오르는 기운 */
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(232, 200, 106, 0.02) 54%,
-    rgba(232, 200, 106, 0.075) 84%,
-    rgba(255, 244, 214, 0.15) 100%
-  );
-  mask-image: radial-gradient(ellipse 58% 100% at 50% 100%, #000 14%, transparent 76%);
-  mix-blend-mode: screen;
-  filter: blur(10px);
-  pointer-events: none;
-}
-
-.compass-stage__mote {
-  position: absolute;
-  left: 50%;
-  bottom: var(--compass-disc-center, 381px);
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: rgba(255, 240, 200, 0.9);
-  box-shadow: 0 0 6px rgba(232, 200, 106, 0.7);
-  mix-blend-mode: screen;
-  opacity: 0;
-  z-index: 3;
-  animation: compass-mote-rise var(--mote-dur, 7s) ease-out var(--mote-delay, 0s) infinite;
-  pointer-events: none;
-}
-
-@keyframes compass-mote-rise {
-  0% {
-    opacity: 0;
-    transform: translate(var(--mote-x, 0px), 0) scale(0.6);
-  }
-  18% {
-    opacity: 0.75;
-  }
-  70% {
-    opacity: 0.35;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(calc(var(--mote-x, 0px) * 1.6), calc(var(--compass-card-lift, 306px) * -0.9))
-      scale(1);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .compass-stage__mote {
-    animation: none;
-  }
-}
-
-/* 카드가 원판 위에 드리우는 접지 그림자 — 공중에 뜬 높이를 읽히게 한다.
-   원판 중심 쪽으로 떨어지도록 중심보다 살짝 안쪽·아래에 둔다 */
-.compass-stage__cast {
-  position: absolute;
-  left: 50%;
-  bottom: calc(
-    var(--compass-disc-center, 381px) + var(--compass-pivot-bottom, 8px) - 31px
-  );
-  z-index: 4;
-  width: calc(var(--compass-disc-width, 717px) * 0.66);
-  height: calc(var(--compass-disc-width, 717px) * 0.17);
-  transform: translate(-50%, 50%);
-  border-radius: 50%;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(0, 0, 0, 0.68) 0%,
-    rgba(0, 0, 0, 0.34) 44%,
-    transparent 72%
-  );
-  filter: blur(17px);
-  pointer-events: none;
-}
-
 .compass-stage__deck {
   position: absolute;
-  left: 50%;
-  /* 나침반 중심보다 lift 만큼 위 — 카드 fan이 원판 위에 떠 있는 높이 */
-  bottom: calc(
-    var(--compass-disc-center, 355px) + var(--compass-pivot-bottom, 8px) +
-      var(--compass-card-lift, 366px)
-  );
-  width: 100%;
-  height: min(500px, 54vh);
-  transform: translate(-50%, 50%);
+  inset: 0;
   z-index: 10;
   perspective: 1500px;
-  perspective-origin: 50% 72%;
+  perspective-origin: 50% 55%;
   pointer-events: none;
 }
 
@@ -250,11 +22,122 @@
 
 .compass-stage__deck .shuffle-deck__stage {
   perspective: 1500px;
-  perspective-origin: 50% 72%;
+  perspective-origin: 50% 55%;
 }
 
-@media (max-width: 639px) {
-  .compass-stage__deck {
-    height: min(380px, 48vh);
+/* ── fan 아래 waypoint rail — 카드 하단과 배경 route를 잇는다 ── */
+.card-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 1%;
+  z-index: 4;
+  height: 56px;
+  pointer-events: none;
+  color: #c9a227;
+}
+
+.card-rail__chart {
+  display: block;
+  width: 100%;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+}
+
+.card-rail__route {
+  opacity: 0.28;
+  stroke-width: 1.3;
+  stroke-dasharray: 5 7;
+}
+
+/* 셔플 1회에만 흐르는 light sweep */
+.card-rail__sweep {
+  opacity: 0.85;
+  stroke: #f0d98a;
+  stroke-width: 1.6;
+  stroke-dasharray: 110 2000;
+  stroke-dashoffset: 2110;
+  animation: card-rail-sweep 900ms cubic-bezier(0.33, 0, 0.2, 1) 1 forwards;
+}
+
+@keyframes card-rail-sweep {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.card-rail__node {
+  opacity: 0.6;
+  stroke-width: 1.5;
+  transition: opacity 260ms ease;
+}
+
+.card-rail__node circle {
+  fill: rgba(2, 10, 18, 0.9);
+}
+
+.card-rail__node--dim {
+  opacity: 0.14;
+}
+
+.card-rail__node--on {
+  opacity: 1;
+  stroke: #f0d98a;
+}
+
+.card-rail__node--on circle {
+  fill: #e8c86a;
+}
+
+/* 셔플 시작 시 80ms 간격으로 한 번 점등 */
+.card-rail__node--lit {
+  animation: card-rail-node-lit 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes card-rail-node-lit {
+  0% {
+    opacity: 0.12;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+/* 선택 시 gold route가 고른 카드 쪽으로 수렴 */
+.card-rail__converge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 8px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, #e8c86a 32%, #f4e6b0 50%, #e8c86a 68%, transparent);
+  animation: card-rail-converge 460ms cubic-bezier(0.4, 0, 0.2, 1) 1 forwards;
+}
+
+@keyframes card-rail-converge {
+  from {
+    transform: scaleX(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scaleX(0.02);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-rail__sweep,
+  .card-rail__converge {
+    animation: none;
+    opacity: 0;
+  }
+
+  .card-rail__node--lit {
+    animation: none;
   }
 }

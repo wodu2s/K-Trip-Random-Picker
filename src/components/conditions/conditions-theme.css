@@ -181,7 +181,7 @@
   line-height: 1.4;
 }
 
-/* 고지도 결 — 등고선·경위선·컴퍼스 원. 가독성을 위해 아주 옅게만 */
+/* 고지도 결 — 등고선·경위선·여정 route. 가독성을 위해 아주 옅게만 */
 .dossier-body::after {
   content: "";
   position: absolute;
@@ -190,10 +190,10 @@
   border-radius: inherit;
   opacity: 0.07;
   background-repeat: no-repeat, repeat;
-  background-position: 82% 62%, 0 0;
-  background-size: 46% auto, 168px 168px;
+  background-position: 92% 62%, 0 0;
+  background-size: 34% auto, 168px 168px;
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='%233b2a10' stroke-width='1.4'%3E%3Ccircle cx='100' cy='100' r='86'/%3E%3Ccircle cx='100' cy='100' r='64'/%3E%3Cpath d='M100 6 L112 100 L100 194 L88 100 Z'/%3E%3Cpath d='M6 100 L100 88 L194 100 L100 112 Z'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20200%20280'%20fill%3D'none'%20stroke%3D'%233b2a10'%20stroke-width%3D'1.6'%3E%3Cpath%20d%3D'M52%2026%20L92%2012%20L124%2026%20L146%2018%20L152%2058%20L154%2096%20L147%20130%20L154%20166%20L145%20198%20L130%20220%20L106%20234%20L82%20228%20L62%20238%20L44%20222%20L40%20194%20L54%20172%20L36%20148%20L46%20120%20L30%2094%20L46%2064%20L40%2042%20Z'%2F%3E%3Cellipse%20cx%3D'60'%20cy%3D'264'%20rx%3D'17'%20ry%3D'8'%2F%3E%3Ccircle%20cx%3D'170'%20cy%3D'104'%20r%3D'3'%2F%3E%3Cpath%20d%3D'M70%2060%20L106%2096%20L88%20148%20L120%20186%20L96%20224'%20stroke-width%3D'1.2'%20stroke-dasharray%3D'4%205'%2F%3E%3Ccircle%20cx%3D'70'%20cy%3D'60'%20r%3D'3.4'%20stroke-width%3D'1.2'%2F%3E%3Ccircle%20cx%3D'120'%20cy%3D'186'%20r%3D'3.4'%20stroke-width%3D'1.2'%2F%3E%3Ccircle%20cx%3D'96'%20cy%3D'224'%20r%3D'3.4'%20stroke-width%3D'1.2'%2F%3E%3C%2Fsvg%3E"),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='168' height='168' fill='none' stroke='%233b2a10' stroke-width='1'%3E%3Cpath d='M-8 24 C30 6 58 44 96 22 C132 2 152 40 176 20'/%3E%3Cpath d='M-8 60 C34 40 62 82 100 58 C136 36 156 76 176 56'/%3E%3Cpath d='M-8 100 C28 82 60 120 98 98 C134 78 158 114 176 96'/%3E%3Cpath d='M-8 140 C32 120 64 158 102 136 C138 116 158 152 176 134'/%3E%3Cpath d='M0 0 V168 M84 0 V168 M168 0 V168 M0 0 H168 M0 84 H168 M0 168 H168' stroke-width='0.5' opacity='0.5'/%3E%3C/svg%3E");
 }
 
@@ -236,7 +236,7 @@
   position: absolute;
   left: 50%;
   width: 0;
-  border-left: 1px dotted rgba(120, 94, 34, 0.45);
+  border-left: 1px dotted rgba(112, 88, 30, 0.65);
 }
 
 .dossier-waypoint::before {
@@ -518,6 +518,64 @@
   box-shadow:
     inset 0 0 0 1px rgba(0, 0, 0, 0.6),
     0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.journey-preview__eyebrow {
+  margin: 0 0 0.15rem;
+  color: rgba(201, 162, 39, 0.8);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+}
+
+/* 실제 여행지 사진 프리뷰 — dark frame + 아주 옅은 warm overlay */
+.journey-preview {
+  background: var(--panel-deep);
+  border: 1px solid rgba(196, 156, 92, 0.35);
+}
+
+.journey-preview__wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(10, 8, 5, 0.18) 0%, transparent 32%, rgba(8, 7, 4, 0.72) 100%),
+    linear-gradient(0deg, rgba(120, 88, 36, 0.1), rgba(120, 88, 36, 0.1));
+}
+
+.journey-preview__caption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0 1rem 0.9rem;
+}
+
+.journey-preview__keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0 0 0.3rem;
+  font-family: "Noto Sans KR Variable", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.journey-preview__keywords span {
+  color: rgba(240, 231, 214, 0.45);
+  transition: color 0.4s ease;
+}
+
+.journey-preview__keywords span[data-current="true"] {
+  color: #e0c163;
+}
+
+.journey-preview__note {
+  margin: 0;
+  color: rgba(240, 231, 214, 0.7);
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 /* ═══════════════════════════════════════════════════

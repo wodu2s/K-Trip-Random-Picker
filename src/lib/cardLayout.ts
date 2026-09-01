@@ -11,65 +11,55 @@ export type CardPose = {
 
 export type LayoutPoint = Pick<CardPose, "x" | "y" | "rotate">;
 
-/** 초기·선택 fan — desktop 기준 px, 회전 [-16,-8,0,8,16] */
+/** 초기·선택 fan — desktop 기준 px, 회전 [-14,-7,0,7,14].
+    카드 하단 힌트 3개가 가려지지 않도록 좌우 간격을 넓게 잡는다 */
 export const SELECTABLE_LAYOUT: LayoutPoint[] = [
-  { x: -290, y: 26, rotate: -16 },
-  { x: -145, y: 7, rotate: -8 },
+  { x: -377, y: 24, rotate: -14 },
+  { x: -188, y: 6, rotate: -7 },
   { x: 0, y: -12, rotate: 0 },
-  { x: 145, y: 7, rotate: 8 },
-  { x: 290, y: 26, rotate: 16 },
+  { x: 188, y: 6, rotate: 7 },
+  { x: 377, y: 24, rotate: 14 },
 ];
 
-/** fanOut: 셔플 후 fan 펼침 */
-export const FAN_LAYOUT: LayoutPoint[] = [
-  { x: -270, y: 22, rotate: -16 },
-  { x: -135, y: 5, rotate: -8 },
-  { x: 0, y: -10, rotate: 0 },
-  { x: 135, y: 5, rotate: 8 },
-  { x: 270, y: 22, rotate: 16 },
-];
+/** 중앙 stack에서 카드 한 장씩 어긋나는 폭(px) — 5장이 겹쳐도 장수가 읽힌다 */
+const STACK_OFFSET_X = 6;
+const STACK_OFFSET_Y = 4;
 
-/** crossing pass 1 — 좌우 교차 */
-export const CROSS_LAYOUT: LayoutPoint[] = [
-  { x: 100, y: -3, rotate: 8 },
-  { x: 60, y: 1, rotate: 5 },
-  { x: 0, y: -4, rotate: 0 },
-  { x: -60, y: 1, rotate: -5 },
-  { x: -100, y: -3, rotate: -8 },
-];
+/** 중앙 stack 축소 비율 */
+const STACK_SCALE = 0.97;
 
-/** mixing pass 2 — 반대 교차 */
-const MIX_PASS_B: LayoutPoint[] = [
-  { x: -95, y: 2, rotate: -7 },
-  { x: -55, y: -1, rotate: -4 },
-  { x: 0, y: -3, rotate: 0 },
-  { x: 55, y: -1, rotate: 4 },
-  { x: 95, y: 2, rotate: 7 },
-];
+/** double-cut에서 두 패킷이 좌우로 갈리는 거리(px, layoutScale 적용 전) */
+const CUT_SHIFT = 70;
 
-/** mixing pass 3 — 마지막 교차 후 restack */
-const MIX_PASS_C: LayoutPoint[] = [
-  { x: 82, y: -2, rotate: 6 },
-  { x: 48, y: 2, rotate: 3 },
-  { x: 0, y: -3, rotate: 0 },
-  { x: -48, y: 2, rotate: -3 },
-  { x: -82, y: -2, rotate: -6 },
-];
+/** double-cut 단계별 카드 index → stack 위치(아래에서 n번째).
+    상단 2장이 통째로 아래로 내려가는 컷을 두 번 적용한 결과 */
+const CUT_ORDERS = [
+  [0, 1, 2, 3, 4],
+  [2, 3, 4, 0, 1],
+  [4, 0, 1, 2, 3],
+] as const;
 
-/** @deprecated 레거시 fan 슬롯 */
-export const FAN_X = [-220, -110, 0, 110, 220] as const;
-export const FAN_SPACING = 110;
+/** step 0·2는 갈라진 상태, 1·3은 재결합한 stack — 각 step이 쓰는 순서표 */
+const CUT_ORDER_AT_STEP = [0, 1, 1, 2] as const;
+
+/** 공개 시 카드 확대 비율 — 기존 카드보다 10% 크게 */
+const PICK_SCALE = 1.1;
+
+/** double-cut 진행 단계 */
+export type MixStep = 0 | 1 | 2 | 3;
 
 /**
  * 스테이지 너비·카드 너비 기준 fan 스케일.
  * fan이 스테이지 가로의 약 45~55%를 쓰도록 조정.
  */
 export function getLayoutScale(stageW: number, cardW: number): number {
-  const targetHalfSpan = stageW * 0.26;
-  const baseOuterX = 290;
+  const targetHalfSpan = stageW * 0.36;
+  const baseOuterX = 377;
   const maxFromStage = (stageW / 2 - cardW * 0.25) / baseOuterX;
   const maxFromTarget = targetHalfSpan / baseOuterX;
-  return Math.min(1, Math.max(0.42, Math.min(maxFromStage, maxFromTarget)));
+  const fit = Math.min(1, Math.max(0.36, Math.min(maxFromStage, maxFromTarget)));
+  /* 좁은 화면에서만 간격을 12% 더 좁힌다 — desktop 간격은 그대로 */
+  return stageW < 1024 ? fit * 0.88 : fit;
 }
 
 /** fan 펼침 시 가로 간격만 확대 (카드 scale/비율 유지) */
@@ -107,30 +97,41 @@ function layoutPose(layout: LayoutPoint[], i: number, z = 5 + i): CardPose {
   return { ...p, scale: 1, opacity: 1, z };
 }
 
-function crossingPose(i: number, layout: LayoutPoint[]): CardPose {
-  const base = layoutPose(layout, i);
-  const zByCard = [9, 8, 11, 7, 8];
-  return { ...base, scale: 1, z: zByCard[i] ?? 8 };
+/** 중앙 stack — rotation 0, scale .97. dx로 컷 패킷 전체를 좌우로 민다 */
+function stackedPose(pos: number, dx = 0): CardPose {
+  return {
+    x: dx + (pos - 2) * STACK_OFFSET_X,
+    y: (pos - 2) * STACK_OFFSET_Y,
+    rotate: 0,
+    scale: STACK_SCALE,
+    opacity: 1,
+    z: 5 + pos,
+  };
 }
 
-function mixingPose(
-  mixStep: 0 | 1,
-  i: number,
-  layoutScale: number,
-): CardPose {
-  const layout = mixStep === 0 ? MIX_PASS_B : MIX_PASS_C;
-  const scaled = scaleLayout(layout, layoutScale);
-  const pt = scaled[i] ?? scaled[0]!;
-  const zByStep =
-    mixStep === 0
-      ? [7, 10, 11, 10, 7]
-      : [9, 8, 11, 8, 9];
-  return { ...pt, scale: 1, opacity: 1, z: zByStep[i] ?? 8 };
+/**
+ * double-cut — 상단 2장과 하단 3장이 좌우로 갈렸다가 순서를 바꿔 재결합한다.
+ * 두 번째 컷은 방향을 뒤집는다. translate와 z만 쓰고 회전·투명도는 건드리지 않는다.
+ */
+function cutPose(step: MixStep, i: number, layoutScale: number): CardPose {
+  const pos = CUT_ORDERS[CUT_ORDER_AT_STEP[step]]![i] ?? i;
+  if (step === 1 || step === 3) return stackedPose(pos);
+
+  const topPacket = pos >= 3;
+  const dir = step === 0 ? -1 : 1;
+  const dx = (topPacket ? dir : -dir) * CUT_SHIFT * layoutScale;
+  /* 갈라진 동안에는 상단 패킷이 앞을 지난다 */
+  return { ...stackedPose(pos, dx), z: (topPacket ? 12 : 5) + pos };
+}
+
+/** waypoint rail이 카드 하단과 맞물리도록 fan 카드의 x 좌표를 그대로 노출한다 */
+export function fanAnchorsX(layoutScale: number): number[] {
+  return scaledFanLayout(SELECTABLE_LAYOUT, layoutScale).map((p) => p.x);
 }
 
 export function poseForCard(
   phase: CardPhase,
-  mixStep: 0 | 1,
+  mixStep: MixStep,
   i: number,
   total: number,
   layoutScale: number,
@@ -138,8 +139,6 @@ export function poseForCard(
   cardId: string,
 ): CardPose {
   const selectable = scaledFanLayout(SELECTABLE_LAYOUT, layoutScale);
-  const fan = scaledFanLayout(FAN_LAYOUT, layoutScale);
-  const cross = scaleLayout(CROSS_LAYOUT, layoutScale);
 
   if (
     (phase === "selected" || phase === "revealing" || phase === "complete") &&
@@ -147,35 +146,34 @@ export function poseForCard(
   ) {
     const base = layoutPose(selectable, i);
     if (cardId === selectedId) {
-      const pickScale = phase === "complete" ? 1.05 : 1.1;
-      return { x: 0, y: -20, rotate: 0, scale: pickScale, opacity: 1, z: 30 };
+      /* 클릭 직후 — 제자리에서 살짝 들어올리기만 한다 */
+      if (phase === "selected") {
+        return { ...base, y: base.y - 14, rotate: base.rotate * 0.3, scale: 1.06, z: 30 };
+      }
+      /* 무대 중앙으로 이동하며 확대. 공개 후에도 크기를 유지한다 */
+      return { x: 0, y: -20, rotate: 0, scale: PICK_SCALE, opacity: 1, z: 30 };
     }
-    const dir = base.x >= 0 ? 1 : -1;
+    /* 나머지 4장은 바깥으로 밀지 않고 선택 카드 뒤로 모인다 */
     return {
-      x: base.x + dir * 100,
-      y: base.y + 10,
-      rotate: base.rotate * 0.25,
-      scale: 1,
-      opacity: 0.2,
+      x: base.x * 0.42,
+      y: base.y + 12,
+      rotate: base.rotate * 0.3,
+      scale: 0.94,
+      opacity: 0.18,
       z: 1 + i,
     };
   }
 
   switch (phase) {
     case "ready":
-      return layoutPose(selectable, i, i === 2 ? 10 : 4 + i);
+      return layoutPose(selectable, i, 4 + i);
     case "gathering":
-      return stackPose(i, total, 4);
-    case "fanOut":
-      return layoutPose(fan, i);
+      return stackedPose(i);
     case "crossing":
-      return crossingPose(i, cross);
-    case "mixing":
-      return mixingPose(mixStep, i, layoutScale);
-    case "restacking":
-      return stackPose(i, total, 3.6);
+      return cutPose(mixStep, i, layoutScale);
     case "selectable":
-      return layoutPose(selectable, i, i === 2 ? 12 : 5 + i);
+      /* 왼쪽부터 순서대로 쌓아야 각 카드 하단 힌트가 오른쪽 이웃에 가리지 않는다 */
+      return layoutPose(selectable, i, 5 + i);
     default:
       return stackPose(i, total);
   }

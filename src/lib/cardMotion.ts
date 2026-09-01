@@ -1,34 +1,30 @@
 import { ADVENTURE_CARD_MOTION, ADVENTURE_CARD_SPRING } from "./adventureCardTokens";
+import type { MixStep } from "./cardLayout";
 import type { CardPhase } from "../types/travel";
 
-/** 셔플 단계별 duration (ms) — 단일 설정 원천 */
+/** 셔플 단계별 duration (ms) — gather 220 → double-cut 500 → fan-out 400.
+    fan stagger 꼬리까지 총 약 1.34s */
 export const SHUFFLE_TIMING_MS = {
-  ready: 80,
-  gathering: 400,
-  fanOut: 450,
-  crossing: 340,
-  mixing: 560,
-  mixingHalf: 280,
-  restacking: 300,
-  selectable: 460,
+  ready: 60,
+  gathering: 220,
+  crossing: 500,
+  /** double-cut 4단계(갈라짐 → 재결합 × 2) */
+  crossingStep: 125,
+  selectable: 400,
 } as const;
 
 /** reduced-motion 셔플 단축 duration (ms) */
 export const SHUFFLE_TIMING_REDUCED_MS = {
   gathering: 120,
   crossing: 220,
-  restacking: 100,
 } as const;
 
 /** Adventure Expedition 카드 드로우 모션 (초 단위) */
 export const CARD_MOTION = {
   ready: SHUFFLE_TIMING_MS.ready / 1000,
   gathering: SHUFFLE_TIMING_MS.gathering / 1000,
-  fanOut: SHUFFLE_TIMING_MS.fanOut / 1000,
   crossing: SHUFFLE_TIMING_MS.crossing / 1000,
-  mixing: SHUFFLE_TIMING_MS.mixing / 1000,
-  mixingHalf: SHUFFLE_TIMING_MS.mixingHalf / 1000,
-  restacking: SHUFFLE_TIMING_MS.restacking / 1000,
+  crossingStep: SHUFFLE_TIMING_MS.crossingStep / 1000,
   selectable: SHUFFLE_TIMING_MS.selectable / 1000,
   select: ADVENTURE_CARD_MOTION.select,
   stamp: ADVENTURE_CARD_MOTION.stamp,
@@ -81,14 +77,8 @@ export function durationForShufflePhase(phase: string, reduce: boolean): number 
   switch (phase) {
     case "gathering":
       return CARD_MOTION.gathering;
-    case "fanOut":
-      return CARD_MOTION.fanOut;
     case "crossing":
-      return CARD_MOTION.crossing;
-    case "mixing":
-      return CARD_MOTION.mixingHalf;
-    case "restacking":
-      return CARD_MOTION.restacking;
+      return CARD_MOTION.crossingStep;
     case "selectable":
       return CARD_MOTION.selectable;
     case "complete":
@@ -98,11 +88,8 @@ export function durationForShufflePhase(phase: string, reduce: boolean): number 
   }
 }
 
-/** fanOut: 중앙 → 좌우 안쪽 → 좌우 바깥 */
+/** wide fan: 중앙 → 좌우 안쪽 → 좌우 바깥 */
 export const FAN_STAGGER_ORDER = [2, 1, 3, 0, 4] as const;
-
-/** restacking: 바깥 카드부터 */
-export const RESTACK_STAGGER_ORDER = [0, 4, 1, 3, 2] as const;
 
 function orderIndex(order: readonly number[], cardIndex: number): number {
   const idx = order.indexOf(cardIndex);
@@ -118,23 +105,21 @@ export function cardStaggerDelay(
   if (reduce) return 0;
   switch (phase) {
     case "gathering":
-      return cardIndex * 0.028;
-    case "fanOut":
-      return orderIndex(FAN_STAGGER_ORDER, cardIndex) * 0.045;
-    case "crossing":
-      return cardIndex * 0.022;
-    case "mixing":
-      return cardIndex * 0.02;
-    case "restacking":
-      return orderIndex(RESTACK_STAGGER_ORDER, cardIndex) * 0.028;
+      return cardIndex * 0.018;
     case "selectable":
-      return orderIndex(FAN_STAGGER_ORDER, cardIndex) * 0.04;
+      return orderIndex(FAN_STAGGER_ORDER, cardIndex) * 0.055;
     default:
       return 0;
   }
 }
 
-export function transitionEaseForPhase(phase: CardPhase): [number, number, number, number] {
-  if (phase === "selectable") return SHUFFLE_EASE_SETTLE;
+export function transitionEaseForPhase(
+  phase: CardPhase,
+  mixStep: MixStep = 0,
+): [number, number, number, number] | "linear" {
+  /* fan-out은 살짝 지나쳤다가 마지막 ~120ms에 자리를 잡는다 */
+  if (phase === "selectable") return SHUFFLE_EASE_OVERSHOOT;
+  /* 갈라질 때는 감속, 재결합할 때는 가속 후 감속 */
+  if (phase === "crossing") return mixStep % 2 === 0 ? CARD_EASE_OUT : CARD_EASE_INOUT;
   return SHUFFLE_EASE;
 }

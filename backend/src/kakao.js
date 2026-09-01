@@ -1,3 +1,5 @@
+import { ktoFirstImageByTitle, titlesMatch } from "./kto.js";
+
 const TIMEOUT_MS = 5000;
 
 /** 카카오 로컬 카테고리 → 프런트 태그 */
@@ -95,4 +97,88 @@ export function toHiddenPlaces({ spots, foods, cafes }) {
     name: p.name,
     tag: p.tag,
   }));
+}
+
+/**
+ * 다음 이미지 검색 — KTO 이미지가 없을 때만 쓰는 보조 수단.
+ * REST 키는 서버에서만 사용하고, 결과가 없으면 null(프런트에서 이미지 영역 생략).
+ */
+/** 썸네일로 쓰기에 너무 작거나 극단적인 비율인 사진은 버린다 */
+function usableImage(doc) {
+  const w = Number(doc.width) || 0;
+  const h = Number(doc.height) || 0;
+  if (!doc.thumbnail_url || w < 400 || h < 260) return false;
+  const ratio = w / h;
+  return ratio >= 0.75 && ratio <= 2.0;
+}
+
+/**
+ * 다음 이미지 검색 — KTO 이미지가 없을 때만 쓰는 보조 수단.
+ * REST 키는 서버에서만 사용하고, 쓸 만한 결과가 없으면 null(프런트에서 이미지 영역 생략).
+ */
+export async function searchImage(query) {
+  const key = process.env.KAKAO_REST_API_KEY;
+  if (!key || !query.trim()) return null;
+
+  const params = new URLSearchParams({ query: query.trim(), size: "10", sort: "accuracy" });
+
+  try {
+    const res = await fetch(`https://dapi.kakao.com/v2/search/image?${params}`, {
+      headers: { Authorization: `KakaoAK ${key}` },
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    if (!res.ok) return null;
+
+    const docs = (await res.json()).documents ?? [];
+    const doc = docs.slice(0, 3).find(usableImage);
+    if (!doc) return null;
+
+    return {
+      thumbnail: doc.thumbnail_url,
+      // 원본이 막혀 있을 때를 대비해 썸네일도 같이 넘긴다
+      image: doc.image_url || doc.thumbnail_url,
+      credit: { sitename: doc.display_sitename ?? "", docUrl: doc.doc_url ?? "" },
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** 검색어용 지역 — 시·군·구만 써서 고유명사와 붙인다 */
+export function regionWord(region = "") {
+  const parts = region.trim().split(/\s+/).filter(Boolean);
+  const city = [...parts].reverse().find((p) => /(시|군|구)$/.test(p));
+  return city || parts.slice(0, 2).join(" ");
+}
+
+/**
+ * 썸네일: KTO 근처 firstimage → searchKeyword2 제목 일치 → Daum(지역+상호+유형).
+ * 쓸 만한 사진이 없으면 필드를 비워 프런트에서 텍스트만 보여 준다.
+ */
+export async function attachThumbnails(places, region, count, keyword = "", ktoPool = []) {
+  const targets = places.slice(0, count);
+  const area = regionWord(region);
+  await Promise.all(
+    targets.map(async (place) => {
+      const fromPool = ktoPool.find((k) => titlesMatch(k.name, place.name))?.image;
+      if (fromPool) {
+        place.image = fromPool;
+        return;
+      }
+      const query = [area, place.name, keyword].filter(Boolean).join(" ");
+      const [fromKto, hit] = await Promise.all([
+        ktoFirstImageByTitle(place.name),
+        searchImage(query),
+      ]);
+      if (fromKto) {
+        place.image = fromKto;
+        return;
+      }
+      if (!hit) return;
+      place.image = hit.image;
+      place.thumbnail = hit.thumbnail;
+      place.imageCredit = hit.credit;
+    }),
+  );
+  return places;
 }

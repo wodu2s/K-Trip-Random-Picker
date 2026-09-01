@@ -51,7 +51,7 @@ export function ExpeditionCardArt({
         <img
           src={LANDING_ASSET_CONFIG.cardBack.src}
           srcSet={LANDING_ASSET_PATHS.cardBackSrcSet}
-          sizes="(max-width: 1023px) 45vw, 300px"
+          sizes="(max-width: 1023px) 45vw, 400px"
           alt=""
           draggable={false}
           decoding="async"
@@ -66,10 +66,27 @@ export function ExpeditionCardArt({
           slotHints={hints}
         />
       )}
+      {featured ? (
+        <div className="expedition-card-art__relief" aria-hidden="true">
+          <svg viewBox="0 0 200 300" fill="none" preserveAspectRatio="none">
+            <g className="expedition-card-art__contour">
+              <path d="M6 96 C44 72 78 116 116 92 C146 72 176 104 196 88" />
+              <path d="M6 132 C46 108 82 152 122 126 C152 106 178 138 196 122" />
+              <path d="M6 170 C48 146 86 190 128 162 C156 144 180 174 196 158" />
+              <path d="M6 208 C50 184 90 226 132 198 C160 180 182 208 196 194" />
+            </g>
+            <path
+              className="expedition-card-art__korea"
+              d="M84 108 L102 101 L118 108 L129 104 L132 124 L133 143 L129 160 L133 178 L128 194 L121 205 L109 212 L97 209 L87 214 L78 206 L76 192 L83 181 L74 169 L79 155 L71 142 L79 127 L76 116 Z"
+            />
+          </svg>
+        </div>
+      ) : null}
+      {featured ? <div className="expedition-card-art__emboss" aria-hidden="true" /> : null}
       {hints && featured ? (
         <div className="expedition-card-art__hints" aria-hidden="true">
-          {hints.map((emoji) => (
-            <span key={emoji} className="expedition-card-art__hint-chip">
+          {hints.map((emoji, i) => (
+            <span key={`${emoji}-${i}`} className="expedition-card-art__hint-chip">
               {emoji}
             </span>
           ))}

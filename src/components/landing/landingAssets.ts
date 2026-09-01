@@ -14,7 +14,7 @@ export const LANDING_ASSET_PATHS = {
     "/assets/adventure/expedition-card-back-384.png 384w," +
     "/assets/adventure/expedition-card-back-512.png 512w," +
     "/assets/adventure/expedition-card-back-768.png 768w," +
-    "/assets/adventure/expedition-card-back.png 1024w",
+    "/assets/adventure/expedition-card-back-1024.png 1024w",
   compass: "/assets/adventure/prop-brass-compass.png?v=4",
   ticket: "/assets/adventure/prop-expedition-ticket.png?v=2",
   koreaNightMap: "/assets/adventure/night-korea-map.webp?v=3",

@@ -64,7 +64,8 @@ function AppShell() {
   const { page } = useTravel();
   const active = page === "shuffle" ? "cards" : page;
   const isLanding = active === "landing";
-  const isDark = active === "landing" || active === "conditions" || active === "cards";
+  const isDark =
+    active === "landing" || active === "conditions" || active === "cards" || active === "destination";
 
   return (
     <div

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { MapPin } from "lucide-react";
-import { fetchNearbyPlaces, type NearbyPlace } from "../../lib/api";
+import type { NearbyPlace } from "../../lib/api";
 import type { Destination } from "../../types/travel";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -34,27 +34,17 @@ function loadKakaoSdk(appKey: string): Promise<any> {
 }
 
 /** 목적지 위치 지도 + 주변 장소 마커. 좌표·키가 없으면 렌더하지 않는다. */
-export function DestinationMap({ destination }: { destination: Destination }) {
+export function DestinationMap({
+  destination,
+  places,
+}: {
+  destination: Destination;
+  places: NearbyPlace[];
+}) {
   const appKey = import.meta.env.VITE_KAKAO_MAP_JS_KEY ?? "";
   const { lat, lng, name } = destination;
   const containerRef = useRef<HTMLDivElement>(null);
-  const [places, setPlaces] = useState<NearbyPlace[]>([]);
   const [failed, setFailed] = useState(false);
-
-  useEffect(() => {
-    if (!lat || !lng) return;
-    let alive = true;
-    fetchNearbyPlaces(lat, lng)
-      .then((data) => {
-        if (alive) setPlaces([...data.spots, ...data.foods, ...data.cafes].slice(0, 8));
-      })
-      .catch(() => {
-        /* 주변 장소는 실패해도 지도는 그대로 노출 */
-      });
-    return () => {
-      alive = false;
-    };
-  }, [lat, lng]);
 
   useEffect(() => {
     if (!appKey || !lat || !lng || !containerRef.current) return;
@@ -91,46 +81,14 @@ export function DestinationMap({ destination }: { destination: Destination }) {
 
   if (!lat || !lng) return null;
 
-  return (
-    <section>
-      <p className="font-expedition mb-1 text-[11px] font-bold tracking-[0.16em] text-brass">
-        FIELD MAP
-      </p>
-      <h2 className="font-expedition mb-1 text-lg font-bold text-ink">목적지 지도</h2>
-      <p className="mb-4 text-sm text-muted">주변 명소·식당·카페를 함께 표시했어요.</p>
+  if (!appKey || failed) {
+    return (
+      <div className="dossier-map dossier-map--empty">
+        <MapPin className="h-6 w-6 text-brass" strokeWidth={1.8} aria-hidden="true" />
+        <p className="text-sm">지도 키가 없어 위치만 안내합니다 — {destination.region}</p>
+      </div>
+    );
+  }
 
-      {appKey && !failed ? (
-        <div
-          ref={containerRef}
-          className="h-[320px] w-full overflow-hidden rounded-[12px] border border-brass/35 shadow-[0_10px_26px_rgba(22,40,31,0.12)] sm:h-[380px]"
-        />
-      ) : (
-        <div className="flex h-[180px] w-full flex-col items-center justify-center gap-2 rounded-[12px] border border-brass/30 bg-[var(--color-parchment-100)] text-muted">
-          <MapPin className="h-6 w-6 text-brass" strokeWidth={1.8} aria-hidden="true" />
-          <p className="text-sm">지도 키가 없어 위치만 안내합니다 — {destination.region}</p>
-        </div>
-      )}
-
-      {places.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-2">
-          {places.map((p) => (
-            <li key={`${p.name}-${p.lat}`}>
-              <a
-                href={p.url}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-[8px] border border-brass/30 bg-[var(--color-parchment-100)] px-2.5 py-1.5 text-xs font-semibold text-ink transition-colors hover:border-brass/60"
-              >
-                <MapPin className="h-3.5 w-3.5 text-brass" strokeWidth={2.2} aria-hidden="true" />
-                {p.name}
-                {p.distance != null && (
-                  <span className="text-muted">{Math.round(p.distance / 100) / 10}km</span>
-                )}
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  );
+  return <div ref={containerRef} className="dossier-map" />;
 }

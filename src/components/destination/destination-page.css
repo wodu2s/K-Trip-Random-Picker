@@ -1,0 +1,973 @@
+/* ── 목적지 페이지
+   첨부 원화 배경 위 hero(좌 정보 ~40% / 우 둥근 메인 사진) + ivory 시트
+   상단: 지도 · 가볼 곳 · 맛집/카페 / 하단: 추천 코스 · 숙소(1박 이상)
+   모든 규칙은 .dossier-page 아래로만 둔다. ── */
+.dossier-page {
+  --dossier-navy: #08192a;
+  --dossier-ivory: #eee4cb;
+  --dossier-muted: rgba(238, 228, 203, 0.72);
+  --dossier-faint: rgba(238, 228, 203, 0.48);
+  --dossier-brass: #c9a227;
+  --dossier-green: #1f3d2b;
+
+  --plan-bg: #f6f2e8;
+  --panel-bg: #faf7ef;
+  --plan-ink: #1b2733;
+  --plan-muted: rgba(27, 39, 51, 0.66);
+  --plan-faint: rgba(27, 39, 51, 0.46);
+  --plan-gold: #8a6a16;
+  --plan-line: rgba(27, 39, 51, 0.12);
+
+  --wrap: 1220px;
+
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100svh - 72px);
+  color: var(--dossier-ivory);
+  font-family: var(--font-family-base, "Pretendard Variable", "Pretendard", sans-serif);
+  overflow-x: clip;
+  background-color: #08192a;
+}
+
+/* 첨부 원화 — 헤더 뒤까지 깔리게 해서 가장자리 산/건축 실루엣이 보이게 */
+.dossier-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8, 25, 42, 0.4) 0%,
+      rgba(8, 25, 42, 0.2) 30%,
+      rgba(244, 237, 220, 0.55) 58%,
+      rgba(244, 237, 220, 0.86) 100%
+    ),
+    url("/images/destination/page-backdrop.webp") center top / cover no-repeat;
+}
+
+/* 시트 뒤 등고선/경로선이 보이지 않도록 하단을 한 번 더 덮는다 */
+.dossier-page::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 62%;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(244, 237, 220, 0.42) 16%,
+    rgba(244, 237, 220, 0.9) 100%
+  );
+}
+
+.dossier-page .dossier-hero,
+.dossier-page .dossier-body,
+.dossier-page .dossier-cta-bar,
+.dossier-page .dossier-empty {
+  position: relative;
+  z-index: 1;
+}
+
+.dossier-page .dossier-wrap {
+  margin: 0 auto;
+  width: 100%;
+  max-width: var(--wrap);
+  padding: 0 1.35rem;
+}
+
+/* ═══ Hero — 배경이 비치게, 사진은 둥근 프레임 ═══ */
+.dossier-page .dossier-hero {
+  background: transparent;
+}
+
+.dossier-page .dossier-hero__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1.1rem;
+  padding-bottom: 1.1rem;
+}
+
+.dossier-page .dossier-hero__copy {
+  padding: 0;
+}
+
+.dossier-page .dossier-region {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: rgba(201, 162, 39, 0.52);
+}
+
+.dossier-page .dossier-region svg {
+  width: 13px;
+  height: 13px;
+}
+
+.dossier-page .dossier-title {
+  margin-top: 0.4rem;
+  font-family: var(--font-family-display, "Noto Serif KR Variable", serif);
+  font-size: clamp(2rem, 3.1vw, 2.625rem);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  color: var(--dossier-brass);
+}
+
+.dossier-page .dossier-title::after {
+  content: "";
+  display: block;
+  margin-top: 0.45rem;
+  width: 48px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--dossier-brass), rgba(201, 162, 39, 0));
+}
+
+.dossier-page .dossier-lead {
+  margin-top: 0.45rem;
+  max-width: 26rem;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--dossier-muted);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.dossier-page .dossier-hints {
+  margin-top: 0.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.dossier-page .dossier-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.7rem 0.28rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--dossier-muted);
+}
+
+.dossier-page .dossier-hint__emoji {
+  font-size: 0.88rem;
+  line-height: 1;
+}
+
+.dossier-page .dossier-cta-row {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.dossier-page .dossier-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 42px;
+  padding: 0 1.2rem;
+  border-radius: 4px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.dossier-page .dossier-btn--primary {
+  background: var(--dossier-brass);
+  color: #12202c;
+}
+
+.dossier-page .dossier-btn--primary:hover {
+  background: #d8b84a;
+}
+
+.dossier-page .dossier-btn--ghost {
+  color: var(--dossier-ivory);
+  border-color: rgba(238, 228, 203, 0.28);
+}
+
+.dossier-page .dossier-btn--ghost:hover {
+  border-color: var(--dossier-brass);
+}
+
+.dossier-page .dossier-photo {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  min-height: 200px;
+  height: 220px;
+  border-radius: 16px;
+  background: #081b2b;
+}
+
+.dossier-page .dossier-photo > img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dossier-page .dossier-photo__credit {
+  position: absolute;
+  right: 0.8rem;
+  bottom: 0.5rem;
+  z-index: 1;
+  font-size: 0.66rem;
+  color: rgba(238, 228, 203, 0.62);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+.dossier-page .dossier-photo__credit a:hover {
+  color: var(--dossier-brass);
+}
+
+.dossier-page .dossier-photo__fallback {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  min-height: 200px;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(150deg, var(--dossier-green) 0%, #0d2a1c 100%);
+}
+
+/* ═══ ivory 시트 — 배경 가장자리가 보이게 띄운다 ═══ */
+.dossier-page .dossier-body {
+  background: transparent;
+  color: var(--plan-ink);
+  padding: 0 0 0.85rem;
+}
+
+/* 전역 조건 페이지 테마의 양피지/등고선 텍스처가 시트 위를 덮지 않게 뒤로 보낸다 */
+.dossier-page .dossier-body::before,
+.dossier-page .dossier-body::after {
+  z-index: -1;
+  opacity: 0.018;
+}
+
+.dossier-page .dossier-sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 1.05rem 1.2rem 0.9rem;
+  border-radius: 20px;
+  background: var(--plan-bg);
+  box-shadow: 0 10px 28px rgba(8, 25, 42, 0.1);
+}
+
+.dossier-page .dossier-top,
+.dossier-page .dossier-bottom {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: 1fr;
+}
+
+.dossier-page .dossier-bottom {
+  margin-top: 0.35rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--plan-line);
+}
+
+.dossier-page .panel {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  min-width: 0;
+}
+
+.dossier-page .panel__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-bottom: 0.32rem;
+  border-bottom: 1px solid var(--plan-line);
+}
+
+.dossier-page .panel__title,
+.dossier-page .stays__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.65rem;
+  margin: 0;
+  font-family: var(--font-family-display, inherit);
+  font-size: 0.94rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.dossier-page .panel__note {
+  font-family: var(--font-family-base, inherit);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--plan-faint);
+}
+
+.dossier-page .panel__more {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--plan-gold);
+}
+
+.dossier-page .panel__more:hover {
+  text-decoration: underline;
+}
+
+.dossier-page .dossier-map {
+  margin-top: 0.55rem;
+  height: 138px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #e6dcc4;
+}
+
+.dossier-page .dossier-map--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0 1rem;
+  text-align: center;
+  color: var(--plan-muted);
+}
+
+.dossier-page .plan__facts {
+  margin: 0.5rem 0 0;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.dossier-page .plan__fact {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  column-gap: 0.5rem;
+  align-items: start;
+}
+
+.dossier-page .plan__fact svg {
+  margin-top: 2px;
+  width: 14px;
+  height: 14px;
+  color: var(--plan-gold);
+}
+
+.dossier-page .plan__fact dt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.dossier-page .plan__fact dd {
+  margin: 0;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--plan-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dossier-page .plan__fact a:hover {
+  color: var(--plan-gold);
+  text-decoration: underline;
+}
+
+.dossier-page .place-thumbs {
+  margin: 0.55rem 0 0;
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+  /* 사진 개수만큼만 칸을 만들어 빈 자리를 남기지 않는다 */
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+}
+
+.dossier-page .place-thumb {
+  display: block;
+  min-width: 0;
+}
+
+.dossier-page .place-thumb__img {
+  width: 100%;
+  height: 92px;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 9px;
+  background: #e6dcc4;
+}
+
+.dossier-page .place-thumb__name {
+  margin-top: 0.32rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--plan-ink);
+}
+
+.dossier-page .place-thumb:hover .place-thumb__name {
+  color: var(--plan-gold);
+}
+
+.dossier-page .place-thumb__meta,
+.dossier-page .place-thumb__credit {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.66rem;
+  color: var(--plan-faint);
+}
+
+.dossier-page .place-thumb__meta {
+  margin-top: 0.05rem;
+  color: var(--plan-muted);
+}
+
+.dossier-page .nearby-list {
+  margin: 0.35rem 0 0;
+  list-style: none;
+  padding: 0;
+}
+
+.dossier-page .nearby-item__link {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.38rem 0;
+  border-top: 1px solid rgba(27, 39, 51, 0.07);
+}
+
+.dossier-page .nearby-item__rank {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--plan-gold);
+}
+
+.dossier-page .nearby-item__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  color: var(--plan-ink);
+  transition: color 0.16s ease;
+}
+
+.dossier-page .nearby-item__arrow {
+  flex-shrink: 0;
+  opacity: 0;
+  color: var(--plan-gold);
+  transition: opacity 0.16s ease;
+}
+
+.dossier-page .nearby-item__dist {
+  flex-shrink: 0;
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--plan-faint);
+}
+
+.dossier-page .nearby-item__link:hover .nearby-item__name {
+  color: var(--plan-gold);
+}
+
+.dossier-page .nearby-item__link:hover .nearby-item__arrow {
+  opacity: 1;
+}
+
+.dossier-page .route-line {
+  margin: 0.55rem 0 0;
+  list-style: none;
+  padding: 0;
+}
+
+.dossier-page .route-stop {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  column-gap: 0.55rem;
+}
+
+.dossier-page .route-stop__node {
+  position: relative;
+}
+
+.dossier-page .route-stop__node::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  bottom: 0;
+  border-left: 1px solid rgba(138, 106, 22, 0.18);
+}
+
+.dossier-page .route-stop:last-child .route-stop__node::before {
+  display: none;
+}
+
+.dossier-page .route-stop__dot {
+  position: absolute;
+  left: 4px;
+  top: 5px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(138, 106, 22, 0.42);
+  background: var(--plan-bg);
+}
+
+.dossier-page .route-stop--stay .route-stop__dot {
+  left: 3px;
+  top: 4px;
+  width: 11px;
+  height: 11px;
+  border-color: var(--plan-gold);
+  background: linear-gradient(180deg, #c9a227 0%, #8a6a16 100%);
+}
+
+.dossier-page .route-stop--stay .route-stop__node::before,
+.dossier-page .route-stop--stay + .route-stop .route-stop__node::before {
+  border-left-color: rgba(138, 106, 22, 0.3);
+}
+
+/* 1박 2일 세로 코스 — 시간·장소를 한 줄에 두어 높이를 줄인다 */
+.dossier-page .route-line:not(.route-line--row) {
+  margin-top: 0.35rem;
+}
+
+.dossier-page .route-line:not(.route-line--row) .route-stop__body {
+  display: grid;
+  grid-template-columns: 74px minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 0.5rem;
+  padding-bottom: 0.14rem;
+}
+
+.dossier-page .route-line:not(.route-line--row) .route-stop__day {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
+/* ── 당일치기 — 가로형 추천 코스 timeline ── */
+.dossier-page .route-line--row {
+  margin-top: 0.5rem;
+  display: grid;
+  width: 100%;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.dossier-page .route-line--row .route-stop {
+  display: block;
+  padding: 0 0.4rem;
+  text-align: center;
+}
+
+.dossier-page .route-line--row .route-stop__node {
+  display: block;
+  height: 12px;
+  margin-bottom: 0.45rem;
+}
+
+.dossier-page .route-line--row .route-stop__node::before {
+  left: 50%;
+  right: -50%;
+  top: 5px;
+  bottom: auto;
+  border-left: 0;
+  border-top: 1.5px solid rgba(138, 106, 22, 0.5);
+}
+
+.dossier-page .route-line--row .route-stop__dot {
+  left: 50%;
+  top: 0;
+  width: 11px;
+  height: 11px;
+  border: 2px solid var(--plan-gold);
+  transform: translateX(-50%);
+}
+
+.dossier-page .route-line--row .route-stop__meta {
+  justify-content: center;
+}
+
+.dossier-page .route-line--row .route-stop__time {
+  font-size: 12px;
+}
+
+.dossier-page .route-line--row .route-stop__kind {
+  font-size: 10.5px;
+}
+
+.dossier-page .route-line--row .route-stop__body {
+  padding-bottom: 0;
+}
+
+.dossier-page .route-line--row .route-stop__title {
+  margin-top: 0.12rem;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.dossier-page .route-stop__body {
+  padding-bottom: 0.45rem;
+  min-width: 0;
+}
+
+.dossier-page .route-stop:last-child .route-stop__body {
+  padding-bottom: 0;
+}
+
+.dossier-page .route-stop__day {
+  margin-bottom: 0.12rem;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--plan-gold);
+}
+
+.dossier-page .route-stop__meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.dossier-page .route-stop__time {
+  font-size: 0.72rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--plan-gold);
+}
+
+.dossier-page .route-stop__kind {
+  font-size: 0.68rem;
+  color: var(--plan-faint);
+}
+
+.dossier-page .route-stop__title {
+  margin-top: 0.05rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.dossier-page .route-stop--stay .route-stop__title {
+  color: #6f5410;
+}
+
+.dossier-page .stays {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.dossier-page .stay-list {
+  margin: 0.5rem 0 0;
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: 1fr;
+}
+
+.dossier-page .stay-item {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+}
+
+.dossier-page .stay-item--text {
+  padding-left: 0.65rem;
+  border-left: 2px solid rgba(138, 106, 22, 0.4);
+}
+
+.dossier-page .stay-item > a {
+  flex-shrink: 0;
+  display: block;
+}
+
+.dossier-page .stay-item__thumb {
+  flex-shrink: 0;
+  width: 62px;
+  height: 46px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #e6dcc4;
+}
+
+.dossier-page .stay-item__body {
+  min-width: 0;
+}
+
+.dossier-page .stay-item__type {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--plan-gold);
+}
+
+.dossier-page .stay-item__name {
+  margin-top: 0.08rem;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--plan-ink);
+}
+
+.dossier-page .stay-item__name:hover {
+  color: var(--plan-gold);
+}
+
+.dossier-page .dossier-source {
+  margin-top: 0.55rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--plan-line);
+  font-size: 0.66rem;
+  color: var(--plan-faint);
+}
+
+.dossier-page .dossier-cta-bar {
+  display: flex;
+  align-items: center;
+  background: var(--dossier-navy);
+  color: var(--dossier-ivory);
+  min-height: 58px;
+}
+
+.dossier-page .dossier-cta-bar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding-top: 0.45rem;
+  padding-bottom: 0.45rem;
+}
+
+.dossier-page .dossier-cta-bar__copy {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--dossier-muted);
+}
+
+.dossier-page .dossier-cta-bar__copy strong {
+  color: var(--dossier-ivory);
+  font-weight: 700;
+}
+
+.dossier-page .dossier-cta-bar .dossier-cta-row {
+  margin-top: 0;
+}
+
+.dossier-page .dossier-cta-bar .dossier-btn {
+  flex-shrink: 0;
+  min-height: 38px;
+}
+
+.dossier-page .dossier-empty {
+  padding: 5rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .dossier-page .dossier-top {
+    grid-template-columns: minmax(0, 27fr) minmax(0, 38fr) minmax(0, 35fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .dossier-page .dossier-bottom {
+    grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
+    gap: 1.1rem;
+    align-items: start;
+  }
+
+  /* 당일치기 — 코스를 상단 바로 아래에 붙인다 */
+  .dossier-page .dossier-bottom--solo {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+}
+
+@media (min-width: 1024px) {
+  .dossier-page .dossier-hero__grid {
+    grid-template-columns: minmax(0, 36fr) minmax(0, 64fr);
+    gap: 1.7rem;
+    min-height: 278px;
+    height: 278px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    align-items: center;
+  }
+
+  .dossier-page .dossier-hero__copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .dossier-page .dossier-title {
+    font-size: 42px;
+  }
+
+  .dossier-page .dossier-photo,
+  .dossier-page .dossier-photo__fallback {
+    height: 270px;
+    min-height: 0;
+  }
+}
+
+@media (min-width: 1280px) {
+  .dossier-page {
+    display: grid;
+    grid-template-rows: 278px minmax(0, 1fr) 58px;
+    height: calc(100svh - 72px);
+    max-height: calc(100svh - 72px);
+    overflow: hidden;
+  }
+
+  .dossier-page .dossier-hero {
+    height: 278px;
+    min-height: 278px;
+    max-height: 278px;
+  }
+
+  /* 당일치기처럼 내용이 적을 때 시트가 위로 쏠리지 않게 남는 높이를 위아래로 나눈다 */
+  .dossier-page .dossier-body {
+    min-height: 0;
+    overflow: hidden;
+    padding: 10px 0 14px;
+    flex-direction: column;
+    justify-content: safe center;
+  }
+
+  .dossier-page .dossier-body .dossier-wrap {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    flex: none;
+  }
+
+  .dossier-page .dossier-sheet {
+    height: auto;
+    max-height: 100%;
+    flex: none;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0.8rem 1.35rem 0.55rem;
+  }
+
+  .dossier-page[data-overnight] .dossier-sheet {
+    max-height: 100%;
+  }
+
+  .dossier-page .dossier-top {
+    flex: 0 0 auto;
+  }
+
+  .dossier-page .dossier-bottom {
+    flex: none;
+    min-height: 0;
+    margin-top: 0.28rem;
+    padding-top: 0.28rem;
+  }
+
+  .dossier-page .dossier-title {
+    font-size: 42px;
+  }
+
+  .dossier-page .dossier-map {
+    height: 124px;
+  }
+
+  /* 숙소 — 3곳이 다 있을 때만 시안처럼 카드 3장으로 나란히 (1~2곳이면 빈칸이 생겨 목록 그대로) */
+  .dossier-page .stay-list:has(> :nth-child(3)) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .dossier-page .stay-list:has(> :nth-child(3)) .stay-item {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .dossier-page .stay-list:has(> :nth-child(3)) .stay-item > a {
+    width: 100%;
+  }
+
+  .dossier-page .stay-list:has(> :nth-child(3)) .stay-item__thumb {
+    width: 100%;
+    height: 84px;
+  }
+
+  .dossier-page .stay-list:has(> :nth-child(3)) .stay-item--text {
+    padding: 0.5rem 0 0;
+    border-left: 0;
+    border-top: 2px solid rgba(138, 106, 22, 0.4);
+  }
+
+  .dossier-page .place-thumb__img {
+    height: 90px;
+  }
+
+  .dossier-page .dossier-source {
+    display: none;
+  }
+
+  .dossier-page .dossier-cta-bar {
+    height: 58px;
+    min-height: 58px;
+  }
+}

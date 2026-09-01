@@ -21,6 +21,23 @@ export type MoodKey = "calm" | "lively" | "emotional";
 /** 발견 성향 — 유명 명소 ~ 숨은 로컬 */
 export type DiscoveryKey = "popular" | "balanced" | "hidden";
 
+/** 카드 힌트 종류 — 분위기 · 장소 · 경험 순서로 정확히 3개를 만든다 */
+export type CardHintType = "atmosphere" | "place" | "experience";
+
+/** 백엔드가 조건값 + KTO 분류코드로 생성한 카드 힌트 */
+export type CardHint = {
+  type: CardHintType;
+  /** 힌트 의미 키 (예: beach, trail) — 표기는 emoji만 사용한다 */
+  key: string;
+  emoji: string;
+};
+
+/** 이미지 출처 — 다음 이미지 검색으로 채운 사진에만 붙는다 */
+export type ImageCredit = {
+  sitename: string;
+  docUrl: string;
+};
+
 /** 숨겨진 로컬 명소 (여행지 하위 추천) */
 export type HiddenPlace = {
   name: string;
@@ -66,9 +83,17 @@ export type Destination = {
   reviewCount: number;
   /** 여행지 공개 화면 히어로 일러스트(이미지 대체용) 분위기 */
   scene: SceneVariant;
+  /** 카드 힌트 3개 (atmosphere · place · experience). API·mock 모두 동일 구조 */
+  hints?: CardHint[];
   /** 실제 API 응답에만 있는 좌표 (지도·주변 장소용) */
   lat?: number | null;
   lng?: number | null;
+  /** KTO 이미지가 없어 이미지 검색으로 채운 경우의 출처 */
+  imageCredit?: ImageCredit;
+  /** KTO detailCommon2에서 함께 채우는 연락 정보 */
+  address?: string;
+  tel?: string;
+  homepage?: string;
 };
 
 /** 카드 선택 화면에 뿌리는 미스터리 카드. 실제 정보는 destinationId로 조회한다. */

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { getDestinationById } from "../../data/destinations";
-import { getEmojiHints } from "../../lib/icons";
+import { buildFallbackHints } from "../../lib/icons";
 import { getLayoutScale, poseForCard } from "../../lib/cardLayout";
 import {
   CARD_MOTION,
@@ -13,29 +13,20 @@ import {
 import {
   isSelectable,
 } from "../../lib/cardPhaseUtils";
+import type { MixStep } from "../../lib/cardLayout";
 import type { CardPhase, MysteryCardData } from "../../types/travel";
 import { AdventureTravelCard } from "./AdventureTravelCard";
 import { CardFx } from "./CardFx";
+import { PickedStamp } from "./PickedStamp";
 import { TravelCardBack } from "./TravelCardBack";
 import "./shuffleDeck.css";
 
-const SCALE_LOCKED_PHASES = new Set<CardPhase>([
-  "gathering",
-  "crossing",
-  "mixing",
-  "restacking",
-  "fanOut",
-]);
-
-/** fan 상태 카드별 translateZ — 중앙이 가장 앞 */
-const FAN_DEPTH_Z = [20, 60, 100, 60, 20];
+/** fan 상태 translateZ — 5장을 같은 깊이에 두어 크기·겹침을 고르게 한다 */
+const FAN_DEPTH_Z = 60;
 
 const LIVE_PHASES = new Set<CardPhase>([
   "gathering",
-  "fanOut",
   "crossing",
-  "mixing",
-  "restacking",
   "selectable",
   "selected",
   "revealing",
@@ -63,7 +54,7 @@ export function CardDeck({
 }: {
   cards: MysteryCardData[];
   phase: CardPhase;
-  mixStep: 0 | 1;
+  mixStep: MixStep;
   reduce: boolean;
   isMobile: boolean;
   stageW: number;
@@ -96,7 +87,9 @@ export function CardDeck({
         .map((card, i) => {
           const destination = getDestinationById(card.destinationId);
           if (!destination) return null;
-          return { card, i, destination, hints: getEmojiHints(destination) };
+          /* 힌트는 백엔드가 조건 + KTO 분류로 만든 3개를 그대로 쓴다 */
+          const hints = destination.hints ?? buildFallbackHints(destination);
+          return { card, i, destination, hints: hints.map((h) => h.emoji) };
         })
         .filter(Boolean) as {
         card: MysteryCardData;
@@ -121,7 +114,7 @@ export function CardDeck({
 
   return (
     <div className={deckClass} data-shuffle-phase={phase}>
-      <CardFx phase={phase} reduce={reduce} isMobile={isMobile} />
+      <CardFx phase={phase} />
 
       <motion.div
         className="shuffle-deck__stage"
@@ -163,58 +156,32 @@ export function CardDeck({
 
           const duration = durationForShufflePhase(phase, reduce);
           const delay = cardStaggerDelay(phase, i, reduce);
-          const ease = transitionEaseForPhase(phase);
+          const ease = transitionEaseForPhase(phase, mixStep);
           const disabled = !isSelectable(phase) || locked || Boolean(selectedId);
 
           const isFocusSelected =
             isSelected &&
             (phase === "selected" || phase === "revealing" || phase === "complete");
 
+          /* Expedition 뒷면 그대로 있다가 공개 순간 한 번만 뒤집는다.
+             중간에 밝은 양피지 면을 끼우면 별도 카드가 뜬 것처럼 보인다 */
           const showReveal = isSelected && flipped;
-          const showHintFace = isFocusSelected && !showReveal;
-          const rotateY = showReveal ? 180 : showHintFace ? 0 : 180;
+          const rotateY = showReveal ? 180 : 0;
 
-          const faceTurnDuration =
-            showReveal && flipped
-              ? reduce
-                ? 0.18
-                : CARD_MOTION.flip
-              : 0;
+          const faceTurnDuration = showReveal ? (reduce ? 0.18 : CARD_MOTION.flip) : 0;
 
+          /* stack·컷 구간의 scale은 pose가 정한다 — 여기서 덮어쓰면 덱 두께가 사라진다 */
           const scaleAnim =
-            SCALE_LOCKED_PHASES.has(phase)
-              ? 1
-              : phase === "ready" && i === 2 && !reduce
-                ? [1, 1.025, 1]
-                : scale;
+            phase === "ready" && i === 2 && !reduce ? [1, 1.025, 1] : scale;
 
-          const showTrail = !reduce && (phase === "fanOut" || phase === "crossing");
           const liveMotion = LIVE_PHASES.has(phase) || phase === "ready";
           const fanFloating =
-            phase === "ready" ||
-            phase === "fanOut" ||
-            phase === "selectable" ||
-            isFocusSelected;
-          const depthZ = fanFloating
-            ? isFocusSelected
-              ? 120
-              : (FAN_DEPTH_Z[i] ?? 20)
-            : 0;
+            phase === "ready" || phase === "selectable" || isFocusSelected;
+          const depthZ = fanFloating ? (isFocusSelected ? 120 : FAN_DEPTH_Z) : 0;
           const tiltX = fanFloating && !isFocusSelected && !isHover ? -5 : isHover ? -8 : 0;
-          /* 끝 카드만 안쪽으로 살짝 돌려 중앙 카드가 가장 앞에 있는 깊이감을 준다 */
-          const tiltY =
-            fanFloating && !isFocusSelected && !isHover
-              ? i === 0
-                ? 8
-                : i === 4
-                  ? -8
-                  : 0
-              : 0;
 
           const transition =
-            phase === "selectable" && !reduce
-              ? { type: "spring" as const, stiffness: 420, damping: 28, delay }
-              : phase === "ready" && i === 2 && !reduce
+            phase === "ready" && i === 2 && !reduce
                 ? {
                     scale: { duration: 2.4, repeat: Infinity, ease: "easeInOut" as const },
                     default: { duration: 0.2 },
@@ -233,7 +200,6 @@ export function CardDeck({
                 "shuffle-deck__card",
                 liveMotion ? "shuffle-deck__card--live" : "",
                 isHover ? "shuffle-deck__card--hover" : "",
-                showTrail ? "shuffle-deck__card--trail" : "",
               ]
                 .filter(Boolean)
                 .join(" ")}
@@ -244,12 +210,10 @@ export function CardDeck({
                 marginLeft: -cardW / 2,
                 marginTop: -cardH / 2,
                 filter: isFocusSelected
-                  ? "drop-shadow(0 56px 40px rgba(0,0,0,0.62)) drop-shadow(0 28px 22px rgba(0,0,0,0.4)) drop-shadow(0 0 18px rgba(201,162,39,0.24))"
+                  ? "drop-shadow(0 32px 26px rgba(0,0,0,0.6))"
                   : isHover
-                    ? "drop-shadow(0 48px 34px rgba(0,0,0,0.58)) drop-shadow(0 24px 18px rgba(0,0,0,0.38)) drop-shadow(0 0 12px rgba(201,162,39,0.16))"
-                    : fanFloating
-                      ? "drop-shadow(0 44px 30px rgba(0,0,0,0.52)) drop-shadow(0 18px 14px rgba(0,0,0,0.34))"
-                      : undefined,
+                    ? "drop-shadow(0 28px 22px rgba(0,0,0,0.55))"
+                    : undefined,
               }}
               disabled={disabled}
               aria-disabled={disabled}
@@ -257,7 +221,7 @@ export function CardDeck({
               aria-label={
                 showReveal
                   ? `선택된 여행지 ${destination.name}`
-                  : `${hints.slice(0, 5).join(", ")} 힌트가 포함된 여행 카드 선택`
+                  : `${hints.join(", ")} 힌트가 포함된 여행 카드 선택`
               }
               initial={false}
               animate={{
@@ -265,7 +229,6 @@ export function CardDeck({
                 y,
                 rotate,
                 rotateX: tiltX,
-                rotateY: tiltY,
                 scale: scaleAnim,
                 opacity,
                 z: depthZ,
@@ -285,7 +248,6 @@ export function CardDeck({
               }}
               onBlur={() => onHoverChange(null)}
             >
-              <div className="shuffle-deck__trail" aria-hidden="true" />
               <div className="shuffle-deck__shine" aria-hidden="true" />
 
               <div className="shuffle-deck__flip perspective-1000 relative h-full w-full">
@@ -299,19 +261,8 @@ export function CardDeck({
                   }}
                 >
                   <div className="backface-hidden absolute inset-0">
-                    {showHintFace ? (
-                      <AdventureTravelCard
-                        embedded
-                        hints={hints}
-                        index={i + 1}
-                        face="hint"
-                        selected={isFocusSelected}
-                        stamped={isSelected && stamped}
-                        needleBoost={isHover ? 10 : 0}
-                      />
-                    ) : (
-                      <TravelCardBack expedition serial={i + 1} />
-                    )}
+                    <TravelCardBack expedition serial={i + 1} hintEmojis={hints} />
+                    <PickedStamp active={isSelected && stamped && !showReveal} reduce={reduce} />
                   </div>
 
                   <div
@@ -333,9 +284,7 @@ export function CardDeck({
                           tags: destination.tags,
                         }}
                       />
-                    ) : (
-                      <TravelCardBack expedition serial={i + 1} />
-                    )}
+                    ) : null}
                   </div>
                 </motion.div>
               </div>
