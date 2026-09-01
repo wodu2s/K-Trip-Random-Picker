@@ -31,3 +31,9 @@ backend/.env
 *.sw?
 
 .vercel
+
+# env
+.env
+
+# local tooling
+.claude

@@ -12,6 +12,7 @@ import { recommendCards } from "../lib/recommend";
 import { fetchRecommendations } from "../lib/api";
 import { getDestinationById, registerDestinations, updateDestination } from "../data/destinations";
 import { buildFallbackHints } from "../lib/icons";
+import { prefetchPool, fetchDestinationPool } from "../api/tour";
 import { preloadConditionsAssets } from "../lib/adventureAssets";
 import type {
   CompanionKey,
@@ -132,6 +133,8 @@ export function TravelProvider({ children }: { children: ReactNode }) {
   const goToConditions = useCallback(() => {
     shuffleLock.current = false;
     preloadConditionsAssets();
+    // 조건 선택 동안 실데이터 여행지 풀을 미리 채운다 (실패 시 mock 폴백)
+    void prefetchPool();
     setState((s) => ({
       ...s,
       page: "conditions",
@@ -208,6 +211,7 @@ export function TravelProvider({ children }: { children: ReactNode }) {
 
   const redraw = useCallback(async () => {
     shuffleLock.current = false;
+    void fetchDestinationPool();
     const s = stateRef.current;
     const prevKey = s.cards.map((c) => c.destinationId).join(",");
 

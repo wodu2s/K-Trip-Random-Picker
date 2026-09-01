@@ -10,6 +10,7 @@ import { DestinationMap } from "./DestinationMap";
 import { ScheduleTimeline } from "./ScheduleTimeline";
 import { getDestinationById } from "../../data/destinations";
 import { useTravel } from "../../state/TravelContext";
+import { fetchDestinationDetail } from "../../api/tour";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { buildFallbackHints } from "../../lib/icons";
 import { fetchNearbyPlaces, type NearbyPlace, type StayPlace } from "../../lib/api";
@@ -126,11 +127,32 @@ function DestinationHeroPhoto({ destination }: { destination: Destination }) {
 /** 탐험 결과 — 배경 원화 위 hero + ivory 시트(지도 · 가볼 곳 · 맛집/카페 · 코스 · 숙소) */
 export function DestinationPage() {
   const { revealedDestinationId, restart, duration } = useTravel();
-  const destination = revealedDestinationId ? getDestinationById(revealedDestinationId) : undefined;
+  const [destination, setDestination] = useState(() =>
+    revealedDestinationId ? getDestinationById(revealedDestinationId) : undefined,
+  );
+
+  useEffect(() => {
+    const base = revealedDestinationId ? getDestinationById(revealedDestinationId) : undefined;
+    setDestination(base);
+    if (!base) return;
+    if (!base.contentId && !base.mapx && !base.lat) return;
+    let cancelled = false;
+    void fetchDestinationDetail(base).then((patch) => {
+      if (cancelled || Object.keys(patch).length === 0) return;
+      setDestination((prev) => (prev ? { ...prev, ...patch } : prev));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [revealedDestinationId]);
+
   const reduce = useReducedMotion();
   /* 숙소는 조건에서 고른 duration이 1박 2일 이상일 때만 */
   const overnight = duration === "overnight";
-  const nearby = useNearby(destination?.lat, destination?.lng, overnight, destination?.region);
+  const lat = destination?.lat ?? destination?.mapy ?? null;
+  const lng = destination?.lng ?? destination?.mapx ?? null;
+  const mapDestination = destination ? { ...destination, lat, lng } : undefined;
+  const nearby = useNearby(lat, lng, overnight, destination?.region);
 
   if (!destination) {
     return (
@@ -152,7 +174,7 @@ export function DestinationPage() {
   /* 카드 뒷면에서 본 힌트와 동일한 출처를 그대로 쓴다 */
   const hints = (destination.hints ?? buildFallbackHints(destination)).slice(0, 3);
   const mapPlaces = [...nearby.spots, ...nearby.foods, ...nearby.cafes].slice(0, 8);
-  const hasMap = Boolean(destination.lat && destination.lng);
+  const hasMap = Boolean(lat && lng);
   const hasSpots = nearby.spots.length > 0 || destination.hiddenPlaces.length > 0;
   const eats = [...nearby.foods.slice(0, 2), ...nearby.cafes.slice(0, 1)];
 
@@ -197,7 +219,7 @@ export function DestinationPage() {
               ))}
             </ul>
 
-            <DestinationActions destination={destination} />
+            <DestinationActions destination={mapDestination!} />
           </motion.div>
 
           <DestinationHeroPhoto destination={destination} />
@@ -214,15 +236,15 @@ export function DestinationPage() {
                     <h2 className="panel__title">주변 지도</h2>
                     <a
                       className="panel__more"
-                      href={kakaoMapUrl(destination)}
+                      href={kakaoMapUrl(mapDestination!)}
                       target="_blank"
                       rel="noreferrer"
                     >
                       전체 보기
                     </a>
                   </div>
-                  <DestinationMap destination={destination} places={mapPlaces} />
-                  <DestinationMeta destination={destination} />
+                  <DestinationMap destination={mapDestination!} places={mapPlaces} />
+                  <DestinationMeta destination={mapDestination!} />
                 </article>
               ) : null}
 
@@ -286,7 +308,7 @@ export function DestinationPage() {
             <strong>{destination.name}</strong>
             {destination.region ? ` · ${destination.region}` : ""}
           </p>
-          <DestinationActions destination={destination} variant="bar" />
+          <DestinationActions destination={mapDestination!} variant="bar" />
         </div>
       </div>
     </div>

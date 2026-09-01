@@ -94,6 +94,11 @@ export type Destination = {
   address?: string;
   tel?: string;
   homepage?: string;
+  /** TourAPI 콘텐츠 ID (상세조회 키). 실데이터일 때만 존재 */
+  contentId?: string;
+  /** TourAPI 좌표 (주변 명소 조회용). mapx=경도, mapy=위도 */
+  mapx?: number;
+  mapy?: number;
 };
 
 /** 카드 선택 화면에 뿌리는 미스터리 카드. 실제 정보는 destinationId로 조회한다. */

@@ -1,4 +1,9 @@
 import type { CompanionKey, Destination, DiscoveryKey, MoodKey, ThemeKey } from "../types/travel";
+import {
+  getRuntimeDestination,
+  registerDestinations as registerRuntime,
+  updateDestination as patchRuntime,
+} from "../api/registry";
 
 /** 테마 표시용 라벨/이모지 (조건 선택·태그에서 재사용) */
 export const THEME_META: Record<ThemeKey, { label: string; emoji: string }> = {
@@ -306,17 +311,16 @@ export const DESTINATIONS: Destination[] = [
 ];
 
 /** API로 받아온 실제 여행지 — 조회 시 mock보다 먼저 사용한다 */
-const runtimeDestinations = new Map<string, Destination>();
-
 export function registerDestinations(list: Destination[]): void {
-  list.forEach((d) => runtimeDestinations.set(d.id, d));
+  registerRuntime(list);
 }
 
 export function updateDestination(id: string, patch: Partial<Destination>): void {
-  const current = runtimeDestinations.get(id) ?? DESTINATIONS.find((d) => d.id === id);
-  if (current) runtimeDestinations.set(id, { ...current, ...patch });
+  if (patchRuntime(id, patch)) return;
+  const base = getRuntimeDestination(id) ?? DESTINATIONS.find((d) => d.id === id);
+  if (base) registerRuntime([{ ...base, ...patch }]);
 }
 
 export function getDestinationById(id: string): Destination | undefined {
-  return runtimeDestinations.get(id) ?? DESTINATIONS.find((d) => d.id === id);
+  return getRuntimeDestination(id) ?? DESTINATIONS.find((d) => d.id === id);
 }
