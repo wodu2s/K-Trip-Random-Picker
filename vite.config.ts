@@ -6,8 +6,8 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig(({ mode }) => {
   // VITE_ 접두사 없는 키까지 읽기 위해 prefix "" 로 로드 (클라이언트 번들에는 노출되지 않음)
   const env = loadEnv(mode, process.cwd(), '')
-  const tourKey = env.TOUR_API_KEY ?? ''
-  const kakaoKey = env.KAKAO_REST_KEY ?? ''
+  const tourKey = env.KTO_API_KEY ?? env.TOUR_API_KEY ?? ''
+  const kakaoKey = env.KAKAO_REST_API_KEY ?? env.KAKAO_REST_KEY ?? ''
 
   return {
     plugins: [react(), tailwindcss()],

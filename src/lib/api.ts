@@ -41,8 +41,8 @@ export type StayPlace = {
 };
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  if (!BASE) throw new Error("VITE_API_BASE_URL 미설정");
-  const res = await fetch(`${BASE}${path}`, {
+  const url = BASE ? `${BASE}${path}` : path;
+  const res = await fetch(url, {
     ...init,
     signal: AbortSignal.timeout(10_000),
   });
