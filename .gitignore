@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# env — 예제 파일(.env.example, .env.local.example)만 커밋한다
+.env
+.env.*
+backend/.env
+!.env.example
+!.env.local.example
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

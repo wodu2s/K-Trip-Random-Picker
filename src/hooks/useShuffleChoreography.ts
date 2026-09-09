@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { MixStep } from "../lib/cardLayout";
 import type { CardPhase } from "../types/travel";
 import {
   SHUFFLE_TIMING_MS,
@@ -17,7 +18,7 @@ export function useShuffleChoreography(
   autoStart = false,
 ) {
   const [phase, setPhase] = useState<CardPhase>("ready");
-  const [mixStep, setMixStep] = useState<0 | 1>(0);
+  const [mixStep, setMixStep] = useState<MixStep>(0);
   const abortRef = useRef<AbortController | null>(null);
 
   const runShuffle = useCallback(
@@ -27,30 +28,22 @@ export function useShuffleChoreography(
           setPhase("gathering");
           await wait(shuffleWaitMs(SHUFFLE_TIMING_REDUCED_MS.gathering, true), signal);
           setPhase("crossing");
+          /* 컷 중간 상태를 건너뛰고 재결합한 stack만 보여준다 */
+          setMixStep(3);
           await wait(shuffleWaitMs(SHUFFLE_TIMING_REDUCED_MS.crossing, true), signal);
-          setPhase("restacking");
-          await wait(shuffleWaitMs(SHUFFLE_TIMING_REDUCED_MS.restacking, true), signal);
           setPhase("selectable");
           return;
         }
 
+        /* fan → 중앙 stack 220 → double-cut 500(125 × 4) → fan-out 400 */
         setPhase("gathering");
         await wait(SHUFFLE_TIMING_MS.gathering, signal);
 
         setPhase("crossing");
-        await wait(SHUFFLE_TIMING_MS.crossing, signal);
-
-        setPhase("mixing");
-        setMixStep(0);
-        await wait(SHUFFLE_TIMING_MS.mixingHalf, signal);
-        setMixStep(1);
-        await wait(SHUFFLE_TIMING_MS.mixingHalf, signal);
-
-        setPhase("restacking");
-        await wait(SHUFFLE_TIMING_MS.restacking, signal);
-
-        setPhase("fanOut");
-        await wait(SHUFFLE_TIMING_MS.fanOut, signal);
+        for (const step of [0, 1, 2, 3] as const) {
+          setMixStep(step);
+          await wait(SHUFFLE_TIMING_MS.crossingStep, signal);
+        }
 
         setPhase("selectable");
       } catch {

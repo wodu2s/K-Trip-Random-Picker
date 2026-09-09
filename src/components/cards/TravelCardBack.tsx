@@ -36,7 +36,9 @@ export function TravelCardBack({
       <ExpeditionCardArt
         featured
         serial={serial}
-        slotHints={serial != null ? EXPEDITION_SLOT_HINTS[serial - 1] : undefined}
+        slotHints={
+          hintEmojis ?? (serial != null ? EXPEDITION_SLOT_HINTS[serial - 1] : undefined)
+        }
       />
     );
   }

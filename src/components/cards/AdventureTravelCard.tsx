@@ -113,7 +113,7 @@ export function AdventureTravelCard({
       {/* 뒷면 / 공개면 (rotateY 180) */}
       <div className="backface-hidden absolute inset-0" style={{ transform: "rotateY(180deg)" }}>
         {flipped && reveal ? (
-          <RevealFace destination={reveal} />
+          <RevealFace destination={reveal} hints={hints} />
         ) : (
           <BackFace />
         )}
@@ -125,7 +125,7 @@ export function AdventureTravelCard({
     if (flipped && reveal) {
       return (
         <div className={`relative h-full w-full ${className}`} aria-hidden="true">
-          <RevealFace destination={reveal} />
+          <RevealFace destination={reveal} hints={hints} />
         </div>
       );
     }
@@ -275,93 +275,156 @@ function HintFace({
   );
 }
 
-function RevealFace({ destination }: { destination: RevealInfo }) {
-  const [imgError, setImgError] = useState(false);
+/** 공개면 내용이 순서대로 올라오는 stagger */
+const REVEAL_ITEM = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0 },
+} as const;
+
+/**
+ * 공개면 — 카드 뒷면과 같은 forest + antique gold 틀 안에
+ * 실제 관광지 사진 · 목적지명 · 소개 2줄 · 힌트 3개를 얹는다.
+ */
+function RevealFace({
+  destination,
+  hints = [],
+}: {
+  destination: RevealInfo;
+  hints?: string[];
+}) {
+  const reduce = useReducedMotion();
+  const [imageFailed, setImageFailed] = useState(false);
+  const bottomHints = hints.slice(0, 3);
+
+  const stagger = (i: number) => ({
+    duration: reduce ? 0 : 0.34,
+    delay: reduce ? 0 : 0.06 + i * CARD_MOTION.revealStagger,
+    ease: [0.22, 0.8, 0.2, 1] as [number, number, number, number],
+  });
 
   return (
-    <div
+    <motion.div
       className="relative flex h-full w-full flex-col overflow-hidden"
+      initial="hidden"
+      animate="show"
       style={{
         borderRadius: "var(--radius-card)",
-        background: ADVENTURE.parchmentLight,
+        background:
+          "linear-gradient(165deg, #1B3022 0%, var(--color-forest-900) 52%, #122018 100%)",
         border: `1.5px solid ${ADVENTURE.brass}`,
-        boxShadow: "0 14px 32px rgba(22,40,31,0.22)",
+        boxShadow: `0 0 0 1px ${ADVENTURE.brassLine}, ${ADVENTURE_SHADOW_SELECTED}`,
       }}
     >
-      <DualBorder brass />
-      <div className="relative h-[54%] w-full shrink-0 overflow-hidden">
-        {!imgError ? (
+      {/* 사진 */}
+      <motion.div
+        className="relative w-full overflow-hidden"
+        style={{ height: "55%" }}
+        variants={REVEAL_ITEM}
+        transition={stagger(0)}
+      >
+        {destination.image && !imageFailed ? (
           <img
             src={destination.image}
             alt=""
-            className="h-full w-full object-cover"
             draggable={false}
-            onError={() => setImgError(true)}
+            decoding="async"
+            className="h-full w-full object-cover"
+            onError={() => setImageFailed(true)}
           />
         ) : (
           <div
-            className="flex h-full w-full items-center justify-center"
+            className="h-full w-full"
             style={{
-              background: `linear-gradient(160deg, ${ADVENTURE.forest} 0%, ${ADVENTURE.forestDark} 100%)`,
+              background:
+                "linear-gradient(150deg, #2A4433 0%, #1B3022 60%, #122018 100%)",
             }}
-          >
-            <MapPin className="h-8 w-8 text-[#F0E6C8]/80" strokeWidth={1.6} aria-hidden="true" />
-          </div>
+          />
         )}
-        <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[#F5F0E1] to-transparent" />
-        <span
-          className="font-expedition absolute left-2.5 top-2.5 rounded-sm px-1.5 py-0.5 text-[8px] font-bold tracking-[0.12em]"
-          style={{ background: "rgba(245,240,225,0.95)", color: ADVENTURE.forestDark }}
-        >
-          DESTINATION FOUND
-        </span>
-        <MapPin
-          className="absolute right-2.5 top-2.5 h-4 w-4"
-          style={{ color: ADVENTURE.brass }}
-          strokeWidth={2.4}
-          aria-hidden="true"
+        {/* 사진 아래를 forest로 녹여 카드와 이어붙인다 */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(18,32,24,0.18) 0%, rgba(18,32,24,0) 45%, rgba(18,32,24,0.92) 100%)",
+          }}
         />
-      </div>
+      </motion.div>
 
-      <div className="relative flex flex-1 flex-col justify-between gap-1.5 px-3 py-2.5 text-left">
-        <div>
+      {/* 양피지 본문 */}
+      <div
+        className="relative flex flex-1 flex-col px-3.5 pt-2.5 pb-3"
+        style={{
+          background: `linear-gradient(180deg, ${ADVENTURE.parchment} 0%, ${ADVENTURE.parchmentLight} 100%)`,
+          borderTop: `1px solid ${ADVENTURE.brass}`,
+        }}
+      >
+        <PaperNoise />
+
+        <motion.div className="relative z-10" variants={REVEAL_ITEM} transition={stagger(1)}>
           <p
-            className="font-expedition text-[10px] font-bold tracking-[0.08em]"
+            className="font-expedition text-[8px] font-bold tracking-[0.22em]"
             style={{ color: ADVENTURE.brass }}
           >
-            {destination.region}
+            DESTINATION FOUND
           </p>
           <p
-            className="font-expedition mt-0.5 text-[16px] font-bold leading-tight"
-            style={{ color: ADVENTURE.ink }}
+            className="mt-0.5 flex items-center gap-1 font-expedition text-[9px] font-bold tracking-[0.14em]"
+            style={{ color: "rgba(22,40,31,0.66)" }}
           >
-            {destination.name}
+            <MapPin
+              className="h-3 w-3 shrink-0"
+              strokeWidth={2.4}
+              style={{ color: ADVENTURE.brass }}
+              aria-hidden="true"
+            />
+            <span className="truncate">{destination.region}</span>
           </p>
-          <p className="mt-1 line-clamp-2 text-[11px] font-medium leading-snug" style={{ color: ADVENTURE.muted }}>
-            {destination.shortDescription}
-          </p>
-        </div>
-        <div className="flex items-end justify-between gap-2">
-          <div className="flex min-w-0 flex-wrap gap-1">
-            {destination.tags.slice(0, 3).map((tag) => (
+        </motion.div>
+
+        <motion.p
+          className="relative z-10 mt-1 font-expedition text-[17px] leading-tight font-bold"
+          style={{ color: ADVENTURE.forestDark }}
+          variants={REVEAL_ITEM}
+          transition={stagger(2)}
+        >
+          {destination.name}
+        </motion.p>
+
+        <motion.p
+          className="relative z-10 mt-1.5 line-clamp-2 text-[10.5px] leading-[1.45]"
+          style={{ color: "rgba(22,40,31,0.72)" }}
+          variants={REVEAL_ITEM}
+          transition={stagger(3)}
+        >
+          {destination.shortDescription}
+        </motion.p>
+
+        {bottomHints.length > 0 ? (
+          <motion.div
+            className="relative z-10 mt-auto flex items-center justify-center gap-1.5 pt-2"
+            style={{ borderTop: `1px solid ${ADVENTURE.brassLine}` }}
+            variants={REVEAL_ITEM}
+            transition={stagger(4)}
+          >
+            {bottomHints.map((emoji, i) => (
               <span
-                key={tag}
-                className="rounded-[4px] px-1.5 py-0.5 text-[8px] font-bold"
-                style={{ background: "rgba(31,61,46,0.1)", color: ADVENTURE.forest }}
+                key={`${emoji}-${i}`}
+                className="flex h-6 w-6 items-center justify-center rounded-full text-[11px] shadow-sm"
+                style={{
+                  background: ADVENTURE.parchmentLight,
+                  border: `1.5px solid ${ADVENTURE.brassLine}`,
+                }}
+                aria-hidden="true"
               >
-                {tag}
+                {emoji}
               </span>
             ))}
-          </div>
-          <span
-            className="font-expedition shrink-0 rotate-[-8deg] rounded-sm border-2 px-1.5 py-0.5 text-[9px] font-bold tracking-[0.12em]"
-            style={{ borderColor: ADVENTURE.brass, color: ADVENTURE.brass }}
-          >
-            ARRIVED
-          </span>
-        </div>
+          </motion.div>
+        ) : null}
       </div>
-    </div>
+
+      <DualBorder brass />
+    </motion.div>
   );
 }
 

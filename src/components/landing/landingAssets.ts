@@ -5,7 +5,16 @@
 
 export const LANDING_ASSET_PATHS = {
   classicTarget: "/assets/adventure/landing-classic-target.png",
-  cardBack: "/assets/adventure/expedition-card-back.png",
+  /**
+   * 카드 뒷면 — 원본 1024×1536은 표시 크기(140~300px)의 4~7배라 브라우저 축소 과정에서
+   * 뭉개진다. 같은 디자인의 Lanczos 축소본을 기본값으로 쓰고 고DPR만 큰 소스로 올린다.
+   */
+  cardBack: "/assets/adventure/expedition-card-back-512.png",
+  cardBackSrcSet:
+    "/assets/adventure/expedition-card-back-384.png 384w," +
+    "/assets/adventure/expedition-card-back-512.png 512w," +
+    "/assets/adventure/expedition-card-back-768.png 768w," +
+    "/assets/adventure/expedition-card-back-1024.png 1024w",
   compass: "/assets/adventure/prop-brass-compass.png?v=4",
   ticket: "/assets/adventure/prop-expedition-ticket.png?v=2",
   koreaNightMap: "/assets/adventure/night-korea-map.webp?v=3",
@@ -83,12 +92,13 @@ export type DeckCardToken = {
  * Desktop uses absolute pixel layout in LandingCardDeck (s stays 1).
  * Tokens here are fallbacks for mid/mobile fan math only.
  */
+/* 중심 간격·회전·높이를 좌우 대칭 등간격으로 — 한쪽만 뭉쳐 보이지 않게 한다 */
 export const DECK_CARDS: readonly DeckCardToken[] = [
-  { id: "Card01", x: -78, y: 48, r: -10, s: 1, z: 2, dim: 0 },
-  { id: "Card02", x: -39, y: 28, r: -5, s: 1, z: 3, dim: 0 },
+  { id: "Card01", x: -240, y: 48, r: -10, s: 1, z: 2, dim: 0 },
+  { id: "Card02", x: -120, y: 12, r: -5, s: 1, z: 3, dim: 0 },
   { id: "Card03", x: 0, y: 0, r: 0, s: 1, z: 6, dim: 0 },
-  { id: "Card04", x: 139, y: 40, r: 8, s: 1, z: 4, dim: 0 },
-  { id: "Card05", x: 234, y: 90, r: 14, s: 1, z: 3, dim: 0 },
+  { id: "Card04", x: 120, y: 12, r: 5, s: 1, z: 4, dim: 0 },
+  { id: "Card05", x: 240, y: 48, r: 10, s: 1, z: 3, dim: 0 },
 ] as const;
 
-export const DECK_OPACITY = [0.88, 0.94, 1, 0.94, 0.86] as const;
+export const DECK_OPACITY = [0.88, 0.94, 1, 0.94, 0.88] as const;

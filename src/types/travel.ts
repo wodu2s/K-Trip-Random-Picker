@@ -21,6 +21,23 @@ export type MoodKey = "calm" | "lively" | "emotional";
 /** 발견 성향 — 유명 명소 ~ 숨은 로컬 */
 export type DiscoveryKey = "popular" | "balanced" | "hidden";
 
+/** 카드 힌트 종류 — 분위기 · 장소 · 경험 순서로 정확히 3개를 만든다 */
+export type CardHintType = "atmosphere" | "place" | "experience";
+
+/** 백엔드가 조건값 + KTO 분류코드로 생성한 카드 힌트 */
+export type CardHint = {
+  type: CardHintType;
+  /** 힌트 의미 키 (예: beach, trail) — 표기는 emoji만 사용한다 */
+  key: string;
+  emoji: string;
+};
+
+/** 이미지 출처 — 다음 이미지 검색으로 채운 사진에만 붙는다 */
+export type ImageCredit = {
+  sitename: string;
+  docUrl: string;
+};
+
 /** 숨겨진 로컬 명소 (여행지 하위 추천) */
 export type HiddenPlace = {
   name: string;
@@ -66,9 +83,20 @@ export type Destination = {
   reviewCount: number;
   /** 여행지 공개 화면 히어로 일러스트(이미지 대체용) 분위기 */
   scene: SceneVariant;
+  /** 카드 힌트 3개 (atmosphere · place · experience). API·mock 모두 동일 구조 */
+  hints?: CardHint[];
+  /** 실제 API 응답에만 있는 좌표 (지도·주변 장소용) */
+  lat?: number | null;
+  lng?: number | null;
+  /** KTO 이미지가 없어 이미지 검색으로 채운 경우의 출처 */
+  imageCredit?: ImageCredit;
+  /** KTO detailCommon2에서 함께 채우는 연락 정보 */
+  address?: string;
+  tel?: string;
+  homepage?: string;
   /** TourAPI 콘텐츠 ID (상세조회 키). 실데이터일 때만 존재 */
   contentId?: string;
-  /** TourAPI 좌표 (주변 명소 조회용). 실데이터일 때만 존재 */
+  /** TourAPI 좌표 (주변 명소 조회용). mapx=경도, mapy=위도 */
   mapx?: number;
   mapy?: number;
 };
@@ -80,7 +108,7 @@ export type MysteryCardData = {
 };
 
 /** 서비스 진행 페이지(단계) */
-export type FlowPage = "landing" | "conditions" | "shuffle" | "cards" | "destination";
+export type FlowPage = "landing" | "conditions" | "shuffle" | "cards" | "destination" | "guestbook";
 
 /**
  * 카드 드로우 단계 상태 머신 — 단일 phase가 UI·애니메이션의 유일한 상태 원천.

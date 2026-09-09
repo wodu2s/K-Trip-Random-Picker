@@ -5,6 +5,7 @@ import { LandingPage } from "./components/landing/LandingPage";
 import { ConditionsPage } from "./components/conditions/ConditionsPage";
 import { CardsPage } from "./components/cards/CardsPage";
 import { DestinationPage } from "./components/destination/DestinationPage";
+import { GuestbookPage } from "./components/guestbook/GuestbookPage";
 import { CARD_MOTION } from "./lib/cardMotion";
 
 function PageSwitch() {
@@ -29,6 +30,7 @@ function PageSwitch() {
         {active === "conditions" && <ConditionsPage />}
         {active === "cards" && <CardsPage />}
         {active === "destination" && <DestinationPage />}
+        {active === "guestbook" && <GuestbookPage />}
       </motion.div>
     </AnimatePresence>
   );
@@ -64,7 +66,8 @@ function AppShell() {
   const { page } = useTravel();
   const active = page === "shuffle" ? "cards" : page;
   const isLanding = active === "landing";
-  const isDark = active === "landing" || active === "conditions" || active === "cards";
+  const isDark =
+    active === "landing" || active === "conditions" || active === "cards" || active === "destination";
 
   return (
     <div

@@ -54,21 +54,15 @@ export function FeatureItems({
                 className="landing-feature-sep pointer-events-none absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 aria-hidden="true"
               >
-                <svg width="28" height="12" viewBox="0 0 28 12" fill="none">
+                <svg width="64" height="8" viewBox="0 0 64 8" fill="none">
                   <path
-                    d="M1 6 H18"
-                    stroke="rgba(210,164,70,0.4)"
-                    strokeWidth="1.1"
+                    d="M1 4 H63"
+                    stroke="rgba(210,164,70,0.42)"
+                    strokeWidth="1"
                     strokeLinecap="round"
+                    strokeDasharray="2 6"
                   />
-                  <path
-                    d="M17 2.5 L23 6 L17 9.5"
-                    stroke="rgba(210,164,70,0.58)"
-                    strokeWidth="1.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                  />
+                  <circle cx="32" cy="4" r="1.8" fill="rgba(210,164,70,0.6)" />
                 </svg>
               </span>
             ) : null}

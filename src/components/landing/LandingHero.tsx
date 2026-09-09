@@ -116,7 +116,7 @@ export function LandingHero({ onStart }: { onStart: () => void }) {
         animate={{
           opacity: deckPhase === "exit" ? 0.85 : entered ? 1 : 0,
           y: entered ? 0 : 24,
-          scale: entered ? 0.77 : 1,
+          scale: entered ? 0.7 : 1,
         }}
         transition={{
           duration: reduce ? 0.2 : 0.9,

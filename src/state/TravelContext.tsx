@@ -9,6 +9,9 @@ import {
   type ReactNode,
 } from "react";
 import { recommendCards } from "../lib/recommend";
+import { fetchRecommendations } from "../lib/api";
+import { getDestinationById, registerDestinations, updateDestination } from "../data/destinations";
+import { buildFallbackHints } from "../lib/icons";
 import { prefetchPool, fetchDestinationPool } from "../api/tour";
 import { preloadConditionsAssets } from "../lib/adventureAssets";
 import type {
@@ -38,18 +41,19 @@ type TravelState = {
 type TravelActions = {
   goToLanding: () => void;
   goToConditions: () => void;
+  goToGuestbook: () => void;
   setDuration: (d: Duration) => void;
   toggleTheme: (theme: ThemeKey) => void;
   setCompanion: (c: CompanionKey) => void;
   setMood: (m: MoodKey) => void;
   setDiscovery: (d: DiscoveryKey) => void;
-  startShuffle: () => void;
+  startShuffle: () => Promise<void>;
   finishShuffle: () => void;
   reorderCards: (cards: MysteryCardData[]) => void;
   selectCard: (cardId: string, destinationId: string) => void;
   clearSelection: () => void;
   goToDestination: () => void;
-  redraw: () => void;
+  redraw: () => Promise<void>;
   restart: () => void;
 };
 
@@ -78,10 +82,49 @@ function scrollTop() {
 export function TravelProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<TravelState>(initialState);
   const shuffleLock = useRef(false);
+  const stateRef = useRef(state);
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
 
   useEffect(() => {
     scrollTop();
   }, [state.page]);
+
+  /**
+   * 조건값으로 카드 5장을 만든다.
+   * 백엔드(KTO) 추천을 우선 사용하고, 호출이 실패할 때만 로컬 mock으로 대체한다.
+   */
+  const drawCards = useCallback(async (s: TravelState): Promise<MysteryCardData[]> => {
+    try {
+      const destinations = await fetchRecommendations({
+        duration: s.duration,
+        themes: s.themes,
+        companion: s.companion,
+        mood: s.mood,
+        discovery: s.discovery,
+      });
+      registerDestinations(destinations);
+      return destinations.slice(0, 5).map((d, i) => ({
+        id: `card-${i + 1}-${d.id}`,
+        destinationId: d.id,
+      }));
+    } catch (err) {
+      console.warn("[recommend] API 실패 — 로컬 데이터로 대체합니다.", err);
+      const cards = recommendCards(s.themes, {
+        companion: s.companion,
+        mood: s.mood,
+        discovery: s.discovery,
+      });
+      /* mock도 API와 같은 hints 3개 구조를 갖도록 조건값으로 채운다 */
+      cards.forEach((card) => {
+        const d = getDestinationById(card.destinationId);
+        if (d) updateDestination(d.id, { hints: buildFallbackHints(d, { mood: s.mood }) });
+      });
+      return cards;
+    }
+  }, []);
 
   const goToLanding = useCallback(() => {
     shuffleLock.current = false;
@@ -99,6 +142,11 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       selectedCardId: null,
       revealedDestinationId: null,
     }));
+  }, []);
+
+  const goToGuestbook = useCallback(() => {
+    shuffleLock.current = false;
+    setState((s) => ({ ...s, page: "guestbook" }));
   }, []);
 
   const setDuration = useCallback((duration: Duration) => {
@@ -125,28 +173,22 @@ export function TravelProvider({ children }: { children: ReactNode }) {
   }, []);
 
   /** 조건 → 카드 드로우(셔플+선택 통합). 중복 진입 잠금. */
-  const startShuffle = useCallback(() => {
+  const startShuffle = useCallback(async () => {
     if (shuffleLock.current) return;
+    const s = stateRef.current;
+    if (!s.duration || s.themes.length === 0) return;
+
     shuffleLock.current = true;
-    setState((s) => {
-      if (!s.duration || s.themes.length === 0) {
-        shuffleLock.current = false;
-        return s;
-      }
-      return {
-        ...s,
-        page: "cards",
-        cards: recommendCards(s.themes, {
-          companion: s.companion,
-          mood: s.mood,
-          discovery: s.discovery,
-        }),
-        selectedCardId: null,
-        revealedDestinationId: null,
-        deckGeneration: s.deckGeneration + 1,
-      };
-    });
-  }, []);
+    const cards = await drawCards(s);
+    setState((prev) => ({
+      ...prev,
+      page: "cards",
+      cards,
+      selectedCardId: null,
+      revealedDestinationId: null,
+      deckGeneration: prev.deckGeneration + 1,
+    }));
+  }, [drawCards]);
 
   const finishShuffle = useCallback(() => {
     shuffleLock.current = false;
@@ -173,27 +215,26 @@ export function TravelProvider({ children }: { children: ReactNode }) {
     setState((s) => (s.revealedDestinationId ? { ...s, page: "destination" } : s));
   }, []);
 
-  const redraw = useCallback(() => {
+  const redraw = useCallback(async () => {
     shuffleLock.current = false;
-    // 다시 뽑기 때마다 풀을 조금씩 키워 변화를 준다 (비차단)
     void fetchDestinationPool();
-    setState((s) => {
-      const recommendOptions = { companion: s.companion, mood: s.mood, discovery: s.discovery };
-      const prevKey = s.cards.map((c) => c.destinationId).join(",");
-      let next = recommendCards(s.themes, recommendOptions);
-      for (let i = 0; i < 6 && next.map((c) => c.destinationId).join(",") === prevKey; i++) {
-        next = recommendCards(s.themes, recommendOptions);
-      }
-      return {
-        ...s,
-        page: "cards",
-        cards: next,
-        selectedCardId: null,
-        revealedDestinationId: null,
-        deckGeneration: s.deckGeneration + 1,
-      };
-    });
-  }, []);
+    const s = stateRef.current;
+    const prevKey = s.cards.map((c) => c.destinationId).join(",");
+
+    let next = await drawCards(s);
+    if (next.map((c) => c.destinationId).join(",") === prevKey) {
+      next = await drawCards(s);
+    }
+
+    setState((prev) => ({
+      ...prev,
+      page: "cards",
+      cards: next,
+      selectedCardId: null,
+      revealedDestinationId: null,
+      deckGeneration: prev.deckGeneration + 1,
+    }));
+  }, [drawCards]);
 
   const restart = useCallback(() => {
     shuffleLock.current = false;
@@ -213,6 +254,7 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       ...state,
       goToLanding,
       goToConditions,
+      goToGuestbook,
       setDuration,
       toggleTheme,
       setCompanion,
@@ -231,6 +273,7 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       state,
       goToLanding,
       goToConditions,
+      goToGuestbook,
       setDuration,
       toggleTheme,
       setCompanion,

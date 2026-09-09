@@ -8,20 +8,29 @@ import { cn } from "../../utils/cn";
 const NAV_ITEMS = [
   { label: "\uD0D0\uD5D8\uD558\uAE30", page: "landing" as const },
   { label: "\uC870\uAC74 \uC124\uC815", page: "conditions" as const },
+  { label: "\uBC29\uBA85\uB85D", page: "guestbook" as const },
 ];
 
 /** Header ? full-bleed on landing (target B), parchment on other pages */
 export function Header() {
   const [open, setOpen] = useState(false);
-  const { page, goToLanding, goToConditions } = useTravel();
-  const dark = page === "landing" || page === "conditions" || page === "cards" || page === "shuffle";
+  const { page, goToLanding, goToConditions, goToGuestbook } = useTravel();
+  const dest = page === "destination";
+  const darkH = dest ? 72 : 86;
+  const dark =
+    page === "landing" ||
+    page === "conditions" ||
+    page === "cards" ||
+    page === "shuffle" ||
+    dest;
   const showJourney = page === "cards" || page === "conditions" || page === "destination";
   const journeyActive =
     page === "conditions" ? 1 : page === "cards" || page === "shuffle" ? 2 : page === "destination" ? 3 : 0;
 
-  function handleNav(target: "landing" | "conditions") {
+  function handleNav(target: "landing" | "conditions" | "guestbook") {
     setOpen(false);
     if (target === "landing") goToLanding();
+    else if (target === "guestbook") goToGuestbook();
     else goToConditions();
   }
 
@@ -31,7 +40,7 @@ export function Header() {
       data-landing-header={dark ? "true" : undefined}
       style={
         dark
-          ? { minHeight: 86, height: 86 }
+          ? { minHeight: darkH, height: darkH }
           : {
               background: "var(--color-parchment-100)",
               borderBottom: "1px solid var(--color-parchment-line)",
@@ -42,7 +51,9 @@ export function Header() {
         className={cn(
           "relative flex w-full items-center justify-between",
           dark
-            ? "h-[86px] min-h-[86px] max-w-none pl-8 pr-[30px]"
+            ? dest
+              ? "h-[72px] min-h-[72px] max-w-none pl-8 pr-[30px]"
+              : "h-[86px] min-h-[86px] max-w-none pl-8 pr-[30px]"
             : "mx-auto h-16 max-w-[1200px] gap-6 px-5 sm:px-8 lg:gap-10",
         )}
       >

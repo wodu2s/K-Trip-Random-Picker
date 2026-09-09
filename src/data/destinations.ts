@@ -1,5 +1,9 @@
 import type { CompanionKey, Destination, DiscoveryKey, MoodKey, ThemeKey } from "../types/travel";
-import { getRuntimeDestination } from "../api/registry";
+import {
+  getRuntimeDestination,
+  registerDestinations as registerRuntime,
+  updateDestination as patchRuntime,
+} from "../api/registry";
 
 /** 테마 표시용 라벨/이모지 (조건 선택·태그에서 재사용) */
 export const THEME_META: Record<ThemeKey, { label: string; emoji: string }> = {
@@ -306,7 +310,17 @@ export const DESTINATIONS: Destination[] = [
   },
 ];
 
+/** API로 받아온 실제 여행지 — 조회 시 mock보다 먼저 사용한다 */
+export function registerDestinations(list: Destination[]): void {
+  registerRuntime(list);
+}
+
+export function updateDestination(id: string, patch: Partial<Destination>): void {
+  if (patchRuntime(id, patch)) return;
+  const base = getRuntimeDestination(id) ?? DESTINATIONS.find((d) => d.id === id);
+  if (base) registerRuntime([{ ...base, ...patch }]);
+}
+
 export function getDestinationById(id: string): Destination | undefined {
-  // 실데이터(런타임 저장소) 우선, 없으면 mock 폴백
   return getRuntimeDestination(id) ?? DESTINATIONS.find((d) => d.id === id);
 }

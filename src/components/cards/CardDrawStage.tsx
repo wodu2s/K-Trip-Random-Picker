@@ -1,16 +1,82 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTravel } from "../../state/TravelContext";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { useShuffleChoreography } from "../../hooks/useShuffleChoreography";
 import { getDestinationById } from "../../data/destinations";
 import { ADVENTURE } from "../../lib/adventureCardTokens";
-import { getCompassStageMetrics } from "../../lib/compassStageLayout";
 import { isSelectable } from "../../lib/cardPhaseUtils";
+import { fanAnchorsX, getLayoutScale } from "../../lib/cardLayout";
 import { CARD_MOTION, phaseWaitMs, wait } from "../../lib/cardMotion";
 import type { CardPhase } from "../../types/travel";
 import { CardDeck } from "./CardDeck";
-import { ShuffleFx } from "./ShuffleFx";
 import "./compass-stage.css";
+
+/** rail 높이(px) — waypoint 점과 카드 하단을 잇는 tether가 들어갈 만큼만 */
+const RAIL_H = 56;
+/** 카드 하단 y를 따라가는 waypoint 높이 — 바깥 카드가 더 아래로 내려온다 */
+const RAIL_NODE_Y = [26, 16, 10, 16, 26];
+
+/**
+ * fan 아래 waypoint·route — 5개 지점이 카드 하단과 이어진다.
+ * 셔플이 시작될 때 route light sweep을 한 번만 흘린다.
+ */
+function CardRouteRail({
+  width,
+  anchors,
+  phase,
+  selectedAnchor,
+}: {
+  width: number;
+  anchors: number[];
+  phase: CardPhase;
+  selectedAnchor: number | null;
+}) {
+  /* 셔플 내내 마운트를 유지해 sweep이 단계마다 재시작하지 않게 한다 */
+  const shuffling = phase === "gathering" || phase === "crossing";
+  /* fan-out이 끝나는 시점에 waypoint를 순서대로 점등한다 */
+  const fanned = phase === "selectable";
+  const route = anchors
+    .map((x, i) => `${i === 0 ? "M" : "L"}${x} ${RAIL_NODE_Y[i] ?? 16}`)
+    .join(" ");
+
+  return (
+    <div className="card-rail" aria-hidden="true">
+      <svg
+        className="card-rail__chart"
+        viewBox={`${-width / 2} 0 ${width} ${RAIL_H}`}
+        preserveAspectRatio="none"
+        height={RAIL_H}
+      >
+        <path className="card-rail__route" d={route} />
+        {shuffling ? <path className="card-rail__sweep" d={route} /> : null}
+        {anchors.map((x, i) => {
+          const y = RAIL_NODE_Y[i] ?? 16;
+          const on = selectedAnchor === x;
+          return (
+            <g
+              key={x}
+              className={`card-rail__node${on ? " card-rail__node--on" : ""}${
+                selectedAnchor != null && !on ? " card-rail__node--dim" : ""
+              }${fanned ? " card-rail__node--lit" : ""}`}
+              /* waypoint는 왼쪽부터 60ms 간격으로 점등된다 */
+              style={fanned ? { animationDelay: `${i * 60}ms` } : undefined}
+            >
+              <line x1={x} y1={y - 14} x2={x} y2={y - 3} />
+              <circle cx={x} cy={y} r="4" />
+            </g>
+          );
+        })}
+      </svg>
+
+      {selectedAnchor != null ? (
+        <div
+          className="card-rail__converge"
+          style={{ transformOrigin: `calc(50% + ${selectedAnchor}px) 50%` }}
+        />
+      ) : null}
+    </div>
+  );
+}
 
 function useStageSize(ref: React.RefObject<HTMLDivElement | null>) {
   const [width, setWidth] = useState(() =>
@@ -31,10 +97,10 @@ function useStageSize(ref: React.RefObject<HTMLDivElement | null>) {
   const isMobile = width < 640;
   const isTablet = width < 1024;
   const cardW = isMobile
-    ? Math.round(Math.min(width * 0.54, 168))
+    ? Math.round(Math.min(width * 0.5, 156))
     : isTablet
-      ? Math.round(Math.min(width * 0.30, 228))
-      : Math.round(Math.min(width * 0.24, 268));
+      ? Math.round(Math.min(width * 0.26, 208))
+      : Math.round(Math.min(width * 0.205, 236));
   const cardH = Math.round((cardW * 3) / 2);
 
   return { stageW: width, cardW, cardH, isMobile, isTablet };
@@ -42,8 +108,11 @@ function useStageSize(ref: React.RefObject<HTMLDivElement | null>) {
 
 /** sticky 헤더 높이 */
 const HEADER_H = 86;
-/** 무대 위 여백 + 원판이 무대 박스 아래로 걸치는 만큼의 하단 여백 */
-const STAGE_GUTTER = 56;
+/**
+ * 무대 위 여백 + 원판이 무대 박스 아래로 걸치는 만큼의 하단 여백.
+ * 하단 CTA가 중앙에 놓이므로 그 높이(버튼 + 안내문 + 바닥 여백)까지 확보한다.
+ */
+const STAGE_GUTTER = 166;
 
 function useViewportHeight() {
   const [height, setHeight] = useState(() =>
@@ -153,10 +222,10 @@ export function CardDrawStage({
         await wait(phaseWaitMs(CARD_MOTION.select, reduce), ac.signal);
         setPhase("revealing");
         setStamped(true);
-        await wait(phaseWaitMs(0.5, reduce), ac.signal);
+        await wait(phaseWaitMs(0.26, reduce), ac.signal);
         setFlipped(true);
         await wait(phaseWaitMs(CARD_MOTION.flip, reduce), ac.signal);
-        await wait(phaseWaitMs(0.7, reduce), ac.signal);
+        await wait(phaseWaitMs(0.4, reduce), ac.signal);
         setPhase("complete");
       } catch {
         /* aborted */
@@ -165,41 +234,20 @@ export function CardDrawStage({
     [phase, localSelected, reduce, selectCard, setPhase],
   );
 
-  const compassMetrics = useMemo(
-    () => getCompassStageMetrics(isMobile, stageW),
-    [isMobile, stageW],
-  );
+  /* waypoint는 fan 카드와 같은 x를 쓴다 — fan 간격 자체는 건드리지 않는다 */
+  const anchors = fanAnchorsX(getLayoutScale(stageW, cardW));
+  const selectedIndex = localSelected
+    ? cards.findIndex((c) => c.id === localSelected)
+    : -1;
+  const selectedAnchor = selectedIndex >= 0 ? (anchors[selectedIndex] ?? 0) : null;
 
-  /* fan 아랫변이 원판 중심보다 cardGap 만큼 위에 오도록 카드 중심 높이를 잡는다 */
-  const cardLiftPx = Math.round(cardH * 0.5 + compassMetrics.cardGapPx);
+  /* 회전한 fan 카드가 잘리지 않을 만큼의 높이 + 선택·hover 리프트 여유 */
+  const stageH = Math.round(cardH * 1.24 + (isMobile ? 96 : 120));
 
-  /* 카드를 나침반 위로 띄운 만큼 무대 상단에 빈 공간이 생기므로,
-     높이를 실제 구성(원판 중심 + lift + 카드 절반)에 맞춰 잡는다 */
-  const stageH = Math.round(
-    Math.max(
-      compassMetrics.discCenterPx +
-        compassMetrics.pivotBottomPx +
-        cardLiftPx -
-        compassMetrics.stageOffsetPx +
-        cardH * 0.56 +
-        (isMobile ? 28 : 22),
-      isMobile ? 620 : 640,
-    ),
-  );
-
-  /* 데스크톱에서 헤더 아래 첫 화면에 무대 전체가 들어오도록 균일 축소.
-     비율(입체 배치)은 그대로 두고 장면 전체만 맞춘다 */
+  /* 데스크톱에서 헤더 아래 첫 화면에 무대 전체가 들어오도록 균일 축소 */
   const fitScale = isMobile
     ? 1
     : Math.min(1, (viewportH - HEADER_H - STAGE_GUTTER) / stageH);
-
-  const anchorStyle = {
-    "--compass-pivot-bottom": `${compassMetrics.pivotBottomPx}px`,
-    "--compass-stage-offset": `${compassMetrics.stageOffsetPx}px`,
-    "--compass-card-lift": `${cardLiftPx}px`,
-    "--compass-disc-center": `${compassMetrics.discCenterPx}px`,
-    "--compass-disc-width": `${compassMetrics.discWidthPx}px`,
-  } as CSSProperties;
 
   return (
     <div
@@ -209,19 +257,18 @@ export function CardDrawStage({
         maxWidth: stageW,
         height: Math.round(stageH * fitScale),
         transform: fitScale < 1 ? `scale(${fitScale})` : undefined,
-        transformOrigin: "bottom center",
+        transformOrigin: "center center",
         background: "transparent",
       }}
     >
-      <div className="compass-stage__anchor" style={anchorStyle}>
-        <ShuffleFx
-          phase={phase}
-          reduce={reduce}
-          isMobile={isMobile}
-          stageW={stageW}
-        />
-
-        {cards.length === 5 ? (
+      {cards.length === 5 ? (
+        <>
+          <CardRouteRail
+            width={stageW}
+            anchors={anchors}
+            phase={phase}
+            selectedAnchor={selectedAnchor}
+          />
           <div className="compass-stage__deck">
             <CardDeck
               cards={cards}
@@ -241,8 +288,8 @@ export function CardDrawStage({
               onSelect={handleSelect}
             />
           </div>
-        ) : null}
-      </div>
+        </>
+      ) : null}
 
       {phase === "error" && (
         <div

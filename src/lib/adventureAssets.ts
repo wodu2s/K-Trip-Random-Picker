@@ -1,6 +1,8 @@
 /** Adventure Expedition — 조건 설정 화면 에셋 경로 */
 export const ADVENTURE_IMAGES = {
   heroWindow: "/assets/adventure/hero-expedition-window.png",
+  /** 랜딩 hero — 도시 노드가 그려진 모험 지도 원본 */
+  koreaAdventureMap: "/assets/adventure/korea-adventure-map.webp",
   /** 카드 무대 — 황금 천문 나침반 + 우주 고리 단일 장면 */
   compassStage: "/assets/adventure/compass-astral-stage.webp",
   /** @deprecated cards 페이지는 compassStage 단일 이미지 사용 */
@@ -13,7 +15,14 @@ export const ADVENTURE_IMAGES = {
   compassCelestial: "/assets/adventure/compass-celestial-gold.png",
   /** @deprecated cards 페이지는 compassStage 단일 이미지 사용 */
   compassGold: "/assets/adventure/compass-gold-radiant.png",
-  /** 조건 설정 전용 장면 — 아치 창+책상 소품이 이미 담긴 실제 자산 */
+  /** 조건 설정 — 오른쪽 랜덤 여행 미리보기. 실제 국내 여행지 사진 (바다·산·한옥·도시) */
+  journeyPhotos: [
+    "/images/journey/sea.webp",
+    "/images/journey/mountain.webp",
+    "/images/journey/hanok.webp",
+    "/images/journey/city.webp",
+  ],
+  /** @deprecated 조건 설정 우측은 journeyPhotos 사용 */
   conditionsScene: encodeURI(
     "/assets/backgrounds/ChatGPT Image 2026년 8월 5일 오후 02_17_19.png",
   ),
@@ -38,5 +47,5 @@ export function preloadAdventureImage(src: string): Promise<void> {
 }
 
 export function preloadConditionsAssets(): void {
-  void preloadAdventureImage(ADVENTURE_IMAGES.conditionsScene);
+  ADVENTURE_IMAGES.journeyPhotos.forEach((src) => void preloadAdventureImage(src));
 }
