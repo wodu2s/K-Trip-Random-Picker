@@ -467,8 +467,10 @@
   transform: none;
 }
 
-/* Tablet / mid desktop — mild shrink only below locked desktop */
-@media (min-width: 1024px) and (max-width: 1439px) {
+/* Tablet / mid desktop — mild shrink only below locked desktop.
+   짧은 뷰포트(높이 < 820)도 포함해야 폭 ≥1440에서 절대배치가 빠지지 않는다. */
+@media (min-width: 1024px) and (max-width: 1439px),
+  (min-width: 1024px) and (max-height: 819px) {
   .landing-hero__copy {
     padding: 85px 0 0 72px;
     width: 420px;
@@ -523,6 +525,43 @@
     bottom: 12px;
     width: auto;
     margin: 0;
+  }
+}
+
+/*
+ * 짧은 데스크톱 뷰포트 — min-height 734px가 뷰포트를 넘겨 스텝바를 스크롤 밖으로 밀어낸다.
+ * 히어로를 뷰포트에 맞추고, 카드 스테이지를 그만큼 위로 당겨 스텝바 자리를 비운다.
+ */
+@media (min-width: 1024px) and (max-height: 819px) {
+  /* 랜딩 루트의 min-h-[820px]가 뷰포트를 넘겨 페이지 스크롤을 만든다 */
+  [data-landing-root="true"] {
+    min-height: 0;
+  }
+
+  .landing-hero {
+    min-height: 0;
+  }
+
+  .landing-hero__copy {
+    padding-top: 48px;
+  }
+
+  /* 카드 하단 = top + height/2 + 386(스케일 0.7 기준 실측). 스텝바 위에서 멈추게 역산 */
+  .landing-hero__visual {
+    top: clamp(-260px, calc(100svh - 758px), 20px);
+  }
+
+  .landing-hero__steps {
+    bottom: 12px;
+    height: 88px;
+    min-height: 88px;
+  }
+}
+
+/* 더 짧은 뷰포트 — LandingCardDeck이 덱을 축소하므로 그만큼 더 내려 배지까지 띄운다 */
+@media (min-width: 1024px) and (max-height: 699px) {
+  .landing-hero__visual {
+    top: clamp(-200px, calc(100svh - 728px), 20px);
   }
 }
 

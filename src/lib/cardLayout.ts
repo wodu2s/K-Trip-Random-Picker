@@ -11,14 +11,15 @@ export type CardPose = {
 
 export type LayoutPoint = Pick<CardPose, "x" | "y" | "rotate">;
 
-/** 초기·선택 fan — desktop 기준 px, 회전 [-14,-7,0,7,14].
-    카드 하단 힌트 3개가 가려지지 않도록 좌우 간격을 넓게 잡는다 */
+/** 초기·선택 배치 — 부채꼴이 아니라 "완만한 아크".
+    좌우로 넓게 펼쳐 겹침을 최소화하고, 가운데가 솟는 곡선 + 완만한 기울기로 드라마를 유지한다.
+    카드 하단 힌트 3개가 옆 카드에 가려지지 않도록 간격을 넓게 잡는다. */
 export const SELECTABLE_LAYOUT: LayoutPoint[] = [
-  { x: -377, y: 24, rotate: -14 },
-  { x: -188, y: 6, rotate: -7 },
-  { x: 0, y: -12, rotate: 0 },
-  { x: 188, y: 6, rotate: 7 },
-  { x: 377, y: 24, rotate: 14 },
+  { x: -384, y: 46, rotate: -9 },
+  { x: -192, y: 12, rotate: -4.5 },
+  { x: 0, y: -16, rotate: 0 },
+  { x: 192, y: 12, rotate: 4.5 },
+  { x: 384, y: 46, rotate: 9 },
 ];
 
 /** 중앙 stack에서 카드 한 장씩 어긋나는 폭(px) — 5장이 겹쳐도 장수가 읽힌다 */
@@ -53,8 +54,9 @@ export type MixStep = 0 | 1 | 2 | 3;
  * fan이 스테이지 가로의 약 45~55%를 쓰도록 조정.
  */
 export function getLayoutScale(stageW: number, cardW: number): number {
-  const targetHalfSpan = stageW * 0.36;
-  const baseOuterX = 377;
+  /* 아크를 넓게 펼치기 위해 목표 half-span을 키운다 (부채꼴보다 겹침 감소) */
+  const targetHalfSpan = stageW * 0.4;
+  const baseOuterX = 384;
   const maxFromStage = (stageW / 2 - cardW * 0.25) / baseOuterX;
   const maxFromTarget = targetHalfSpan / baseOuterX;
   const fit = Math.min(1, Math.max(0.36, Math.min(maxFromStage, maxFromTarget)));
@@ -62,8 +64,8 @@ export function getLayoutScale(stageW: number, cardW: number): number {
   return stageW < 1024 ? fit * 0.88 : fit;
 }
 
-/** fan 펼침 시 가로 간격만 확대 (카드 scale/비율 유지) */
-const FAN_X_SPREAD = 1.12;
+/** 아크 펼침 시 가로 간격 미세 확대 (카드 scale/비율 유지) */
+const FAN_X_SPREAD = 1.02;
 
 export function scaleLayout(layout: LayoutPoint[], factor: number): LayoutPoint[] {
   return layout.map((p) => ({

@@ -97,10 +97,10 @@ function useStageSize(ref: React.RefObject<HTMLDivElement | null>) {
   const isMobile = width < 640;
   const isTablet = width < 1024;
   const cardW = isMobile
-    ? Math.round(Math.min(width * 0.54, 168))
+    ? Math.round(Math.min(width * 0.5, 156))
     : isTablet
-      ? Math.round(Math.min(width * 0.30, 228))
-      : Math.round(Math.min(width * 0.24, 268));
+      ? Math.round(Math.min(width * 0.26, 208))
+      : Math.round(Math.min(width * 0.205, 236));
   const cardH = Math.round((cardW * 3) / 2);
 
   return { stageW: width, cardW, cardH, isMobile, isTablet };
@@ -108,8 +108,11 @@ function useStageSize(ref: React.RefObject<HTMLDivElement | null>) {
 
 /** sticky 헤더 높이 */
 const HEADER_H = 86;
-/** 무대 위 여백 + 원판이 무대 박스 아래로 걸치는 만큼의 하단 여백 */
-const STAGE_GUTTER = 56;
+/**
+ * 무대 위 여백 + 원판이 무대 박스 아래로 걸치는 만큼의 하단 여백.
+ * 하단 CTA가 중앙에 놓이므로 그 높이(버튼 + 안내문 + 바닥 여백)까지 확보한다.
+ */
+const STAGE_GUTTER = 166;
 
 function useViewportHeight() {
   const [height, setHeight] = useState(() =>

@@ -85,11 +85,13 @@ export function ExpeditionCardArt({
       {featured ? <div className="expedition-card-art__emboss" aria-hidden="true" /> : null}
       {hints && featured ? (
         <div className="expedition-card-art__hints" aria-hidden="true">
-          {hints.map((emoji, i) => (
-            <span key={`${emoji}-${i}`} className="expedition-card-art__hint-chip">
-              {emoji}
-            </span>
-          ))}
+          <div className="expedition-card-art__hints-row">
+            {hints.map((emoji, i) => (
+              <span key={`${emoji}-${i}`} className="expedition-card-art__hint-chip">
+                {emoji}
+              </span>
+            ))}
+          </div>
         </div>
       ) : null}
       {featured ? <div className="expedition-card-art__glow" aria-hidden="true" /> : null}

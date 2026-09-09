@@ -41,6 +41,7 @@ type TravelState = {
 type TravelActions = {
   goToLanding: () => void;
   goToConditions: () => void;
+  goToGuestbook: () => void;
   setDuration: (d: Duration) => void;
   toggleTheme: (theme: ThemeKey) => void;
   setCompanion: (c: CompanionKey) => void;
@@ -141,6 +142,11 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       selectedCardId: null,
       revealedDestinationId: null,
     }));
+  }, []);
+
+  const goToGuestbook = useCallback(() => {
+    shuffleLock.current = false;
+    setState((s) => ({ ...s, page: "guestbook" }));
   }, []);
 
   const setDuration = useCallback((duration: Duration) => {
@@ -248,6 +254,7 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       ...state,
       goToLanding,
       goToConditions,
+      goToGuestbook,
       setDuration,
       toggleTheme,
       setCompanion,
@@ -266,6 +273,7 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       state,
       goToLanding,
       goToConditions,
+      goToGuestbook,
       setDuration,
       toggleTheme,
       setCompanion,

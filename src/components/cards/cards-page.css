@@ -269,30 +269,33 @@
   .cards-page__stage-wrap {
     min-height: 0;
     flex: 0 1 auto;
-    padding: 0 0.5rem 1.5rem;
+    /* 하단 CTA가 중앙으로 오면서 카드 아래를 지나가므로 그만큼 비워둔다 */
+    padding: 0 0.5rem 7rem;
     /* fan 전체를 오른쪽으로 밀어 첫 카드가 좌측 카피를 덮지 않게 한다.
        1440에서 80px, 1024로 갈수록 0으로 줄어든다. 카드 크기·간격·회전은 그대로 */
     translate: clamp(0px, (100vw - 1024px) / 5.2, 80px) 0;
   }
 
   /* CTA는 무대 아래 흐름에서 빼내 좌측 카피 컬럼 하단에 둔다 (원판과 겹치지 않음) */
+  /* 화면 가운데 하단 — 좌측 카피 아래가 아니라 스테이지 중앙 축에 맞춘다 */
   .cards-page__cta-bar {
     position: absolute;
-    left: clamp(2rem, 4vw, 4.5rem);
+    left: 50%;
+    translate: -50% 0;
     bottom: clamp(1.25rem, 3.5vh, 2.5rem);
     z-index: 3;
-    width: min(300px, 22vw);
+    width: min(360px, 32vw);
     padding: 0;
-    align-items: flex-start;
+    align-items: center;
     gap: 0.7rem;
   }
 
   .cards-page__cta-guide {
-    text-align: left;
+    text-align: center;
   }
 
   .cards-page__cta-wrap {
-    align-items: flex-start;
+    align-items: center;
     width: 100%;
   }
 

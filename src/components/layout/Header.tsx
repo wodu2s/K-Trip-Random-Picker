@@ -8,12 +8,13 @@ import { cn } from "../../utils/cn";
 const NAV_ITEMS = [
   { label: "\uD0D0\uD5D8\uD558\uAE30", page: "landing" as const },
   { label: "\uC870\uAC74 \uC124\uC815", page: "conditions" as const },
+  { label: "\uBC29\uBA85\uB85D", page: "guestbook" as const },
 ];
 
 /** Header ? full-bleed on landing (target B), parchment on other pages */
 export function Header() {
   const [open, setOpen] = useState(false);
-  const { page, goToLanding, goToConditions } = useTravel();
+  const { page, goToLanding, goToConditions, goToGuestbook } = useTravel();
   const dest = page === "destination";
   const darkH = dest ? 72 : 86;
   const dark =
@@ -26,9 +27,10 @@ export function Header() {
   const journeyActive =
     page === "conditions" ? 1 : page === "cards" || page === "shuffle" ? 2 : page === "destination" ? 3 : 0;
 
-  function handleNav(target: "landing" | "conditions") {
+  function handleNav(target: "landing" | "conditions" | "guestbook") {
     setOpen(false);
     if (target === "landing") goToLanding();
+    else if (target === "guestbook") goToGuestbook();
     else goToConditions();
   }
 

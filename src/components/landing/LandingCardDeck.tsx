@@ -16,13 +16,16 @@ const CARD_IDLE = [
   { dx: 0, dy: -4, dr: 0, dur: 7, delay: 0.55 },
 ] as const;
 
-/** Pixel-locked desktop poses — tightened fan gap around the center card */
+/**
+ * Pixel-locked desktop poses — index 0은 렌더하지 않으므로 1~4가 실제 4장.
+ * 중심 간격 110px 등간격, 중앙(2)에서 멀어질수록 낮아지는 대칭 아치.
+ */
 const LOCKED_CARDS = [
-  { left: 305, top: 70, w: 300, r: -10, z: 2 },
-  { left: 334, top: 42, w: 330, r: -5, z: 3 },
+  { left: 190, top: 110, w: 300, r: -12, z: 2 },
+  { left: 285, top: 50, w: 330, r: -6, z: 3 },
   { left: 375, top: 20, w: 370, r: 0, z: 6 },
-  { left: 514, top: 60, w: 340, r: 8, z: 4 },
-  { left: 609, top: 110, w: 320, r: 14, z: 3 },
+  { left: 500, top: 50, w: 330, r: 6, z: 4 },
+  { left: 620, top: 110, w: 300, r: 12, z: 3 },
 ] as const;
 
 type DeckLayout = {
@@ -69,6 +72,17 @@ function useDeckLayout(): DeckLayout {
           deckW: 620,
           deckH: 520,
           mode: "peek",
+          peekPx: 12,
+        });
+      } else if (h < 700) {
+        /* 짧은 데스크톱 — 카드가 헤더/스텝바에 물리지 않게 덱 전체를 축소 */
+        setLayout({
+          dist: 0.82,
+          frontW: 264,
+          backW: 244,
+          deckW: 700,
+          deckH: 520,
+          mode: "full",
           peekPx: 12,
         });
       } else if (w < 1440 || h < 820) {
@@ -225,8 +239,6 @@ export function LandingCardDeck({
       >
         {DECK_CARDS.map((card, i) => {
           if (layout.mode === "peek" && i === 0) return null;
-          /* Locked: hide outermost left so center + right dominate */
-          if (locked && i === 0) return null;
           return (
             <DeckCardLayer
               key={`${card.id}-${motionKey}`}
@@ -600,14 +612,9 @@ function cardDepthFilter(
       ? "brightness(1.13) contrast(1.09) saturate(1.06) drop-shadow(0 22px 36px rgba(0,0,0,0.5))"
       : "brightness(1.13) contrast(1.09) saturate(1.06)";
   }
-  if (index === 4) {
-    return "brightness(0.7) saturate(0.76)";
-  }
-  if (index === 3) {
-    return "brightness(0.83) saturate(0.88)";
-  }
-  if (index === 0) {
-    return "brightness(0.78) saturate(0.84)";
+  /* 중앙에서 같은 거리면 같은 밝기 — 좌우가 다르게 어두우면 배열이 흐트러져 보인다 */
+  if (index === 0 || index === 4) {
+    return "brightness(0.76) saturate(0.82)";
   }
   return "brightness(0.86) saturate(0.9)";
 }

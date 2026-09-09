@@ -108,7 +108,7 @@ export type MysteryCardData = {
 };
 
 /** 서비스 진행 페이지(단계) */
-export type FlowPage = "landing" | "conditions" | "shuffle" | "cards" | "destination";
+export type FlowPage = "landing" | "conditions" | "shuffle" | "cards" | "destination" | "guestbook";
 
 /**
  * 카드 드로우 단계 상태 머신 — 단일 phase가 UI·애니메이션의 유일한 상태 원천.

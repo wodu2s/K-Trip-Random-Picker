@@ -92,12 +92,13 @@ export type DeckCardToken = {
  * Desktop uses absolute pixel layout in LandingCardDeck (s stays 1).
  * Tokens here are fallbacks for mid/mobile fan math only.
  */
+/* 중심 간격·회전·높이를 좌우 대칭 등간격으로 — 한쪽만 뭉쳐 보이지 않게 한다 */
 export const DECK_CARDS: readonly DeckCardToken[] = [
-  { id: "Card01", x: -78, y: 48, r: -10, s: 1, z: 2, dim: 0 },
-  { id: "Card02", x: -39, y: 28, r: -5, s: 1, z: 3, dim: 0 },
+  { id: "Card01", x: -240, y: 48, r: -10, s: 1, z: 2, dim: 0 },
+  { id: "Card02", x: -120, y: 12, r: -5, s: 1, z: 3, dim: 0 },
   { id: "Card03", x: 0, y: 0, r: 0, s: 1, z: 6, dim: 0 },
-  { id: "Card04", x: 139, y: 40, r: 8, s: 1, z: 4, dim: 0 },
-  { id: "Card05", x: 234, y: 90, r: 14, s: 1, z: 3, dim: 0 },
+  { id: "Card04", x: 120, y: 12, r: 5, s: 1, z: 4, dim: 0 },
+  { id: "Card05", x: 240, y: 48, r: 10, s: 1, z: 3, dim: 0 },
 ] as const;
 
-export const DECK_OPACITY = [0.88, 0.94, 1, 0.94, 0.86] as const;
+export const DECK_OPACITY = [0.88, 0.94, 1, 0.94, 0.88] as const;

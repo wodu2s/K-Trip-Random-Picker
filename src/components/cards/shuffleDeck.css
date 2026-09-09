@@ -186,31 +186,65 @@
     inset 0 -1px 0 rgba(0, 0, 0, 0.42),
     inset 0 0 14px rgba(0, 0, 0, 0.16);
 }
+/* 힌트 트리오 — 부채꼴에서 옆 카드에 가려지지 않도록 항상 보이는 중앙 밴드(하단에서 살짝 위)에
+   좁게 중앙 정렬한다. 반투명 티켓 트레이 위에 여권 스탬프 메달을 얹어 재미와 정돈을 함께 준다. */
 .expedition-card-art__hints {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: clamp(8px, 4%, 16px);
+  /* 아크 배치는 겹침이 최소라 중앙 정렬로 둔다 */
+  left: 50%;
+  bottom: clamp(14px, 12%, 32px);
+  transform: translateX(-50%);
   z-index: 3;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(6px, 3%, 10px);
-  padding: 0 8px;
+  padding: clamp(4px, 1.8%, 7px) clamp(7px, 3.2%, 12px);
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    rgba(6, 20, 32, 0.62) 0%,
+    rgba(3, 12, 22, 0.72) 100%
+  );
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(232, 200, 106, 0.12);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  pointer-events: none;
+}
+.expedition-card-art__hints-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(6px, 3.4%, 11px);
 }
 .expedition-card-art__hint-chip {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: clamp(28px, 14%, 36px);
-  height: clamp(28px, 14%, 36px);
+  width: clamp(28px, 14.5%, 40px);
+  height: clamp(28px, 14.5%, 40px);
   border-radius: 50%;
-  font-size: clamp(12px, 5vw, 16px);
-  background: rgba(3, 16, 27, 0.55);
-  border: 1px solid rgba(212, 175, 55, 0.55);
+  font-size: clamp(14px, 6.4%, 20px);
+  line-height: 1;
+  background: radial-gradient(
+    circle at 50% 32%,
+    rgba(34, 66, 50, 0.96) 0%,
+    rgba(4, 16, 27, 0.96) 100%
+  );
+  border: 1.5px solid rgba(212, 175, 55, 0.75);
   box-shadow:
-    0 0 10px rgba(201, 162, 39, 0.2),
-    inset 0 0 8px rgba(201, 162, 39, 0.08);
+    0 3px 8px rgba(0, 0, 0, 0.4),
+    0 0 10px rgba(201, 162, 39, 0.24),
+    inset 0 0 8px rgba(201, 162, 39, 0.14);
+}
+/* 스탬프처럼 살짝 기울여 재미를 준다 */
+.expedition-card-art__hints-row .expedition-card-art__hint-chip:first-child {
+  transform: rotate(-6deg);
+}
+.expedition-card-art__hints-row .expedition-card-art__hint-chip:last-child {
+  transform: rotate(6deg);
 }
 .shuffle-deck[data-shuffle-phase="ready"] .shuffle-deck__card:nth-child(odd),
 .shuffle-deck[data-shuffle-phase="selectable"] .shuffle-deck__card:nth-child(odd) {
