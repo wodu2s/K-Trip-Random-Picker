@@ -3,18 +3,20 @@ import { Menu, User, X } from "lucide-react";
 import { Logo } from "./Logo";
 import { JourneySteps } from "./JourneySteps";
 import { useTravel } from "../../state/TravelContext";
+import { useAuth } from "../../state/AuthContext";
 import { cn } from "../../utils/cn";
 
 const NAV_ITEMS = [
   { label: "\uD0D0\uD5D8\uD558\uAE30", page: "landing" as const },
   { label: "\uC870\uAC74 \uC124\uC815", page: "conditions" as const },
-  { label: "\uBC29\uBA85\uB85D", page: "guestbook" as const },
+  { label: "방명록", page: "guestbook" as const },
 ];
 
 /** Header ? full-bleed on landing (target B), parchment on other pages */
 export function Header() {
   const [open, setOpen] = useState(false);
   const { page, goToLanding, goToConditions, goToGuestbook } = useTravel();
+  const { user, enabled, displayName, signInWithKakao, signOut } = useAuth();
   const dest = page === "destination";
   const darkH = dest ? 72 : 86;
   const dark =
@@ -22,6 +24,7 @@ export function Header() {
     page === "conditions" ||
     page === "cards" ||
     page === "shuffle" ||
+    page === "guestbook" ||
     dest;
   const showJourney = page === "cards" || page === "conditions" || page === "destination";
   const journeyActive =
@@ -30,8 +33,8 @@ export function Header() {
   function handleNav(target: "landing" | "conditions" | "guestbook") {
     setOpen(false);
     if (target === "landing") goToLanding();
-    else if (target === "guestbook") goToGuestbook();
-    else goToConditions();
+    else if (target === "conditions") goToConditions();
+    else goToGuestbook();
   }
 
   return (
@@ -106,23 +109,21 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-3.5 md:flex">
-          {page === "cards" || page === "shuffle" ? (
-            <button
-              type="button"
-              className="inline-flex h-[46px] w-[46px] items-center justify-center rounded-full border transition-colors hover:border-[rgba(208,165,77,0.75)]"
-              style={{
-                borderColor: "rgba(208,165,77,0.45)",
-                color: "#F0E9DA",
-                background: "rgba(201,162,39,0.06)",
-              }}
-              aria-label="마이페이지"
-            >
-              <User size={20} strokeWidth={1.8} aria-hidden="true" />
-            </button>
-          ) : (
+          {!enabled ? null : user ? (
             <>
+              <span
+                className="inline-flex items-center gap-2 text-[15px] font-semibold"
+                style={{
+                  color: dark ? "#F0E9DA" : "var(--color-text-headline)",
+                  fontFamily: "var(--font-family-base)",
+                }}
+              >
+                <User size={18} strokeWidth={1.8} aria-hidden="true" />
+                {displayName}
+              </span>
               <button
                 type="button"
+                onClick={() => void signOut()}
                 className={cn(
                   "inline-flex items-center justify-center rounded-[8px] border text-[15px] font-semibold transition-colors",
                   dark ? "h-[50px] px-6" : "h-11 px-5",
@@ -143,32 +144,26 @@ export function Header() {
                       }
                 }
               >
-                {"\uB85C\uADF8\uC778"}
-              </button>
-              <button
-                type="button"
-                className={cn(
-                  "inline-flex items-center justify-center rounded-[8px] text-[15px] font-semibold transition-colors",
-                  dark ? "h-[50px] px-6" : "h-11 px-5",
-                )}
-                style={
-                  dark
-                    ? {
-                        background: "#1F3D2E",
-                        color: "#F0E6C8",
-                        fontFamily: "var(--font-family-base)",
-                        border: "1px solid rgba(208,165,77,0.35)",
-                      }
-                    : {
-                        background: "var(--color-forest-800)",
-                        color: "var(--color-text-on-forest)",
-                        fontFamily: "var(--font-family-base)",
-                      }
-                }
-              >
-                {"\uD68C\uC6D0\uAC00\uC785"}
+                로그아웃
               </button>
             </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => void signInWithKakao()}
+              className={cn(
+                "inline-flex items-center justify-center rounded-[8px] text-[15px] font-semibold transition-colors",
+                dark ? "h-[50px] px-6" : "h-11 px-5",
+              )}
+              style={{
+                background: dark ? "#1F3D2E" : "var(--color-forest-800)",
+                color: "#F0E6C8",
+                fontFamily: "var(--font-family-base)",
+                border: "1px solid rgba(208,165,77,0.35)",
+              }}
+            >
+              카카오 로그인
+            </button>
           )}
         </div>
 
@@ -210,29 +205,36 @@ export function Header() {
                 {item.label}
               </button>
             ))}
-            <div className="mt-2 flex gap-2">
-              <button
-                type="button"
-                className="flex-1 rounded-[8px] border py-2.5 text-[15px] font-semibold"
-                style={{
-                  borderColor: dark ? "rgba(208,165,77,0.55)" : "var(--color-text-headline)",
-                  color: dark ? "#F0E9DA" : "var(--color-text-headline)",
-                  background: "transparent",
-                }}
-              >
-                {"\uB85C\uADF8\uC778"}
-              </button>
-              <button
-                type="button"
-                className="flex-1 rounded-[8px] py-2.5 text-[15px] font-semibold"
-                style={{
-                  background: dark ? "#1F3D2E" : "var(--color-forest-800)",
-                  color: "#F0E6C8",
-                }}
-              >
-                {"\uD68C\uC6D0\uAC00\uC785"}
-              </button>
-            </div>
+            {enabled ? (
+              <div className="mt-2 flex gap-2">
+                {user ? (
+                  <button
+                    type="button"
+                    onClick={() => void signOut()}
+                    className="flex-1 rounded-[8px] border py-2.5 text-[15px] font-semibold"
+                    style={{
+                      borderColor: dark ? "rgba(208,165,77,0.55)" : "var(--color-text-headline)",
+                      color: dark ? "#F0E9DA" : "var(--color-text-headline)",
+                      background: "transparent",
+                    }}
+                  >
+                    로그아웃 ({displayName})
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => void signInWithKakao()}
+                    className="flex-1 rounded-[8px] py-2.5 text-[15px] font-semibold"
+                    style={{
+                      background: dark ? "#1F3D2E" : "var(--color-forest-800)",
+                      color: "#F0E6C8",
+                    }}
+                  >
+                    카카오 로그인
+                  </button>
+                )}
+              </div>
+            ) : null}
           </nav>
         </div>
       )}

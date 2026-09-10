@@ -48,6 +48,15 @@ export function shortenRegion(addr1?: string): string {
   return `${SIDO_SHORT[sido] ?? sido} ${sigungu}`.trim();
 }
 
+/** 지역 단위 기능(방명록 등)이 쓰는 시·도 17개 — SIDO_SHORT 값에서 중복 제거 */
+export const SIDO_LIST: readonly string[] = [...new Set(Object.values(SIDO_SHORT))];
+
+/** "강원 속초시" 같은 region 문자열에서 시·도만 떼어낸다 */
+export function sidoOf(region?: string): string {
+  const head = (region ?? "").trim().split(/\s+/)[0] ?? "";
+  return SIDO_LIST.includes(head) ? head : "";
+}
+
 /** 제목 키워드 기반 테마 추론 (cat 코드만으로는 세분화가 어려워 제목을 보조로 사용) */
 const THEME_KEYWORDS: { theme: ThemeKey; re: RegExp }[] = [
   { theme: "sea", re: /해수욕장|해변|해안|바다|섬|항\b|포구|등대|방파제/ },

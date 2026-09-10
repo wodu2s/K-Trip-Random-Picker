@@ -1,5 +1,6 @@
 import { MotionConfig, AnimatePresence, LayoutGroup, motion } from "motion/react";
 import { TravelProvider, useTravel } from "./state/TravelContext";
+import { AuthProvider } from "./state/AuthContext";
 import { Header } from "./components/layout/Header";
 import { LandingPage } from "./components/landing/LandingPage";
 import { ConditionsPage } from "./components/conditions/ConditionsPage";
@@ -67,7 +68,11 @@ function AppShell() {
   const active = page === "shuffle" ? "cards" : page;
   const isLanding = active === "landing";
   const isDark =
-    active === "landing" || active === "conditions" || active === "cards" || active === "destination";
+    active === "landing" ||
+    active === "conditions" ||
+    active === "cards" ||
+    active === "destination" ||
+    active === "guestbook";
 
   return (
     <div
@@ -93,11 +98,13 @@ function AppShell() {
 function App() {
   return (
     <MotionConfig reducedMotion="user">
-      <TravelProvider>
-        <LayoutGroup>
-          <AppShell />
-        </LayoutGroup>
-      </TravelProvider>
+      <AuthProvider>
+        <TravelProvider>
+          <LayoutGroup>
+            <AppShell />
+          </LayoutGroup>
+        </TravelProvider>
+      </AuthProvider>
     </MotionConfig>
   );
 }

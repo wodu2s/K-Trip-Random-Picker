@@ -144,11 +144,6 @@ export function TravelProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
-  const goToGuestbook = useCallback(() => {
-    shuffleLock.current = false;
-    setState((s) => ({ ...s, page: "guestbook" }));
-  }, []);
-
   const setDuration = useCallback((duration: Duration) => {
     setState((s) => ({ ...s, duration }));
   }, []);
@@ -208,6 +203,11 @@ export function TravelProvider({ children }: { children: ReactNode }) {
 
   const clearSelection = useCallback(() => {
     setState((s) => ({ ...s, selectedCardId: null, revealedDestinationId: null }));
+  }, []);
+
+  const goToGuestbook = useCallback(() => {
+    shuffleLock.current = false;
+    setState((s) => ({ ...s, page: "guestbook" }));
   }, []);
 
   const goToDestination = useCallback(() => {
