@@ -8,6 +8,7 @@ import { PlaceList } from "./NearbyWaypoints";
 import { NearbyStays } from "./NearbyStays";
 import { DestinationMap } from "./DestinationMap";
 import { ScheduleTimeline } from "./ScheduleTimeline";
+import { RegionGuestbook } from "./RegionGuestbook";
 import { getDestinationById } from "../../data/destinations";
 import { useTravel } from "../../state/TravelContext";
 import { fetchDestinationDetail } from "../../api/tour";
@@ -301,6 +302,8 @@ export function DestinationPage() {
           </div>
         </div>
       </div>
+
+      <RegionGuestbook region={destination.region} />
 
       <div className="dossier-cta-bar">
         <div className="dossier-wrap dossier-cta-bar__inner">

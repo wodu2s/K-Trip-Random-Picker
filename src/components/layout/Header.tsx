@@ -3,6 +3,7 @@ import { Menu, User, X } from "lucide-react";
 import { Logo } from "./Logo";
 import { JourneySteps } from "./JourneySteps";
 import { useTravel } from "../../state/TravelContext";
+import { useAuth } from "../../state/AuthContext";
 import { cn } from "../../utils/cn";
 
 const NAV_ITEMS = [
@@ -14,6 +15,7 @@ const NAV_ITEMS = [
 export function Header() {
   const [open, setOpen] = useState(false);
   const { page, goToLanding, goToConditions } = useTravel();
+  const { user, openLogin, logout } = useAuth();
   const dest = page === "destination";
   const darkH = dest ? 72 : 86;
   const dark =
@@ -121,6 +123,7 @@ export function Header() {
             <>
               <button
                 type="button"
+                onClick={() => (user ? undefined : openLogin())}
                 className={cn(
                   "inline-flex items-center justify-center rounded-[8px] border text-[15px] font-semibold transition-colors",
                   dark ? "h-[50px] px-6" : "h-11 px-5",
@@ -141,10 +144,11 @@ export function Header() {
                       }
                 }
               >
-                {"\uB85C\uADF8\uC778"}
+                {user ? user.nickname : "\uB85C\uADF8\uC778"}
               </button>
               <button
                 type="button"
+                onClick={() => (user ? logout() : openLogin())}
                 className={cn(
                   "inline-flex items-center justify-center rounded-[8px] text-[15px] font-semibold transition-colors",
                   dark ? "h-[50px] px-6" : "h-11 px-5",
@@ -164,7 +168,7 @@ export function Header() {
                       }
                 }
               >
-                {"\uD68C\uC6D0\uAC00\uC785"}
+                {user ? "\uB85C\uADF8\uC544\uC6C3" : "\uD68C\uC6D0\uAC00\uC785"}
               </button>
             </>
           )}
@@ -211,6 +215,7 @@ export function Header() {
             <div className="mt-2 flex gap-2">
               <button
                 type="button"
+                onClick={() => (user ? undefined : openLogin())}
                 className="flex-1 rounded-[8px] border py-2.5 text-[15px] font-semibold"
                 style={{
                   borderColor: dark ? "rgba(208,165,77,0.55)" : "var(--color-text-headline)",
@@ -218,17 +223,18 @@ export function Header() {
                   background: "transparent",
                 }}
               >
-                {"\uB85C\uADF8\uC778"}
+                {user ? user.nickname : "\uB85C\uADF8\uC778"}
               </button>
               <button
                 type="button"
+                onClick={() => (user ? logout() : openLogin())}
                 className="flex-1 rounded-[8px] py-2.5 text-[15px] font-semibold"
                 style={{
                   background: dark ? "#1F3D2E" : "var(--color-forest-800)",
                   color: "#F0E6C8",
                 }}
               >
-                {"\uD68C\uC6D0\uAC00\uC785"}
+                {user ? "\uB85C\uADF8\uC544\uC6C3" : "\uD68C\uC6D0\uAC00\uC785"}
               </button>
             </div>
           </nav>

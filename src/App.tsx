@@ -1,5 +1,7 @@
 import { MotionConfig, AnimatePresence, LayoutGroup, motion } from "motion/react";
 import { TravelProvider, useTravel } from "./state/TravelContext";
+import { AuthProvider } from "./state/AuthContext";
+import { LoginModal } from "./components/auth/LoginModal";
 import { Header } from "./components/layout/Header";
 import { LandingPage } from "./components/landing/LandingPage";
 import { ConditionsPage } from "./components/conditions/ConditionsPage";
@@ -84,6 +86,7 @@ function AppShell() {
       {!isDark ? <PersistentBackdrop /> : null}
       <Header />
       <PageSwitch />
+      <LoginModal />
     </div>
   );
 }
@@ -91,11 +94,13 @@ function AppShell() {
 function App() {
   return (
     <MotionConfig reducedMotion="user">
-      <TravelProvider>
-        <LayoutGroup>
-          <AppShell />
-        </LayoutGroup>
-      </TravelProvider>
+      <AuthProvider>
+        <TravelProvider>
+          <LayoutGroup>
+            <AppShell />
+          </LayoutGroup>
+        </TravelProvider>
+      </AuthProvider>
     </MotionConfig>
   );
 }

@@ -971,3 +971,245 @@
     min-height: 58px;
   }
 }
+
+/* ── 지역 방명록 — 기존 규칙은 건드리지 않고 이 블록만 추가 ── */
+.dossier-page .dsn-gb {
+  position: relative;
+  z-index: 1;
+  padding: 1.6rem 0 2rem;
+}
+
+.dossier-page .dsn-gb__inner {
+  background: var(--panel-bg);
+  border: 1px solid var(--plan-line);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem 1.25rem;
+  color: var(--plan-ink);
+}
+
+.dossier-page .dsn-gb__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.dossier-page .dsn-gb__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--plan-gold);
+}
+
+.dossier-page .dsn-gb__title {
+  margin: 0.3rem 0 0;
+  font-size: 1.12rem;
+  font-weight: 800;
+}
+
+.dossier-page .dsn-gb__desc {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  color: var(--plan-muted);
+}
+
+.dossier-page .dsn-gb__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.dossier-page .dsn-gb__count {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--plan-faint);
+}
+
+.dossier-page .dsn-gb__write {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 36px;
+  padding: 0 0.85rem;
+  border-radius: 9px;
+  border: 1px solid rgba(138, 106, 22, 0.4);
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--plan-gold);
+  cursor: pointer;
+}
+
+.dossier-page .dsn-gb__write.is-active {
+  background: rgba(138, 106, 22, 0.1);
+}
+
+.dossier-page .dsn-gb__rule {
+  margin: 0.9rem 0 0;
+  border-top: 1px solid var(--plan-line);
+}
+
+.dossier-page .dsn-gb__form {
+  margin-top: 0.9rem;
+}
+
+.dossier-page .dsn-gb__input {
+  width: 100%;
+  resize: vertical;
+  border: 1px solid var(--plan-line);
+  border-radius: 10px;
+  background: #fff;
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+  font-size: 0.88rem;
+  color: var(--plan-ink);
+  outline: none;
+}
+
+.dossier-page .dsn-gb__input:focus {
+  border-color: rgba(138, 106, 22, 0.55);
+}
+
+.dossier-page .dsn-gb__formfoot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: 0.45rem;
+}
+
+.dossier-page .dsn-gb__who {
+  font-size: 0.76rem;
+  color: var(--plan-faint);
+}
+
+.dossier-page .dsn-gb__submit {
+  min-height: 34px;
+  padding: 0 1rem;
+  border: 0;
+  border-radius: 9px;
+  background: var(--dossier-green);
+  color: #f0e6c8;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.dossier-page .dsn-gb__submit:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.dossier-page .dsn-gb__panel {
+  margin-top: 0.9rem;
+}
+
+.dossier-page .dsn-gb__empty {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0.9rem 0;
+  font-size: 0.85rem;
+  color: var(--plan-muted);
+}
+
+.dossier-page .dsn-gb__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.dossier-page .dsn-gb__item {
+  display: flex;
+  gap: 0.6rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--plan-line);
+}
+
+.dossier-page .dsn-gb__item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.dossier-page .dsn-gb__avatar {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(31, 61, 43, 0.1);
+  color: var(--dossier-green);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.dossier-page .dsn-gb__body {
+  min-width: 0;
+}
+
+.dossier-page .dsn-gb__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.dossier-page .dsn-gb__nick {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.dossier-page .dsn-gb__date {
+  font-size: 0.72rem;
+  color: var(--plan-faint);
+}
+
+.dossier-page .dsn-gb__text {
+  margin: 0.18rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.55;
+  color: var(--plan-muted);
+  overflow-wrap: anywhere;
+}
+
+.dossier-page .dsn-gb__more {
+  display: block;
+  width: 100%;
+  margin-top: 0.85rem;
+  min-height: 36px;
+  border: 1px solid var(--plan-line);
+  border-radius: 9px;
+  background: transparent;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--plan-muted);
+  cursor: pointer;
+}
+
+/* 방명록이 .dossier-page 그리드의 4번째 자식이라, 3행 고정(278px/1fr/58px) +
+   height:100svh + overflow:hidden 인 1280px 이상 레이아웃에서 잘려 나갔다.
+   hero·본문 행 높이는 그대로 두고 3번째 행부터 흐르게 해 페이지를 스크롤 가능하게 한다. */
+@media (min-width: 1280px) {
+  .dossier-page {
+    /* 1fr → 기존과 동일한 실측값(100svh - 72px 헤더 - 278px hero - 58px CTA) */
+    grid-template-rows: 278px minmax(0, calc(100svh - 408px)) auto;
+    height: auto;
+    max-height: none;
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+}
+
+/* 노치 단말에서 CTA가 홈 인디케이터에 물리지 않게 */
+.dossier-page .dossier-cta-bar {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}

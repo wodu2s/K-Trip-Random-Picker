@@ -19,7 +19,7 @@ export type TourItem = {
 };
 
 /** 시·도 표기 축약 */
-const SIDO_SHORT: Record<string, string> = {
+export const SIDO_SHORT: Record<string, string> = {
   서울특별시: "서울",
   부산광역시: "부산",
   대구광역시: "대구",
