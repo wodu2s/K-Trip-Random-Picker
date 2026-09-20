@@ -9,12 +9,13 @@ import { cn } from "../../utils/cn";
 const NAV_ITEMS = [
   { label: "\uD0D0\uD5D8\uD558\uAE30", page: "landing" as const },
   { label: "\uC870\uAC74 \uC124\uC815", page: "conditions" as const },
+  { label: "\uC800\uC7A5\uD55C \uC7A5\uC18C", page: "saved" as const },
 ];
 
 /** Header ? full-bleed on landing (target B), parchment on other pages */
 export function Header() {
   const [open, setOpen] = useState(false);
-  const { page, goToLanding, goToConditions } = useTravel();
+  const { page, goToLanding, goToConditions, goToSaved } = useTravel();
   const { user, openLogin, logout } = useAuth();
   const dest = page === "destination";
   const darkH = dest ? 72 : 86;
@@ -28,10 +29,12 @@ export function Header() {
   const journeyActive =
     page === "conditions" ? 1 : page === "cards" || page === "shuffle" ? 2 : page === "destination" ? 3 : 0;
 
-  function handleNav(target: "landing" | "conditions") {
+  function handleNav(target: "landing" | "conditions" | "saved") {
     setOpen(false);
     if (target === "landing") goToLanding();
-    else goToConditions();
+    else if (target === "conditions") goToConditions();
+    else if (user) goToSaved();
+    else openLogin("저장한 장소를 보려면 로그인이 필요해요.");
   }
 
   return (
@@ -116,6 +119,7 @@ export function Header() {
                 background: "rgba(201,162,39,0.06)",
               }}
               aria-label="마이페이지"
+              onClick={() => handleNav("saved")}
             >
               <User size={20} strokeWidth={1.8} aria-hidden="true" />
             </button>
@@ -215,7 +219,10 @@ export function Header() {
             <div className="mt-2 flex gap-2">
               <button
                 type="button"
-                onClick={() => (user ? undefined : openLogin())}
+                onClick={() => {
+                  setOpen(false);
+                  if (!user) openLogin();
+                }}
                 className="flex-1 rounded-[8px] border py-2.5 text-[15px] font-semibold"
                 style={{
                   borderColor: dark ? "rgba(208,165,77,0.55)" : "var(--color-text-headline)",
@@ -227,7 +234,11 @@ export function Header() {
               </button>
               <button
                 type="button"
-                onClick={() => (user ? logout() : openLogin())}
+                onClick={() => {
+                  setOpen(false);
+                  if (user) logout();
+                  else openLogin();
+                }}
                 className="flex-1 rounded-[8px] py-2.5 text-[15px] font-semibold"
                 style={{
                   background: dark ? "#1F3D2E" : "var(--color-forest-800)",

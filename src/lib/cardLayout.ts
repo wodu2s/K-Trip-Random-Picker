@@ -52,12 +52,18 @@ export type MixStep = 0 | 1 | 2 | 3;
  * 스테이지 너비·카드 너비 기준 fan 스케일.
  * fan이 스테이지 가로의 약 45~55%를 쓰도록 조정.
  */
+/** 바깥쪽 카드는 ±14deg 회전하므로 실제 화면을 차지하는 폭(AABB)은
+    카드 폭보다 크다 — cardH = cardW*1.5 기준 회전 후 절반 폭 비율 */
+const OUTER_CARD_HALF_WIDTH_RATIO = 0.6665;
+
 export function getLayoutScale(stageW: number, cardW: number): number {
   const targetHalfSpan = stageW * 0.36;
   const baseOuterX = 377;
-  const maxFromStage = (stageW / 2 - cardW * 0.25) / baseOuterX;
+  /* 회전한 바깥쪽 카드의 실제 폭(AABB) + 여백을 빼야 화면 밖으로 잘리지 않는다 */
+  const edgePad = stageW < 1024 ? 10 : 0;
+  const maxFromStage = (stageW / 2 - edgePad - cardW * OUTER_CARD_HALF_WIDTH_RATIO) / baseOuterX;
   const maxFromTarget = targetHalfSpan / baseOuterX;
-  const fit = Math.min(1, Math.max(0.36, Math.min(maxFromStage, maxFromTarget)));
+  const fit = Math.min(1, Math.max(0.12, Math.min(maxFromStage, maxFromTarget)));
   /* 좁은 화면에서만 간격을 12% 더 좁힌다 — desktop 간격은 그대로 */
   return stageW < 1024 ? fit * 0.88 : fit;
 }

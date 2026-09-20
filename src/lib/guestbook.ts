@@ -1,4 +1,5 @@
 import { SIDO_SHORT } from "../api/mappers";
+import { supabase } from "./supabase";
 
 /**
  * 지역별 방명록.
@@ -7,12 +8,18 @@ import { SIDO_SHORT } from "../api/mappers";
  */
 export type GuestbookEntry = {
   id: string;
+  /** 작성자 (auth.users.id). 수정·삭제 권한 판단 기준 */
+  userId: string;
   /** 시·도 축약 표기 (서울 · 부산 · 제주 · 강원 · 경기 …) */
   region: string;
+  /** 이 후기가 남겨진 구체적인 추천 여행지 */
+  destinationId: string;
+  destinationName: string;
   nickname: string;
   content: string;
   /** ISO 문자열 */
   createdAt: string;
+  updatedAt: string;
 };
 
 /** mappers.ts가 쓰는 축약 표기 집합 — 별도 지역 목록을 만들지 않는다 */
@@ -29,25 +36,60 @@ export function sidoOf(region?: string | null): string | null {
   return SIDO.has(head) ? head : null;
 }
 
-/* ── 공개 인터페이스 ──────────────────────────────────
-   호출부(RegionGuestbook)는 아래 두 함수만 쓴다. 둘 다 Promise를 돌려주므로
-   서버 전환 시 본문만 fetch로 바꾸면 컴포넌트는 그대로 둘 수 있다.
+/** 입력 제한 — 서버 검증도 같은 값을 쓴다 (supabase/schema.sql 참고) */
+export const MAX_CONTENT = 200;
 
-   서버 전환 후:
-     listEntries → GET  /api/guestbook?region=강원&limit=10
-     addEntry    → POST /api/guestbook  { region, content }   (닉네임은 세션에서)
-   ────────────────────────────────────────────────── */
-
-/** 해당 시·도 글을 최신순으로 */
-export async function listEntries(region: string, limit = 20): Promise<GuestbookEntry[]> {
-  return readAll()
-    .filter((e) => e.region === region)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-    .slice(0, limit);
+function requireClient() {
+  if (!supabase) throw new Error("Supabase가 설정되지 않았습니다.");
+  return supabase;
 }
 
+type ReviewRow = {
+  id: string;
+  user_id: string;
+  destination_id: string;
+  destination_name: string;
+  region: string;
+  nickname: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+};
+
+function toEntry(row: ReviewRow): GuestbookEntry {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    region: row.region,
+    destinationId: row.destination_id,
+    destinationName: row.destination_name,
+    nickname: row.nickname,
+    content: row.content,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+/** 해당 시·도 글을 최신순으로. 비로그인 사용자도 조회할 수 있다. */
+export async function listEntries(region: string, limit = 50): Promise<GuestbookEntry[]> {
+  const client = requireClient();
+  const { data, error } = await client
+    .from("reviews")
+    .select("*")
+    .eq("region", region)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw new Error(error.message);
+  return (data as ReviewRow[]).map(toEntry);
+}
+
+/** 후기 작성. user_id 는 RLS(auth.uid() = user_id)로 검증되므로 다른 사람 이름으로는 쓸 수 없다. */
 export async function addEntry(input: {
   region: string;
+  destinationId: string;
+  destinationName: string;
+  userId: string;
   nickname: string;
   content: string;
 }): Promise<GuestbookEntry> {
@@ -55,42 +97,48 @@ export async function addEntry(input: {
   const nickname = input.nickname.trim();
   if (!content || !nickname) throw new Error("닉네임과 내용을 모두 입력해 주세요.");
 
-  const entry: GuestbookEntry = {
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    region: input.region,
-    nickname,
-    content: content.slice(0, MAX_CONTENT),
-    createdAt: new Date().toISOString(),
-  };
-  writeAll([entry, ...readAll()]);
-  return entry;
+  const client = requireClient();
+  const { data, error } = await client
+    .from("reviews")
+    .insert({
+      user_id: input.userId,
+      destination_id: input.destinationId,
+      destination_name: input.destinationName,
+      region: input.region,
+      nickname,
+      content: content.slice(0, MAX_CONTENT),
+    })
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return toEntry(data as ReviewRow);
 }
 
-/** 입력 제한 — 서버 전환 시 같은 값으로 서버측 검증을 건다 */
-export const MAX_CONTENT = 200;
+/** 후기 수정. RLS가 작성자 본인만 허용한다. */
+export async function updateEntry(entryId: string, content: string): Promise<GuestbookEntry> {
+  const client = requireClient();
+  const trimmed = content.trim();
+  if (!trimmed) throw new Error("내용을 입력해 주세요.");
 
-/* ── 임시 저장소 (localStorage) ───────────────────────
-   ponytail: 브라우저 1대 안에서만 공유된다. 위 두 함수 본문 외에는
-   readAll/writeAll을 쓰는 곳이 없으므로 교체 범위가 이 블록으로 한정된다.
-   ────────────────────────────────────────────────── */
-const KEY = "pickgo.guestbook.v1";
+  const { data, error } = await client
+    .from("reviews")
+    .update({ content: trimmed.slice(0, MAX_CONTENT) })
+    .eq("id", entryId)
+    .select()
+    .maybeSingle();
 
-function readAll(): GuestbookEntry[] {
-  if (typeof localStorage === "undefined") return [];
-  try {
-    const parsed = JSON.parse(localStorage.getItem(KEY) ?? "[]");
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
+  if (error) throw new Error(error.message);
+  // RLS 로 막히면 error 없이 0행이 돌아온다.
+  if (!data) throw new Error("수정 권한이 없거나 후기를 찾을 수 없습니다.");
+  return toEntry(data as ReviewRow);
 }
 
-function writeAll(entries: GuestbookEntry[]): void {
-  try {
-    localStorage.setItem(KEY, JSON.stringify(entries));
-  } catch {
-    /* 용량 초과 등은 무시하고 화면 상태만 유지 */
-  }
+/** 후기 삭제. RLS가 작성자 본인만 허용한다. */
+export async function deleteEntry(entryId: string): Promise<void> {
+  const client = requireClient();
+  const { error } = await client.from("reviews").delete().eq("id", entryId);
+  if (error) throw new Error(error.message);
 }
 
 export function formatDate(iso: string): string {

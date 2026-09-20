@@ -7,6 +7,7 @@ import { LandingPage } from "./components/landing/LandingPage";
 import { ConditionsPage } from "./components/conditions/ConditionsPage";
 import { CardsPage } from "./components/cards/CardsPage";
 import { DestinationPage } from "./components/destination/DestinationPage";
+import { SavedPlacesPage } from "./components/saved/SavedPlacesPage";
 import { CARD_MOTION } from "./lib/cardMotion";
 
 function PageSwitch() {
@@ -31,6 +32,7 @@ function PageSwitch() {
         {active === "conditions" && <ConditionsPage />}
         {active === "cards" && <CardsPage />}
         {active === "destination" && <DestinationPage />}
+        {active === "saved" && <SavedPlacesPage />}
       </motion.div>
     </AnimatePresence>
   );

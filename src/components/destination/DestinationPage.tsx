@@ -310,7 +310,7 @@ export function DestinationPage() {
         </div>
       </div>
 
-      <RegionGuestbook region={destination.region} />
+      <RegionGuestbook destination={destination} />
 
       <div className="dossier-cta-bar">
         <div className="dossier-wrap dossier-cta-bar__inner">

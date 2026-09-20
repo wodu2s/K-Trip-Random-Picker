@@ -222,6 +222,12 @@
   border-color: rgba(242, 234, 217, 0.3);
 }
 
+.dossier-page .dossier-btn--ghost.is-active {
+  border-color: var(--dossier-brass);
+  background: rgba(201, 162, 39, 0.14);
+  color: var(--dossier-brass);
+}
+
 .dossier-page .dossier-btn--ghost:hover {
   border-color: var(--dossier-brass);
   color: var(--dossier-brass);
@@ -1124,6 +1130,52 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;
+}
+
+.dossier-page .dsn-gb__place {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0.15rem 0 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--plan-faint);
+}
+
+.dossier-page .dsn-gb__error {
+  margin: 0.4rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #c0523a;
+}
+
+.dossier-page .dsn-gb__owner-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+}
+
+.dossier-page .dsn-gb__icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 32px;
+  padding: 0 0.4rem;
+  border: none;
+  background: transparent;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--plan-faint);
+  cursor: pointer;
+}
+
+.dossier-page .dsn-gb__icon-btn:hover {
+  color: var(--plan-muted);
+}
+
+.dossier-page .dsn-gb__icon-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .dossier-page .dsn-gb__more {

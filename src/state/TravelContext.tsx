@@ -55,6 +55,7 @@ type TravelActions = {
   selectCard: (cardId: string, destinationId: string) => void;
   clearSelection: () => void;
   goToDestination: () => void;
+  goToSaved: () => void;
   redraw: () => Promise<void>;
   restart: () => void;
 };
@@ -216,6 +217,11 @@ export function TravelProvider({ children }: { children: ReactNode }) {
     setState((s) => (s.revealedDestinationId ? { ...s, page: "destination" } : s));
   }, []);
 
+  const goToSaved = useCallback(() => {
+    shuffleLock.current = false;
+    setState((s) => ({ ...s, page: "saved" }));
+  }, []);
+
   const redraw = useCallback(async () => {
     shuffleLock.current = false;
     void fetchDestinationPool();
@@ -266,6 +272,7 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       selectCard,
       clearSelection,
       goToDestination,
+      goToSaved,
       redraw,
       restart,
     }),
@@ -284,6 +291,7 @@ export function TravelProvider({ children }: { children: ReactNode }) {
       selectCard,
       clearSelection,
       goToDestination,
+      goToSaved,
       redraw,
       restart,
     ],

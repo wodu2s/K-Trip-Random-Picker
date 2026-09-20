@@ -37,6 +37,14 @@
   filter: brightness(1.08) contrast(1.12) saturate(1.04);
 }
 
+/* 좁고 긴 모바일 화면에서는 배경 나침반 그림의 중심이 제목·부제 영역과
+   겹치므로, 그 부분만 위로 밀어 텍스트 위로 오지 않게 한다 */
+@media (max-width: 1023px) {
+  .cards-page__atmosphere::before {
+    background-position: center 15%;
+  }
+}
+
 /* 가장자리를 눌러 카드 쪽 가독성을 확보한다 */
 .cards-page__vignette {
   position: absolute;
@@ -113,6 +121,7 @@
   font-size: clamp(0.88rem, 1.8vw, 1rem);
   line-height: 1.65;
   color: var(--cards-muted);
+  text-shadow: 0 1px 6px rgba(3, 8, 20, 0.55);
 }
 
 .cards-page__aside-rule {
