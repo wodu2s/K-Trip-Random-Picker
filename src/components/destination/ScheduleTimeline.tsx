@@ -20,18 +20,21 @@ function kindOf(period: string): string {
 /**
  * 추천 코스 — 당일치기는 가로, 1박 2일은 세로 waypoint timeline.
  * 1박 2일이면 Day 1 관광 → 저녁 → 숙박 → Day 2 관광 순으로 잇는다.
+ * 1박 여부는 조건에서 고른 기간(overnight)으로만 정한다 —
+ * 주변 숙소를 못 찾았다고 해서 당일치기로 바뀌면 안 된다.
  */
 export function ScheduleTimeline({
   schedule,
+  overnight,
   stayName,
   day2Name,
 }: {
   schedule: ScheduleItem[];
+  overnight: boolean;
   stayName?: string;
   day2Name?: string;
 }) {
   const reduce = useReducedMotion();
-  const overnight = Boolean(stayName);
 
   /* 1박이면 Day 1은 오전·점심·저녁만 남겨 숙박/Day 2 자리를 만든다 */
   const evening = schedule.find((s) => s.period === "저녁");
@@ -47,11 +50,23 @@ export function ScheduleTimeline({
     title: item.title,
   }));
 
-  if (stayName) {
-    stops.push({ key: "stay", day: "숙박", time: "18:00", kind: "숙소", title: stayName, stay: true });
-    if (day2Name) {
-      stops.push({ key: "day2", day: "Day 2", time: "10:00", kind: "관광", title: day2Name });
-    }
+  if (overnight) {
+    /* 숙소·Day 2 장소를 아직 못 받았어도 자리는 남긴다 (실제 장소명은 들어오면 채워진다) */
+    stops.push({
+      key: "stay",
+      day: "숙박",
+      time: "18:00",
+      kind: "숙소",
+      title: stayName ?? "근처 숙소에서 1박",
+      stay: true,
+    });
+    stops.push({
+      key: "day2",
+      day: "Day 2",
+      time: "10:00",
+      kind: "관광",
+      title: day2Name ?? "다음 날 주변 둘러보기",
+    });
   }
 
   const visible = stops.slice(0, 5);

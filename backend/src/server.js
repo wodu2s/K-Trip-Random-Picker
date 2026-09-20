@@ -10,6 +10,7 @@ import {
 import {
   attachNearbyImages,
   buildSchedule,
+  resolveStayLinks,
   nearbyPlaces,
   regionWord,
   searchImage,
@@ -126,6 +127,9 @@ app.get("/api/places/nearby", async (req, res) => {
 
     await attachNearbyImages(places, region, ktoPool, stays).catch(() => {
       /* 썸네일은 없어도 리스트는 그대로 노출 */
+    });
+    await resolveStayLinks(stays).catch(() => {
+      /* 링크를 못 찾으면 링크 없는 숙소 카드로 나간다 */
     });
     res.json({
       ...places,

@@ -4,6 +4,10 @@ import { Gem, MapPin } from "lucide-react";
 import type { Destination, SceneVariant } from "../../types/travel";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { getEmojiHints } from "../../lib/icons";
+import { THEME_META } from "../../data/destinations";
+
+/** 대표 사진이 없을 때 쓰는 공용 여행 배경 — 이 장소의 실제 사진이 아니다 */
+const SHARED_BACKDROP = "/images/destination/destination-backdrop.webp";
 
 /**
  * PAGE 5 여행지 공개 Hero (design_2.5 톤).
@@ -41,7 +45,7 @@ export function DestinationHero({ destination, layoutId }: { destination: Destin
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, ease: "easeOut" }}
       >
-        {!imgError ? (
+        {destination.image && !imgError ? (
           <img
             src={destination.image}
             alt={`${destination.name} 대표 사진`}
@@ -49,7 +53,7 @@ export function DestinationHero({ destination, layoutId }: { destination: Destin
             onError={() => setImgError(true)}
           />
         ) : (
-          <HeroArt variant={destination.scene} />
+          <HeroFallback destination={destination} />
         )}
 
         {destination.isHiddenGem && (
@@ -76,6 +80,41 @@ export function DestinationHero({ destination, layoutId }: { destination: Destin
           {hints.join(" ")}
         </span>
       </p>
+    </div>
+  );
+}
+
+/**
+ * 대표 사진이 없거나 로드에 실패했을 때 — 공용 여행 배경 위에 목적지명·카테고리만 올린다.
+ * 이 장소의 사진인 척하지 않도록 배경을 어둡게 깔고 "대표 사진 준비 중"을 함께 표시한다.
+ * 공용 배경까지 실패하면 풍경 일러스트로 내려가 빈칸·broken image가 남지 않는다.
+ */
+function HeroFallback({ destination }: { destination: Destination }) {
+  const [backdropError, setBackdropError] = useState(false);
+  const category = destination.themes[0] ? THEME_META[destination.themes[0]].label : "여행지";
+
+  return (
+    <div className="relative h-full w-full bg-[var(--adventure-forest,#2a4a38)]">
+      {!backdropError ? (
+        <img
+          src={SHARED_BACKDROP}
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-cover opacity-70"
+          onError={() => setBackdropError(true)}
+        />
+      ) : (
+        <HeroArt variant={destination.scene} />
+      )}
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 bg-gradient-to-b from-black/35 via-black/25 to-black/45 px-4 text-center">
+        <span className="rounded-full border border-white/35 bg-black/30 px-2.5 py-0.5 text-[11px] font-bold tracking-[0.1em] text-white/85">
+          {category}
+        </span>
+        <p className="text-xl font-extrabold text-white drop-shadow-sm sm:text-2xl">
+          {destination.name}
+        </p>
+        <p className="text-[11px] font-semibold text-white/70">대표 사진 준비 중</p>
+      </div>
     </div>
   );
 }

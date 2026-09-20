@@ -197,8 +197,38 @@ export async function lodgingNearby(lat, lng, radius = 10000) {
       distance: Math.round(Number(i.dist)) || null,
       // KTO 대표 이미지가 실제 있을 때만 채운다 (없으면 프런트에서 사진 영역 생략)
       image: i.firstimage || i.firstimage2 || "",
-      url: `https://korean.visitkorea.or.kr/detail/ms_detail.do?cotid=${i.contentid}`,
+      /* 링크는 resolveStayLinks가 실제로 열리는 주소를 확인해 채운다.
+         TourAPI의 숫자 contentId는 대한민국 구석구석의 cotid(UUID)와 다른 값이라
+         ms_detail.do?cotid=<contentId>를 만들면 404가 난다. */
+      url: "",
     }));
+}
+
+/** http(s) 주소 한 개만 통과시킨다 — javascript:, 빈 값, 잘못된 주소는 버린다 */
+function safeUrl(raw = "") {
+  const hit = String(raw).match(/https?:\/\/[^\s"'<>]+/);
+  if (!hit) return "";
+  try {
+    const url = new URL(hit[0]);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.toString() : "";
+  } catch {
+    return "";
+  }
+}
+
+/** KTO detailCommon2의 공식 homepage — 없으면 빈 문자열 */
+export async function homepageOf(contentId) {
+  if (!contentId) return "";
+  try {
+    const [detail] = await callKto("detailCommon2", {
+      contentId: String(contentId),
+      numOfRows: "1",
+      pageNo: "1",
+    });
+    return safeUrl(stripHtml(detail?.homepage ?? ""));
+  } catch {
+    return "";
+  }
 }
 
 /**

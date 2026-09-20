@@ -490,6 +490,35 @@
   color: var(--plan-muted);
 }
 
+/* 사진 대신 그 장소 좌표를 띄운 mini-map — 사진 칸과 같은 높이 */
+.dossier-page .place-thumb__map {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 92px;
+  overflow: hidden;
+  border: 1px solid var(--plan-line);
+  border-radius: 10px;
+  background: #e9e4d6;
+}
+
+.dossier-page .place-thumb__map-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 지도 중앙 핀 — StaticMap 마커 위에 겹쳐 어떤 타일에서도 위치가 보이게 한다 */
+.dossier-page .place-thumb__map-pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -85%);
+  color: var(--plan-gold, #8a6a16);
+  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.9));
+  pointer-events: none;
+}
+
 /* 사진을 못 찾은 장소 — 사진 자리에 아이콘만. 사진처럼 보이는 placeholder는 쓰지 않는다 */
 .dossier-page .place-thumb__blank {
   position: relative;
@@ -785,11 +814,6 @@
   border-color: rgba(138, 106, 22, 0.42);
 }
 
-.dossier-page .stay-item--text {
-  padding-left: 0.75rem;
-  border-left: 2px solid rgba(138, 106, 22, 0.45);
-}
-
 .dossier-page .stay-item > a {
   flex-shrink: 0;
   display: block;
@@ -803,6 +827,20 @@
   object-fit: cover;
   border-radius: 9px;
   background: #e9e0cd;
+}
+
+/* 사진 없는 숙소 — thumb와 같은 크기의 아이콘 카드 (빈칸·broken image 방지) */
+.dossier-page .stay-item__thumb--blank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--plan-line);
+  background: repeating-linear-gradient(
+    135deg,
+    transparent 0 7px,
+    rgba(138, 106, 22, 0.055) 7px 8px
+  );
+  color: var(--plan-muted);
 }
 
 .dossier-page .stay-item__body {
@@ -834,6 +872,12 @@
 
 .dossier-page .stay-item__name:hover {
   color: var(--plan-gold);
+}
+
+/* 열 수 있는 주소를 못 찾은 숙소 — 링크가 아니므로 hover 강조도 하지 않는다 */
+.dossier-page .stay-item__name--plain:hover {
+  color: var(--plan-ink);
+  cursor: default;
 }
 
 .dossier-page .dossier-source {
@@ -1240,12 +1284,6 @@
 
   .dossier-page .stay-item__body {
     padding: 0 0.25rem;
-  }
-
-  .dossier-page .stay-item--text {
-    padding-left: 0.3rem;
-    border-left: 0;
-    border-top: 2px solid rgba(138, 106, 22, 0.45);
   }
 
   /* 방명록 — 좌 25% 헤더 / 우 75% 최신 글 3개 한 줄 */

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Coffee, Landmark, MapPin, UtensilsCrossed, type LucideIcon } from "lucide-react";
 import type { NearbyPlace } from "../../lib/api";
 import type { HiddenPlace } from "../../types/travel";
+import { loadKakaoSdk } from "./DestinationMap";
 
 function distanceText(distance: number | null): string {
   if (distance == null) return "";
@@ -40,6 +41,53 @@ function PlaceThumbBlank({ category }: { category: string }) {
     <span className="place-thumb__blank" aria-hidden="true">
       <Icon className="place-thumb__blank-icon h-[22px] w-[22px]" strokeWidth={1.6} />
       <MapPin className="place-thumb__blank-pin h-[13px] w-[13px]" strokeWidth={2} />
+    </span>
+  );
+}
+
+/**
+ * 사진이 없는 주변 명소용 mini-map — 그 장소 좌표를 중심에 둔 정적 지도 + 가운데 핀.
+ * 지도 키가 없거나 SDK 로드에 실패하면 카테고리 아이콘 카드로 내려간다.
+ * 사진 칸과 같은 높이를 차지해 목록이 밀리지 않는다.
+ */
+function PlaceThumbMap({ place }: { place: NearbyPlace }) {
+  const appKey = import.meta.env.VITE_KAKAO_MAP_JS_KEY ?? "";
+  const ref = useRef<HTMLSpanElement>(null);
+  const [failed, setFailed] = useState(false);
+  const { lat, lng } = place;
+
+  useEffect(() => {
+    if (!appKey || !lat || !lng) return;
+    let alive = true;
+
+    /* SDK가 로드되지 않거나(키 도메인 제한 등) 지도가 그려지지 않으면 빈 칸이 남는다.
+       일정 시간 안에 타일이 안 생기면 카테고리 아이콘 카드로 내린다. */
+    const timer = window.setTimeout(() => {
+      if (alive && ref.current?.childElementCount === 0) setFailed(true);
+    }, 2500);
+
+    loadKakaoSdk(appKey)
+      .then((kakao) => {
+        if (!alive || !ref.current) return;
+        const center = new kakao.maps.LatLng(lat, lng);
+        new kakao.maps.StaticMap(ref.current, { center, level: 4, marker: { position: center } });
+      })
+      .catch(() => {
+        if (alive) setFailed(true);
+      });
+
+    return () => {
+      alive = false;
+      window.clearTimeout(timer);
+    };
+  }, [appKey, lat, lng]);
+
+  if (!appKey || !lat || !lng || failed) return <PlaceThumbBlank category={place.category} />;
+
+  return (
+    <span className="place-thumb__map" aria-hidden="true">
+      <span ref={ref} className="place-thumb__map-canvas" />
+      <MapPin className="place-thumb__map-pin h-[18px] w-[18px]" strokeWidth={2.4} />
     </span>
   );
 }
@@ -87,10 +135,13 @@ export function PlaceList({
   places,
   fallback = [],
   limit = 3,
+  mapFallback = false,
 }: {
   places: NearbyPlace[];
   fallback?: HiddenPlace[];
   limit?: number;
+  /** 사진이 없을 때 mini-map으로 대체할지 (주변 명소 전용 — 맛집·카페는 카테고리 아이콘) */
+  mapFallback?: boolean;
 }) {
   /* 이미지가 깨지면 다음 후보로, 후보가 떨어지면 텍스트로 내린다 */
   const [fails, setFails] = useState<Record<string, number>>({});
@@ -130,6 +181,8 @@ export function PlaceList({
                     setFails((prev) => ({ ...prev, [keyOf(p)]: (prev[keyOf(p)] ?? 0) + 1 }))
                   }
                 />
+              ) : mapFallback ? (
+                <PlaceThumbMap place={p} />
               ) : (
                 <PlaceThumbBlank category={p.category} />
               )}

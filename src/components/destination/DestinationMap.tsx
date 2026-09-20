@@ -12,8 +12,8 @@ declare global {
 
 const SDK_ID = "kakao-maps-sdk";
 
-/** Kakao Maps JS SDK 1회 로드 (JS 키는 도메인 제한이 있는 공개 키) */
-function loadKakaoSdk(appKey: string): Promise<any> {
+/** Kakao Maps JS SDK 1회 로드 (JS 키는 도메인 제한이 있는 공개 키). mini-map도 같은 로더를 쓴다 */
+export function loadKakaoSdk(appKey: string): Promise<any> {
   if (window.kakao?.maps?.Map) return Promise.resolve(window.kakao);
 
   return new Promise((resolve, reject) => {

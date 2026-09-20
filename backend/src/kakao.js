@@ -1,4 +1,4 @@
-import { ktoImageByTitle, titlesMatch } from "./kto.js";
+import { homepageOf, ktoImageByTitle, titlesMatch } from "./kto.js";
 
 const TIMEOUT_MS = 5000;
 
@@ -44,6 +44,46 @@ async function searchCategory(code, lat, lng, radius = 5000, size = 15) {
     distance: Number(d.distance) || null,
     url: d.place_url,
   }));
+}
+
+/**
+ * 장소명 + 좌표로 카카오 로컬에서 같은 곳을 찾아 place_url을 돌려준다.
+ * 이름이 정확히 맞고 좌표가 maxMeters 안일 때만 — 엉뚱한 동명 장소로 보내지 않는다.
+ */
+export async function placeUrlByName(name, lat, lng, maxMeters = 700) {
+  const key = process.env.KAKAO_REST_API_KEY;
+  if (!key || !name?.trim() || !Number.isFinite(lat) || !Number.isFinite(lng)) return "";
+
+  const query = new URLSearchParams({
+    query: name.trim(),
+    x: String(lng),
+    y: String(lat),
+    radius: String(Math.max(maxMeters, 1000)),
+    size: "10",
+    sort: "distance",
+  });
+
+  try {
+    const res = await fetch(`https://dapi.kakao.com/v2/local/search/keyword.json?${query}`, {
+      headers: { Authorization: `KakaoAK ${key}` },
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    if (!res.ok) return "";
+
+    const docs = (await res.json()).documents ?? [];
+    const core = normalizeName(name);
+    const hit = docs.find(
+      (d) =>
+        d.place_url &&
+        Number(d.distance) <= maxMeters &&
+        (normalizeName(d.place_name) === core ||
+          normalizeName(d.place_name).includes(core) ||
+          core.includes(normalizeName(d.place_name))),
+    );
+    return hit?.place_url ?? "";
+  } catch {
+    return "";
+  }
 }
 
 /** 목적지 주변 장소 (관광명소·음식점·카페) */
@@ -426,4 +466,43 @@ export async function attachNearbyImages(places, region, ktoPool = [], stays = [
     places[field] = ranked.slice(0, RESPONSE_MAX);
   }
   return places;
+}
+
+/**
+ * 주소가 실제로 열리는지 확인한다.
+ * 연결 자체가 안 되거나(도메인 만료·서버 다운) 404/410일 때만 false —
+ * 403 같은 봇 차단 응답은 살아 있는 사이트로 본다(멀쩡한 공식 홈페이지를 버리지 않게).
+ */
+async function isReachable(url) {
+  try {
+    const res = await fetch(url, {
+      redirect: "follow",
+      signal: AbortSignal.timeout(3000),
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; PickAndGo/1.0)" },
+    });
+    res.body?.cancel?.();
+    return res.status !== 404 && res.status !== 410;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 숙소 카드 링크 — 실제로 열리는 주소만 채운다. 라우트 두 곳이 함께 쓴다.
+ *   1) KTO detailCommon2의 공식 homepage (열리는지 확인)
+ *   2) 없거나 죽은 주소면 숙소명 + 좌표로 찾은 카카오 로컬 place_url
+ *   3) 둘 다 없으면 빈 문자열 → 프런트에서 링크 없는 카드로 보여 준다
+ * 화면에 실제로 쓰는 앞쪽 몇 곳만 확인한다(추천·이미지·거리 로직은 건드리지 않는다).
+ */
+export async function resolveStayLinks(stays, limit = 4) {
+  for (const stay of stays.slice(0, limit)) {
+    if (stay.url) continue;
+    const homepage = await homepageOf(stay.contentId);
+    if (homepage && (await isReachable(homepage))) {
+      stay.url = homepage;
+      continue;
+    }
+    stay.url = await placeUrlByName(stay.name, stay.lat, stay.lng);
+  }
+  return stays;
 }

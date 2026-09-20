@@ -190,7 +190,8 @@ export function DestinationPage() {
         ? `${stayDistance}m`
         : `${(stayDistance / 1000).toFixed(1)}km`;
   const used = new Set(destination.schedule.map((s) => s.title));
-  const day2Name = stayName ? nearby.spots.find((p) => !used.has(p.name))?.name : undefined;
+  /* Day 2 장소는 기간 선택에만 달려 있다 — 숙소를 못 찾아도 Day 2는 사라지지 않는다 */
+  const day2Name = overnight ? nearby.spots.find((p) => !used.has(p.name))?.name : undefined;
 
   return (
     <div className="dossier-page" data-overnight={overnight ? "true" : undefined}>
@@ -254,7 +255,12 @@ export function DestinationPage() {
                   <div className="panel__head">
                     <h2 className="panel__title">함께 가볼 만한 곳</h2>
                   </div>
-                  <PlaceList places={nearby.spots} fallback={destination.hiddenPlaces} limit={3} />
+                  <PlaceList
+                    places={nearby.spots}
+                    fallback={destination.hiddenPlaces}
+                    limit={3}
+                    mapFallback
+                  />
                 </article>
               ) : null}
 
@@ -273,10 +279,11 @@ export function DestinationPage() {
                 <article className="panel scroll-mt-20" id="schedule-timeline">
                   <div className="panel__head">
                     <h2 className="panel__title">추천 코스</h2>
-                    <span className="panel__note">{stayName ? "1박 2일" : "당일치기"}</span>
+                    <span className="panel__note">{overnight ? "1박 2일" : "당일치기"}</span>
                   </div>
                   <ScheduleTimeline
                     schedule={destination.schedule}
+                    overnight={overnight}
                     stayName={stayName}
                     day2Name={day2Name}
                   />
