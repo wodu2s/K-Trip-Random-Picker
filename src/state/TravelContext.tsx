@@ -24,6 +24,9 @@ import type {
   ThemeKey,
 } from "../types/travel";
 
+/** 여행 테마 최대 선택 개수 */
+export const MAX_THEMES = 2;
+
 type TravelState = {
   page: FlowPage;
   duration: Duration | null;
@@ -148,10 +151,14 @@ export function TravelProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toggleTheme = useCallback((theme: ThemeKey) => {
-    setState((s) => ({
-      ...s,
-      themes: s.themes.includes(theme) ? s.themes.filter((t) => t !== theme) : [...s.themes, theme],
-    }));
+    setState((s) => {
+      if (s.themes.includes(theme)) {
+        return { ...s, themes: s.themes.filter((t) => t !== theme) };
+      }
+      /* 테마는 최대 MAX_THEMES개까지만 — 가득 차면 새 선택은 무시한다 */
+      if (s.themes.length >= MAX_THEMES) return s;
+      return { ...s, themes: [...s.themes, theme] };
+    });
   }, []);
 
   const setCompanion = useCallback((companion: CompanionKey) => {

@@ -1,4 +1,5 @@
 import type { Destination, HiddenPlace, ImageCredit } from "../types/travel";
+import { shortenRegion } from "../api/mappers";
 
 const BASE = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
 
@@ -60,7 +61,12 @@ export async function fetchRecommendations(payload: RecommendPayload): Promise<D
   if (!Array.isArray(data.destinations) || data.destinations.length === 0) {
     throw new Error("추천 결과가 비어 있습니다.");
   }
-  return data.destinations;
+  /* 백엔드는 region에 addr1 원문을 담아준다. 표기는 지역코드 기준으로 통일한다
+     (TourAPI가 광주·전남을 "전남광주통합특별시" 한 이름으로 내려보내기 때문) */
+  return data.destinations.map((d) => ({
+    ...d,
+    region: shortenRegion(d.region, d.areaCode),
+  }));
 }
 
 /** 결과 페이지 — 목적지 주변 장소. 1박 이상일 때만 숙박까지 함께 받는다 */

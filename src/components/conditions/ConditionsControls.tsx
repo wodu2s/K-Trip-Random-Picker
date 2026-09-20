@@ -10,7 +10,7 @@ import {
   THEME_ORDER,
 } from "../../data/destinations";
 import type { Duration } from "../../types/travel";
-import { useTravel } from "../../state/TravelContext";
+import { MAX_THEMES, useTravel } from "../../state/TravelContext";
 import { useReducedMotion } from "../../hooks/useReducedMotion";
 import { cn } from "../../utils/cn";
 
@@ -39,18 +39,10 @@ function Field({
         <span className="dossier-waypoint__mark">{no}</span>
       </span>
       <div className="dossier-row__label">
-        <h3
-          className="whitespace-nowrap text-[15px] font-bold tracking-tight"
-          style={{
-            color: "var(--ivory)",
-            fontFamily: "'Noto Serif KR Variable', serif",
-          }}
-        >
-          {title}
-        </h3>
+        <h3>{title}</h3>
         <span className="dossier-row__note">{note}</span>
       </div>
-      <div className="flex flex-wrap gap-2">{children}</div>
+      <div className="dossier-row__choices">{children}</div>
     </div>
   );
 }
@@ -60,18 +52,22 @@ function ChoiceButton({
   active,
   onClick,
   reduce,
+  locked = false,
 }: {
   label: string;
   active: boolean;
   onClick: () => void;
   reduce: boolean;
+  /** 최대 개수를 채워서 더 고를 수 없는 상태 */
+  locked?: boolean;
 }) {
   return (
     <motion.button
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      whileTap={reduce ? undefined : { scale: 0.98 }}
+      disabled={locked}
+      whileTap={reduce || locked ? undefined : { scale: 0.98 }}
       transition={{ duration: 0.18 }}
       className="dossier-choice"
     >
@@ -103,7 +99,7 @@ export function ConditionsControls({ className = "" }: { className?: string }) {
           <p className="dossier-header__eyebrow font-expedition">EXPEDITION DOSSIER</p>
           <h1 className="dossier-header__title">탐험 기록지</h1>
         </div>
-        <p className="dossier-header__aside">다섯 칸을 채우면 오늘의 여행 후보를 뽑습니다.</p>
+        <p className="dossier-header__aside">다섯 칸을 채우면 오늘의 여행 후보를 찾습니다.</p>
       </header>
 
       <div className="dossier-fields">
@@ -119,7 +115,12 @@ export function ConditionsControls({ className = "" }: { className?: string }) {
           ))}
         </Field>
 
-        <Field no="II" title="여행 테마" note="Themes" active={themes.length > 0}>
+        <Field
+          no="II"
+          title="여행 테마"
+          note={`Themes · 최대 ${MAX_THEMES}개`}
+          active={themes.length > 0}
+        >
           {THEME_ORDER.map((key) => (
             <ChoiceButton
               key={key}
@@ -127,6 +128,7 @@ export function ConditionsControls({ className = "" }: { className?: string }) {
               active={themes.includes(key)}
               onClick={() => toggleTheme(key)}
               reduce={reduce}
+              locked={!themes.includes(key) && themes.length >= MAX_THEMES}
             />
           ))}
         </Field>

@@ -100,6 +100,102 @@ export function getEmojiHints(destination: Pick<Destination, "themes" | "id">): 
   return hints.slice(0, 5);
 }
 
+/* ── 조건 설정 테마 기반 카드 이모지 힌트 ──
+   목적지·지역을 짐작할 수 없는 분위기 이모지만 담는다. 실제 장소를 가리키는
+   이모지는 넣지 않는다. */
+
+const THEME_EMOJI_POOL: Record<ThemeKey, readonly string[]> = {
+  sea: ["🌊", "🐚", "🏖️", "⚓", "🐟", "🌅", "🪸", "⛵"],
+  nature: ["🌿", "🌲", "⛰️", "🍃", "🌳", "🌼", "🪨", "🏞️"],
+  food: ["🍜", "🍚", "🍲", "🥘", "🍽️", "☕", "🥢", "🍴"],
+  vibe: ["📷", "🌅", "✨", "🕯️", "🌙", "💫", "🪟", "🎞️"],
+  history: ["🏛️", "🏯", "🪷", "📜", "🏺", "🎎", "🖼️", "🏮"],
+  local: ["🏘️", "🛤️", "🧺", "🏪", "🚲", "🪧", "🛖", "🌾"],
+  activity: ["🥾", "🚣", "🧗", "🚲", "🏄", "🎒", "🛶", "⛺"],
+  etc: ["🧭", "🎲", "✨", "🗺️", "🎒", "🚩", "🔎", "🌟"],
+};
+
+function shuffled(pool: readonly string[]): string[] {
+  const out = [...pool];
+  for (let i = out.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+/**
+ * 테마 pool이 모자랄 때 채우는 공통 여행 이모지 — 목적지를 드러내지 않는 것만.
+ * 어떤 테마를 하나만 골라도 (테마 8 + 공통) 15개를 중복 없이 채울 수 있는 크기로 둔다.
+ */
+const COMMON_EMOJI_POOL: readonly string[] = [
+  "🧭",
+  "🗺️",
+  "🎒",
+  "🚩",
+  "🔎",
+  "🌟",
+  "🛤️",
+  "🧳",
+  "📍",
+  "🥾",
+  "🚏",
+  "🎫",
+  "📔",
+  "🌤️",
+  "🧢",
+];
+
+/** 큐 앞에서부터 아직 쓰지 않은 이모지 하나. 없으면 null (큐는 그만큼 줄어든다) */
+function pullUnused(queue: string[], used: Set<string>): string | null {
+  while (queue.length > 0) {
+    const emoji = queue.shift() as string;
+    if (!used.has(emoji)) return emoji;
+  }
+  return null;
+}
+
+/**
+ * 조건 설정에서 고른 테마로 카드별 이모지 힌트를 한 번에 만든다.
+ *
+ * 카드 한 장씩이 아니라 "칸(slot) 단위로 5장을 가로질러" 채운다.
+ *   1칸째 — 5장 모두 테마 이모지 (모든 카드가 선택 테마를 최소 1개 갖는다)
+ *   2칸째 — 남은 테마 이모지를 서로 다른 카드에, 떨어지면 공통 pool
+ *   3칸째 — 남은 것을 같은 방식으로
+ * 테마가 2개면 칸마다 테마를 번갈아 잡아 한 카드에 두 테마가 함께 들어간다.
+ * deck 전체 usedEmoji Set으로 5장 × 3개 = 15개가 값 기준으로 모두 달라진다.
+ * 카드 생성 시 한 번만 호출해서 결과를 고정한다 — 매 렌더 호출 금지.
+ */
+export function buildCardEmojiHints(
+  selectedThemes: ThemeKey[],
+  cardCount = 5,
+  hintsPerCard = 3,
+): string[][] {
+  const themes = selectedThemes.length > 0 ? selectedThemes : (["etc"] as ThemeKey[]);
+  const queues = themes.map((t) => shuffled(THEME_EMOJI_POOL[t]));
+  const common = shuffled(COMMON_EMOJI_POOL);
+  /* 테마 pool끼리 겹치는 이모지(🌅·🚲·✨·🎒 등)도 값으로 걸러진다 */
+  const used = new Set<string>();
+
+  const cards: string[][] = Array.from({ length: cardCount }, () => []);
+  for (let slot = 0; slot < hintsPerCard; slot += 1) {
+    for (let c = 0; c < cardCount; c += 1) {
+      const card = cards[c];
+      /* 카드마다 시작 테마를 한 칸씩 밀어 2개 선택 시 양쪽이 같은 카드에 섞이게 한다 */
+      const queue = queues[(c + slot) % queues.length];
+      let emoji = pullUnused(queue, used) ?? pullUnused(common, used);
+      if (!emoji) {
+        /* 테마 + 공통 pool이 전부 마른 극단적인 경우에만 재사용 — 카드 안 중복은 여전히 없다 */
+        const all = [...themes.flatMap((t) => THEME_EMOJI_POOL[t]), ...COMMON_EMOJI_POOL];
+        emoji = shuffled(all).find((e) => !card.includes(e)) ?? all[0];
+      }
+      used.add(emoji);
+      card.push(emoji);
+    }
+  }
+  return cards;
+}
+
 /* ── mock fallback 카드 힌트 ──
    백엔드가 KTO 분류코드로 만드는 hints와 같은 {type,key,emoji} 3개 구조를 유지한다.
    mock 데이터에는 분류코드가 없어 scene·theme로만 파생한다. */

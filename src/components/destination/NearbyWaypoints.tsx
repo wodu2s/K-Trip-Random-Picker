@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Coffee, Landmark, MapPin, UtensilsCrossed, type LucideIcon } from "lucide-react";
 import type { NearbyPlace } from "../../lib/api";
 import type { HiddenPlace } from "../../types/travel";
 
@@ -16,10 +16,32 @@ function keyOf(p: NearbyPlace): string {
   return `${p.name}-${p.lat}`;
 }
 
-/** 원본 → 썸네일 순으로 시도하고, 둘 다 실패하면 사진 없이 텍스트로 보여준다 */
+/** 카카오 로컬 카테고리 코드 → 사진이 없을 때 쓰는 아이콘 */
+const CATEGORY_ICON: Record<string, LucideIcon> = {
+  AT4: Landmark,
+  CT1: Landmark,
+  FD6: UtensilsCrossed,
+  CE7: Coffee,
+};
+
+/** 원본 → 썸네일 순으로 시도하고, 둘 다 실패하면 사진 자리에 compact fallback을 넣는다 */
 function srcOf(p: NearbyPlace, fails: number): string {
   const candidates = [p.image, p.thumbnailUrl, p.thumbnail].map((s) => (s ?? "").trim()).filter(Boolean);
   return candidates[fails] ?? "";
+}
+
+/**
+ * 사진을 못 찾은 장소 — 사진인 척하는 placeholder 대신 카테고리 아이콘과 지도핀만 둔다.
+ * 사진 카드와 같은 칸을 차지해서 목록이 들쭉날쭉해지지 않는다.
+ */
+function PlaceThumbBlank({ category }: { category: string }) {
+  const Icon = CATEGORY_ICON[category] ?? MapPin;
+  return (
+    <span className="place-thumb__blank" aria-hidden="true">
+      <Icon className="place-thumb__blank-icon h-[22px] w-[22px]" strokeWidth={1.6} />
+      <MapPin className="place-thumb__blank-pin h-[13px] w-[13px]" strokeWidth={2} />
+    </span>
+  );
 }
 
 function PlaceTextRow({
@@ -90,48 +112,35 @@ export function PlaceList({
     return ia - ib;
   });
   const shown = ranked.slice(0, limit);
-  const photos = shown.filter((p) => srcOf(p, fails[keyOf(p)] ?? 0));
-  const texts = shown.filter((p) => !srcOf(p, fails[keyOf(p)] ?? 0));
 
   return (
-    <>
-      {photos.length > 0 ? (
-        <ul className="place-thumbs">
-          {photos.map((p) => (
-            <li key={keyOf(p)}>
-              <a className="place-thumb" href={p.url} target="_blank" rel="noreferrer">
+    <ul className="place-thumbs">
+      {shown.map((p) => {
+        const src = srcOf(p, fails[keyOf(p)] ?? 0);
+        return (
+          <li key={keyOf(p)}>
+            <a className="place-thumb" href={p.url} target="_blank" rel="noreferrer">
+              {src ? (
                 <img
                   className="place-thumb__img"
-                  src={srcOf(p, fails[keyOf(p)] ?? 0)}
+                  src={src}
                   alt=""
                   loading="lazy"
                   onError={() =>
                     setFails((prev) => ({ ...prev, [keyOf(p)]: (prev[keyOf(p)] ?? 0) + 1 }))
                   }
                 />
-                <p className="place-thumb__name">{p.name}</p>
-                {distanceText(p.distance) ? (
-                  <p className="place-thumb__meta">{distanceText(p.distance)}</p>
-                ) : null}
-              </a>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-
-      {texts.length > 0 ? (
-        <ul className="nearby-list">
-          {texts.map((p, i) => (
-            <PlaceTextRow
-              key={keyOf(p)}
-              name={p.name}
-              meta={distanceText(p.distance)}
-              href={p.url}
-              index={i}
-            />
-          ))}
-        </ul>
-      ) : null}
-    </>
+              ) : (
+                <PlaceThumbBlank category={p.category} />
+              )}
+              <p className="place-thumb__name">{p.name}</p>
+              {distanceText(p.distance) ? (
+                <p className="place-thumb__meta">{distanceText(p.distance)}</p>
+              ) : null}
+            </a>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

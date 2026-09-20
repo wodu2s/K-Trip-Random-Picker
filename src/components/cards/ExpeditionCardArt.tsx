@@ -229,9 +229,9 @@ function ExpeditionCardArtFallback({
         </p>
         {hintEmojis ? (
           <div className="mt-2.5 flex items-center justify-center gap-2">
-            {hintEmojis.map((emoji) => (
+            {hintEmojis.map((emoji, i) => (
               <span
-                key={emoji}
+                key={`hint-${emoji}-${i}`}
                 className="flex h-7 w-7 items-center justify-center rounded-full text-[12px]"
                 style={{
                   background: "rgba(245,240,225,0.1)",

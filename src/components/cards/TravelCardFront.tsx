@@ -79,9 +79,9 @@ export function TravelCardFront({
         <div className="mt-1 flex items-end justify-between gap-1 pr-9">
           <div className="min-w-0 space-y-1">
             <div className="flex min-w-0 flex-wrap gap-1">
-              {destination.tags.slice(0, 3).map((tag) => (
+              {destination.tags.slice(0, 3).map((tag, i) => (
                 <span
-                  key={tag}
+                  key={`${destination.id}-tag-${tag}-${i}`}
                   className="truncate rounded-full px-1.5 py-0.5 text-[8px] font-bold sm:text-[9px]"
                   style={{ backgroundColor: `${accent}1A`, color: accent }}
                 >

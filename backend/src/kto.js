@@ -267,8 +267,8 @@ export async function recommendDestinations({ duration, themes, companion, mood,
 
 function coreName(s = "") {
   return stripHtml(s)
-    .replace(/\([^)]*\)/g, "")
-    .replace(/\s+/g, "")
+    .replace(/\([^)]*\)/g, " ")
+    .replace(/[^0-9A-Za-z가-힣]/g, "")
     .toLowerCase();
 }
 
@@ -304,22 +304,46 @@ export async function ktoPlaceImagesNear(lat, lng, radius = 5000) {
   return out;
 }
 
-/** searchKeyword2에서 제목이 일치하는 항목의 firstimage만 쓴다 */
-export async function ktoFirstImageByTitle(name) {
+/**
+ * searchKeyword2에서 제목이 정확히 일치하는 항목의 사진.
+ * 같은 이름이 여러 지역에 있을 수 있어, 목적지와 같은 시·도/시·군·구 결과를 먼저 본다.
+ * firstimage가 없으면 같은 콘텐츠의 detailImage2 첫 장까지 본다. 일부만 비슷한 이름은 쓰지 않는다.
+ */
+export async function ktoImageByTitle(name, region = "") {
   const keyword = stripHtml(name);
-  if (keyword.length < 2) return "";
+  if (coreName(keyword).length < 2) return "";
+  const [sido = "", sigungu = ""] = String(region).trim().split(/\s+/);
   try {
     const items = await callKto(
       "searchKeyword2",
       {
         keyword,
-        numOfRows: "8",
+        numOfRows: "12",
         pageNo: "1",
       },
       4000,
     );
-    const hit = items.find((i) => titlesMatch(keyword, i.title) && (i.firstimage || i.firstimage2));
-    return hit ? hit.firstimage || hit.firstimage2 : "";
+
+    /* 정규화한 이름이 정확히 같은 것만 후보로 둔다 */
+    const matches = items.filter((i) => titlesMatch(keyword, i.title));
+    if (matches.length === 0) return "";
+
+    /* 지역이 맞는 결과를 앞으로 — addr1에 시·도 또는 시·군·구가 들어 있는지로 본다 */
+    const inRegion = (i) => {
+      const addr = stripHtml(i.addr1 ?? "");
+      if (!addr) return 0;
+      if (sigungu && addr.includes(sigungu)) return 2;
+      if (sido && addr.includes(sido)) return 1;
+      return 0;
+    };
+    const ranked = [...matches].sort((a, b) => inRegion(b) - inRegion(a));
+
+    const withImage = ranked.find((i) => i.firstimage || i.firstimage2);
+    if (withImage) return withImage.firstimage || withImage.firstimage2;
+
+    /* 목록에는 대표 이미지가 없어도 상세 이미지가 있는 경우가 있다 */
+    const id = ranked[0]?.contentid;
+    return id ? await detailImageUrl(id) : "";
   } catch {
     return "";
   }

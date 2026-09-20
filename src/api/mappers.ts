@@ -16,6 +16,7 @@ export type TourItem = {
   mapx?: string;
   mapy?: string;
   tel?: string;
+  areacode?: string;
 };
 
 /** 시·도 표기 축약 */
@@ -42,10 +43,36 @@ export const SIDO_SHORT: Record<string, string> = {
   제주특별자치도: "제주",
 };
 
-export function shortenRegion(addr1?: string): string {
-  if (!addr1) return "대한민국";
-  const [sido = "", sigungu = ""] = addr1.trim().split(/\s+/);
-  return `${SIDO_SHORT[sido] ?? sido} ${sigungu}`.trim();
+/**
+ * TourAPI 지역코드 → 시·도 축약.
+ * addr1만으로는 시·도를 정할 수 없는 경우가 있어(광주·전남이 "전남광주통합특별시"로 합쳐져 내려온다)
+ * 지역코드가 있으면 이 표를 우선한다.
+ */
+export const AREA_SIDO: Record<string, string> = {
+  "1": "서울",
+  "2": "인천",
+  "3": "대전",
+  "4": "대구",
+  "5": "광주",
+  "6": "부산",
+  "7": "울산",
+  "8": "세종",
+  "31": "경기",
+  "32": "강원",
+  "33": "충북",
+  "34": "충남",
+  "35": "경북",
+  "36": "경남",
+  "37": "전북",
+  "38": "전남",
+  "39": "제주",
+};
+
+export function shortenRegion(addr1?: string, areacode?: string | number): string {
+  const [sido = "", sigungu = ""] = (addr1 ?? "").trim().split(/\s+/);
+  const head = AREA_SIDO[String(areacode ?? "")] ?? SIDO_SHORT[sido] ?? sido;
+  if (!head) return "대한민국";
+  return `${head} ${sigungu}`.trim();
 }
 
 /** 제목 키워드 기반 테마 추론 (cat 코드만으로는 세분화가 어려워 제목을 보조로 사용) */
@@ -128,7 +155,7 @@ const TAGLINE: Record<ThemeKey, string> = {
 export function toDestination(item: TourItem): Destination {
   const id = item.contentid ?? `tour-${hashString(item.title ?? "")}`;
   const name = item.title ?? "이름 없는 여행지";
-  const region = shortenRegion(item.addr1);
+  const region = shortenRegion(item.addr1, item.areacode);
   const themes = mapThemes(item);
   const h = hashString(id);
   const rating = Number((4.0 + (h % 10) / 10).toFixed(1));
@@ -154,6 +181,7 @@ export function toDestination(item: TourItem): Destination {
     schedule: synthSchedule(name, region),
     hiddenPlaces: [],
     contentId: item.contentid,
+    areaCode: item.areacode,
     mapx: item.mapx ? Number(item.mapx) : undefined,
     mapy: item.mapy ? Number(item.mapy) : undefined,
   };

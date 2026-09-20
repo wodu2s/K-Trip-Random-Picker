@@ -8,7 +8,7 @@ import {
   recommendDestinations,
 } from "./kto.js";
 import {
-  attachThumbnails,
+  attachNearbyImages,
   buildSchedule,
   nearbyPlaces,
   regionWord,
@@ -41,8 +41,12 @@ async function fillMainImage(destination) {
   destination.image = await detailImageUrl(destination.contentId);
   if (destination.image) return;
 
-  const hit = await searchImage(`${regionWord(destination.region)} ${destination.name}`);
-  if (!hit) return;
+  const hit = await searchImage(`${regionWord(destination.region)} ${destination.name}`, {
+    exact: true,
+    name: destination.name,
+  });
+  /* hero는 크게 쓰이므로 원본 URL이 있는 사진만 — 저화질 썸네일은 확대하지 않는다 */
+  if (!hit || !hit.original) return;
   destination.image = hit.image;
   destination.imageCredit = hit.credit;
 }
@@ -120,11 +124,7 @@ app.get("/api/places/nearby", async (req, res) => {
       ktoPlaceImagesNear(lat, lng).catch(() => []),
     ]);
 
-    await Promise.all([
-      attachThumbnails(places.spots, region, 3, "관광", ktoPool),
-      attachThumbnails(places.foods, region, 2, "음식점", ktoPool),
-      attachThumbnails(places.cafes, region, 1, "카페", ktoPool),
-    ]).catch(() => {
+    await attachNearbyImages(places, region, ktoPool, stays).catch(() => {
       /* 썸네일은 없어도 리스트는 그대로 노출 */
     });
     res.json({

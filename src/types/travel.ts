@@ -96,6 +96,8 @@ export type Destination = {
   homepage?: string;
   /** TourAPI 콘텐츠 ID (상세조회 키). 실데이터일 때만 존재 */
   contentId?: string;
+  /** TourAPI 지역코드. addr1만으로 시·도를 가릴 수 없을 때(광주·전남) 기준이 된다 */
+  areaCode?: string;
   /** TourAPI 좌표 (주변 명소 조회용). mapx=경도, mapy=위도 */
   mapx?: number;
   mapy?: number;

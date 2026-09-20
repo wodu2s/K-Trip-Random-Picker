@@ -1,24 +1,31 @@
-/* ── 목적지 페이지
-   첨부 원화 배경 위 hero(좌 정보 ~40% / 우 둥근 메인 사진) + ivory 시트
-   상단: 지도 · 가볼 곳 · 맛집/카페 / 하단: 추천 코스 · 숙소(1박 이상)
+/* ── 목적지 결과 페이지
+   배경: /images/destination/hero-backdrop.webp (첨부 원화) 한 장을 뷰포트 고정 레이어로 깔고,
+   그 위에 hero(navy 영역) → ivory floating sheet → 방명록 → CTA 순으로 흐른다.
+   원화가 장식(등고선·나침반·산·문구)을 이미 갖고 있으므로 CSS 장식은 만들지 않는다.
    모든 규칙은 .dossier-page 아래로만 둔다. ── */
 .dossier-page {
-  --dossier-navy: #08192a;
-  --dossier-ivory: #eee4cb;
-  --dossier-muted: rgba(238, 228, 203, 0.72);
-  --dossier-faint: rgba(238, 228, 203, 0.48);
+  /* deep navy */
+  --dossier-navy: #0a1d30;
+  --dossier-ivory: #f2ead9;
+  --dossier-muted: rgba(242, 234, 217, 0.76);
+  --dossier-faint: rgba(242, 234, 217, 0.5);
+  /* antique gold */
   --dossier-brass: #c9a227;
   --dossier-green: #1f3d2b;
 
-  --plan-bg: #f6f2e8;
-  --panel-bg: #faf7ef;
-  --plan-ink: #1b2733;
-  --plan-muted: rgba(27, 39, 51, 0.66);
-  --plan-faint: rgba(27, 39, 51, 0.46);
+  /* warm ivory surface */
+  --plan-bg: #faf6ec;
+  --panel-bg: #faf6ec;
+  --card-bg: #fffdf7;
+  --plan-ink: #17232f;
+  --plan-muted: rgba(23, 35, 47, 0.68);
+  --plan-faint: rgba(23, 35, 47, 0.45);
   --plan-gold: #8a6a16;
-  --plan-line: rgba(27, 39, 51, 0.12);
+  --plan-line: rgba(23, 35, 47, 0.1);
 
-  --wrap: 1220px;
+  /* 원화의 좌우 장식(등고선·나침반·산·스탬프·문구)이 보이도록 콘텐츠 폭을 좁게 잡는다.
+     1440에서 ivory 패널은 1072px, 좌우로 184px씩 배경이 드러난다. */
+  --wrap: 1120px;
 
   position: relative;
   isolation: isolate;
@@ -26,47 +33,39 @@
   color: var(--dossier-ivory);
   font-family: var(--font-family-base, "Pretendard Variable", "Pretendard", sans-serif);
   overflow-x: clip;
-  background-color: #08192a;
+  background-color: #0a1d30;
 }
 
-/* 첨부 원화 — 헤더 뒤까지 깔리게 해서 가장자리 산/건축 실루엣이 보이게 */
+/* 첨부 원화 — 화면에 고정해 스크롤해도 navy→ivory 흐름이 유지된다 */
 .dossier-page::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  /* 가로를 꽉 채우고 비율(1586×992)은 그대로 둔다 — 좌우 등고선·나침반·산·스탬프·문구가
+     잘리지 않는다. 이미지보다 세로로 긴 화면에서 남는 아래쪽은 원화 하단 색으로 이어 붙인다. */
   background:
-    linear-gradient(
-      180deg,
-      rgba(8, 25, 42, 0.4) 0%,
-      rgba(8, 25, 42, 0.2) 30%,
-      rgba(244, 237, 220, 0.55) 58%,
-      rgba(244, 237, 220, 0.86) 100%
-    ),
-    url("/images/destination/page-backdrop.webp") center top / cover no-repeat;
+    url("/images/destination/destination-backdrop.webp") top center / 100% auto no-repeat,
+    linear-gradient(180deg, #f0e6d4 0%, #e9dec9 100%);
 }
 
-/* 시트 뒤 등고선/경로선이 보이지 않도록 하단을 한 번 더 덮는다 */
+/* hero 글자 가독성용 아주 옅은 navy scrim (상단에만, 원화 색은 그대로 통과) */
 .dossier-page::after {
   content: "";
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
-  height: 62%;
+  top: 0;
+  height: 34svh;
   z-index: 0;
   pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    rgba(244, 237, 220, 0.42) 16%,
-    rgba(244, 237, 220, 0.9) 100%
-  );
+  background: linear-gradient(180deg, rgba(6, 18, 31, 0.26) 0%, rgba(6, 18, 31, 0) 100%);
 }
 
 .dossier-page .dossier-hero,
 .dossier-page .dossier-body,
+.dossier-page .dsn-gb,
 .dossier-page .dossier-cta-bar,
 .dossier-page .dossier-empty {
   position: relative;
@@ -77,10 +76,10 @@
   margin: 0 auto;
   width: 100%;
   max-width: var(--wrap);
-  padding: 0 1.35rem;
+  padding: 0 1.5rem;
 }
 
-/* ═══ Hero — 배경이 비치게, 사진은 둥근 프레임 ═══ */
+/* ═══ Hero — 좌 정보 / 우 대표 사진. 원화의 navy 영역 안에 앉힌다 ═══ */
 .dossier-page .dossier-hero {
   background: transparent;
 }
@@ -89,9 +88,10 @@
   display: grid;
   grid-template-columns: 1fr;
   align-items: center;
-  gap: 1rem;
-  padding-top: 1.1rem;
-  padding-bottom: 1.1rem;
+  gap: 1.25rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  /* 고정 높이 없음 — 제목이 2줄이 되면 hero가 같이 늘어난다 */
 }
 
 .dossier-page .dossier-hero__copy {
@@ -102,42 +102,55 @@
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  font-size: 0.68rem;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  color: rgba(201, 162, 39, 0.52);
+  gap: 0.35rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(201, 162, 39, 0.9);
+  min-width: 0;
+}
+
+.dossier-page .dossier-region > span,
+.dossier-page .dossier-region {
+  white-space: nowrap;
+}
+
+.dossier-page .dossier-region {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dossier-page .dossier-region svg {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
 }
 
 .dossier-page .dossier-title {
-  margin-top: 0.4rem;
+  margin-top: 0.45rem;
   font-family: var(--font-family-display, "Noto Serif KR Variable", serif);
-  font-size: clamp(2rem, 3.1vw, 2.625rem);
+  font-size: clamp(2.125rem, 3vw, 2.75rem);
   font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: -0.03em;
-  color: var(--dossier-brass);
+  line-height: 1.15;
+  /* 긴 목적지명은 2줄까지 자연스럽게 흐르게 — 높이 고정·말줄임 없음 */
+  overflow-wrap: break-word;
+  letter-spacing: -0.035em;
+  color: var(--dossier-ivory);
 }
 
 .dossier-page .dossier-title::after {
   content: "";
   display: block;
-  margin-top: 0.45rem;
-  width: 48px;
-  height: 2px;
+  margin-top: 0.55rem;
+  width: 52px;
+  height: 1px;
   background: linear-gradient(90deg, var(--dossier-brass), rgba(201, 162, 39, 0));
 }
 
 .dossier-page .dossier-lead {
-  margin-top: 0.45rem;
-  max-width: 26rem;
-  font-size: 0.84rem;
-  line-height: 1.45;
+  margin-top: 0.6rem;
+  max-width: 30rem;
+  font-size: 0.88rem;
+  line-height: 1.65;
   color: var(--dossier-muted);
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -146,7 +159,7 @@
 }
 
 .dossier-page .dossier-hints {
-  margin-top: 0.6rem;
+  margin-top: 0.75rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
@@ -156,21 +169,22 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.28rem 0.7rem 0.28rem 0.55rem;
+  padding: 0.32rem 0.75rem 0.32rem 0.6rem;
   border-radius: 999px;
-  border: 1px solid rgba(201, 162, 39, 0.4);
-  font-size: 0.74rem;
+  border: 1px solid rgba(201, 162, 39, 0.34);
+  font-size: 0.75rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--dossier-muted);
 }
 
 .dossier-page .dossier-hint__emoji {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   line-height: 1;
 }
 
 .dossier-page .dossier-cta-row {
-  margin-top: 0.75rem;
+  margin-top: 0.9rem;
   display: flex;
   flex-wrap: wrap;
   gap: 0.55rem;
@@ -180,34 +194,37 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
-  min-height: 42px;
-  padding: 0 1.2rem;
-  border-radius: 4px;
-  font-size: 0.86rem;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0 1.45rem;
+  border-radius: 6px;
+  font-size: 0.89rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
   border: 1px solid transparent;
   transition:
     background-color 0.18s ease,
-    border-color 0.18s ease;
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .dossier-page .dossier-btn--primary {
   background: var(--dossier-brass);
-  color: #12202c;
+  color: #14202c;
 }
 
 .dossier-page .dossier-btn--primary:hover {
-  background: #d8b84a;
+  background: #dcbb4c;
 }
 
 .dossier-page .dossier-btn--ghost {
   color: var(--dossier-ivory);
-  border-color: rgba(238, 228, 203, 0.28);
+  border-color: rgba(242, 234, 217, 0.3);
 }
 
 .dossier-page .dossier-btn--ghost:hover {
   border-color: var(--dossier-brass);
+  color: var(--dossier-brass);
 }
 
 .dossier-page .dossier-photo {
@@ -215,9 +232,10 @@
   margin: 0;
   overflow: hidden;
   min-height: 200px;
-  height: 220px;
+  height: 210px;
   border-radius: 16px;
   background: #081b2b;
+  box-shadow: 0 20px 48px rgba(4, 14, 24, 0.45);
 }
 
 .dossier-page .dossier-photo > img {
@@ -231,11 +249,11 @@
 
 .dossier-page .dossier-photo__credit {
   position: absolute;
-  right: 0.8rem;
-  bottom: 0.5rem;
+  right: 0.9rem;
+  bottom: 0.55rem;
   z-index: 1;
-  font-size: 0.66rem;
-  color: rgba(238, 228, 203, 0.62);
+  font-size: 0.68rem;
+  color: rgba(242, 234, 217, 0.66);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
 }
 
@@ -253,40 +271,40 @@
   background: linear-gradient(150deg, var(--dossier-green) 0%, #0d2a1c 100%);
 }
 
-/* ═══ ivory 시트 — 배경 가장자리가 보이게 띄운다 ═══ */
+/* ═══ ivory floating sheet — 하나의 큰 surface. 구분은 spacing + thin divider만 ═══ */
 .dossier-page .dossier-body {
   background: transparent;
   color: var(--plan-ink);
-  padding: 0 0 0.85rem;
+  padding: 0 0 0.9rem;
 }
 
-/* 전역 조건 페이지 테마의 양피지/등고선 텍스처가 시트 위를 덮지 않게 뒤로 보낸다 */
+/* 전역 양피지/등고선 텍스처가 시트 위를 덮지 않게 뒤로 보낸다 */
 .dossier-page .dossier-body::before,
 .dossier-page .dossier-body::after {
   z-index: -1;
-  opacity: 0.018;
+  opacity: 0;
 }
 
 .dossier-page .dossier-sheet {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  padding: 1.05rem 1.2rem 0.9rem;
+  padding: 1.15rem 1.15rem 1rem;
   border-radius: 20px;
   background: var(--plan-bg);
-  box-shadow: 0 10px 28px rgba(8, 25, 42, 0.1);
+  box-shadow: 0 18px 44px rgba(6, 20, 34, 0.18);
 }
 
 .dossier-page .dossier-top,
 .dossier-page .dossier-bottom {
   display: grid;
-  gap: 0.85rem;
+  gap: 1.15rem;
   grid-template-columns: 1fr;
 }
 
 .dossier-page .dossier-bottom {
-  margin-top: 0.35rem;
-  padding-top: 0.35rem;
+  margin-top: 1.05rem;
+  padding-top: 1.05rem;
   border-top: 1px solid var(--plan-line);
 }
 
@@ -301,8 +319,8 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 0.5rem;
-  padding-bottom: 0.32rem;
+  gap: 0.6rem;
+  padding-bottom: 0.45rem;
   border-bottom: 1px solid var(--plan-line);
 }
 
@@ -311,17 +329,17 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.35rem 0.65rem;
+  gap: 0.3rem 0.6rem;
   margin: 0;
-  font-family: var(--font-family-display, inherit);
-  font-size: 0.94rem;
+  font-family: var(--font-family-display, "Noto Serif KR Variable", serif);
+  font-size: 0.97rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 .dossier-page .panel__note {
   font-family: var(--font-family-base, inherit);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0;
   color: var(--plan-faint);
@@ -329,7 +347,7 @@
 
 .dossier-page .panel__more {
   flex-shrink: 0;
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 700;
   color: var(--plan-gold);
 }
@@ -338,13 +356,14 @@
   text-decoration: underline;
 }
 
+/* ── 주변 지도 (Kakao Map — 로직 그대로) ── */
 .dossier-page .dossier-map {
-  margin-top: 0.55rem;
-  height: 138px;
+  margin-top: 0.7rem;
+  height: 152px;
   width: 100%;
   overflow: hidden;
-  border-radius: 8px;
-  background: #e6dcc4;
+  border-radius: 10px;
+  background: #e9e0cd;
 }
 
 .dossier-page .dossier-map--empty {
@@ -355,13 +374,14 @@
   gap: 0.4rem;
   padding: 0 1rem;
   text-align: center;
+  font-size: 0.8rem;
   color: var(--plan-muted);
 }
 
 .dossier-page .plan__facts {
-  margin: 0.5rem 0 0;
+  margin: 0.6rem 0 0;
   display: grid;
-  gap: 0.3rem;
+  gap: 0.32rem;
 }
 
 .dossier-page .plan__fact {
@@ -388,8 +408,8 @@
 
 .dossier-page .plan__fact dd {
   margin: 0;
-  font-size: 0.74rem;
-  line-height: 1.4;
+  font-size: 0.78rem;
+  line-height: 1.45;
   color: var(--plan-muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -401,8 +421,9 @@
   text-decoration: underline;
 }
 
+/* ── 장소 썸네일 카드 — 사진 있는 항목 우선, 최대 3개. placeholder 없음 ── */
 .dossier-page .place-thumbs {
-  margin: 0.55rem 0 0;
+  margin: 0.7rem 0 0;
   list-style: none;
   padding: 0;
   display: grid;
@@ -415,25 +436,39 @@
 .dossier-page .place-thumb {
   display: block;
   min-width: 0;
+  padding: 0.3rem 0.3rem 0.45rem;
+  border: 1px solid var(--plan-line);
+  border-radius: 12px;
+  background: var(--card-bg);
+  transition: border-color 0.18s ease;
+}
+
+.dossier-page .place-thumb:hover {
+  border-color: rgba(138, 106, 22, 0.42);
 }
 
 .dossier-page .place-thumb__img {
+  display: block;
   width: 100%;
   height: 92px;
-  aspect-ratio: 16 / 10;
   object-fit: cover;
-  border-radius: 9px;
-  background: #e6dcc4;
+  border-radius: 10px;
+  background: #e9e0cd;
 }
 
 .dossier-page .place-thumb__name {
-  margin-top: 0.32rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.78rem;
+  margin: 0.42rem 0.25rem 0;
+  font-size: 0.83rem;
   font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.02em;
   color: var(--plan-ink);
+  /* 2줄까지 wrap — 글자 상하가 잘리지 않게 고정 높이를 쓰지 않는다 */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: break-word;
 }
 
 .dossier-page .place-thumb:hover .place-thumb__name {
@@ -445,17 +480,48 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   color: var(--plan-faint);
 }
 
 .dossier-page .place-thumb__meta {
-  margin-top: 0.05rem;
+  margin: 0.1rem 0.25rem 0;
+  font-variant-numeric: tabular-nums;
   color: var(--plan-muted);
 }
 
+/* 사진을 못 찾은 장소 — 사진 자리에 아이콘만. 사진처럼 보이는 placeholder는 쓰지 않는다 */
+.dossier-page .place-thumb__blank {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 92px;
+  border: 1px dashed var(--plan-line);
+  border-radius: 10px;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent 0 7px,
+    rgba(138, 106, 22, 0.055) 7px 8px
+  );
+  color: var(--plan-muted);
+}
+
+.dossier-page .place-thumb__blank-icon {
+  opacity: 0.6;
+}
+
+.dossier-page .place-thumb__blank-pin {
+  position: absolute;
+  right: 7px;
+  bottom: 6px;
+  opacity: 0.45;
+}
+
+/* ── 사진이 없는 항목 — compact 텍스트 fallback ── */
 .dossier-page .nearby-list {
-  margin: 0.35rem 0 0;
+  margin: 0.45rem 0 0;
   list-style: none;
   padding: 0;
 }
@@ -463,14 +529,18 @@
 .dossier-page .nearby-item__link {
   display: flex;
   align-items: baseline;
-  gap: 0.5rem;
-  padding: 0.38rem 0;
-  border-top: 1px solid rgba(27, 39, 51, 0.07);
+  gap: 0.55rem;
+  padding: 0.42rem 0;
+  border-top: 1px solid var(--plan-line);
+}
+
+.dossier-page .nearby-list > li:first-child .nearby-item__link {
+  border-top: 0;
 }
 
 .dossier-page .nearby-item__rank {
   flex-shrink: 0;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--plan-gold);
@@ -482,7 +552,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.82rem;
+  font-size: 0.83rem;
   color: var(--plan-ink);
   transition: color 0.16s ease;
 }
@@ -496,7 +566,7 @@
 
 .dossier-page .nearby-item__dist {
   flex-shrink: 0;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-variant-numeric: tabular-nums;
   color: var(--plan-faint);
 }
@@ -509,8 +579,9 @@
   opacity: 1;
 }
 
+/* ── 추천 코스 — 여정선. 연결선/node만 antique gold ── */
 .dossier-page .route-line {
-  margin: 0.55rem 0 0;
+  margin: 0.7rem 0 0;
   list-style: none;
   padding: 0;
 }
@@ -518,7 +589,7 @@
 .dossier-page .route-stop {
   display: grid;
   grid-template-columns: 18px minmax(0, 1fr);
-  column-gap: 0.55rem;
+  column-gap: 0.7rem;
 }
 
 .dossier-page .route-stop__node {
@@ -529,9 +600,9 @@
   content: "";
   position: absolute;
   left: 8px;
-  top: 8px;
+  top: 9px;
   bottom: 0;
-  border-left: 1px solid rgba(138, 106, 22, 0.18);
+  border-left: 1px solid rgba(138, 106, 22, 0.3);
 }
 
 .dossier-page .route-stop:last-child .route-stop__node::before {
@@ -542,48 +613,44 @@
   position: absolute;
   left: 4px;
   top: 5px;
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  border: 1.5px solid rgba(138, 106, 22, 0.42);
+  border: 1.5px solid rgba(138, 106, 22, 0.55);
   background: var(--plan-bg);
 }
 
 .dossier-page .route-stop--stay .route-stop__dot {
   left: 3px;
   top: 4px;
-  width: 11px;
-  height: 11px;
+  width: 12px;
+  height: 12px;
   border-color: var(--plan-gold);
   background: linear-gradient(180deg, #c9a227 0%, #8a6a16 100%);
 }
 
 .dossier-page .route-stop--stay .route-stop__node::before,
 .dossier-page .route-stop--stay + .route-stop .route-stop__node::before {
-  border-left-color: rgba(138, 106, 22, 0.3);
+  border-left-color: rgba(138, 106, 22, 0.45);
 }
 
-/* 1박 2일 세로 코스 — 시간·장소를 한 줄에 두어 높이를 줄인다 */
-.dossier-page .route-line:not(.route-line--row) {
-  margin-top: 0.35rem;
-}
-
+/* 1박 2일 — 세로 여정. 시간·장소를 한 줄에 둬 높이를 줄인다 */
 .dossier-page .route-line:not(.route-line--row) .route-stop__body {
   display: grid;
-  grid-template-columns: 74px minmax(0, 1fr);
+  grid-template-columns: 70px minmax(0, 1fr);
   align-items: baseline;
-  column-gap: 0.5rem;
-  padding-bottom: 0.14rem;
+  column-gap: 0.55rem;
+  padding-bottom: 0.55rem;
 }
 
 .dossier-page .route-line:not(.route-line--row) .route-stop__day {
   grid-column: 1 / -1;
-  margin-bottom: 0;
+  margin-bottom: 0.1rem;
 }
 
-/* ── 당일치기 — 가로형 추천 코스 timeline ── */
+/* 당일치기 — 가로 여정 */
 .dossier-page .route-line--row {
-  margin-top: 0.5rem;
+  margin-top: 0.85rem;
   display: grid;
   width: 100%;
   grid-auto-flow: column;
@@ -600,7 +667,7 @@
 .dossier-page .route-line--row .route-stop__node {
   display: block;
   height: 12px;
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.5rem;
 }
 
 .dossier-page .route-line--row .route-stop__node::before {
@@ -609,14 +676,14 @@
   top: 5px;
   bottom: auto;
   border-left: 0;
-  border-top: 1.5px solid rgba(138, 106, 22, 0.5);
+  border-top: 1px solid rgba(138, 106, 22, 0.5);
 }
 
 .dossier-page .route-line--row .route-stop__dot {
   left: 50%;
   top: 0;
-  width: 11px;
-  height: 11px;
+  width: 12px;
+  height: 12px;
   border: 2px solid var(--plan-gold);
   transform: translateX(-50%);
 }
@@ -625,31 +692,16 @@
   justify-content: center;
 }
 
-.dossier-page .route-line--row .route-stop__time {
-  font-size: 12px;
-}
-
-.dossier-page .route-line--row .route-stop__kind {
-  font-size: 10.5px;
-}
-
 .dossier-page .route-line--row .route-stop__body {
   padding-bottom: 0;
 }
 
 .dossier-page .route-line--row .route-stop__title {
-  margin-top: 0.12rem;
-  font-size: 13px;
-  font-weight: 600;
-  white-space: normal;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
+  margin-top: 0.15rem;
 }
 
 .dossier-page .route-stop__body {
-  padding-bottom: 0.45rem;
+  padding-bottom: 0.5rem;
   min-width: 0;
 }
 
@@ -658,10 +710,11 @@
 }
 
 .dossier-page .route-stop__day {
-  margin-bottom: 0.12rem;
-  font-size: 0.64rem;
+  margin-bottom: 0.1rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--plan-gold);
 }
 
@@ -672,32 +725,35 @@
 }
 
 .dossier-page .route-stop__time {
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--plan-gold);
 }
 
 .dossier-page .route-stop__kind {
-  font-size: 0.68rem;
+  font-size: 0.69rem;
   color: var(--plan-faint);
 }
 
 .dossier-page .route-stop__title {
   margin-top: 0.05rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.84rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.4;
   letter-spacing: -0.02em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: break-word;
 }
 
 .dossier-page .route-stop--stay .route-stop__title {
   color: #6f5410;
 }
 
+/* ── 추천 숙소 — compact horizontal card (KTO 숙박, 가격·별점 없음) ── */
 .dossier-page .stays {
   margin: 0;
   padding: 0;
@@ -705,23 +761,33 @@
 }
 
 .dossier-page .stay-list {
-  margin: 0.5rem 0 0;
+  margin: 0.7rem 0 0;
   list-style: none;
   padding: 0;
   display: grid;
-  gap: 0.55rem;
+  gap: 0.45rem;
   grid-template-columns: 1fr;
 }
 
 .dossier-page .stay-item {
   display: flex;
-  gap: 0.55rem;
-  align-items: flex-start;
+  gap: 0.6rem;
+  align-items: center;
+  min-width: 0;
+  padding: 0.3rem;
+  border: 1px solid var(--plan-line);
+  border-radius: 12px;
+  background: var(--card-bg);
+  transition: border-color 0.18s ease;
+}
+
+.dossier-page .stay-item:hover {
+  border-color: rgba(138, 106, 22, 0.42);
 }
 
 .dossier-page .stay-item--text {
-  padding-left: 0.65rem;
-  border-left: 2px solid rgba(138, 106, 22, 0.4);
+  padding-left: 0.75rem;
+  border-left: 2px solid rgba(138, 106, 22, 0.45);
 }
 
 .dossier-page .stay-item > a {
@@ -731,34 +797,39 @@
 
 .dossier-page .stay-item__thumb {
   flex-shrink: 0;
-  width: 62px;
-  height: 46px;
+  display: block;
+  width: 84px;
+  height: 54px;
   object-fit: cover;
-  border-radius: 6px;
-  background: #e6dcc4;
+  border-radius: 9px;
+  background: #e9e0cd;
 }
 
 .dossier-page .stay-item__body {
   min-width: 0;
+  padding-right: 0.35rem;
 }
 
 .dossier-page .stay-item__type {
-  font-size: 0.66rem;
+  font-size: 0.69rem;
   font-weight: 700;
   letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
   color: var(--plan-gold);
 }
 
 .dossier-page .stay-item__name {
-  margin-top: 0.08rem;
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.82rem;
+  margin-top: 0.12rem;
+  font-size: 0.83rem;
   font-weight: 700;
+  line-height: 1.35;
   letter-spacing: -0.02em;
   color: var(--plan-ink);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: break-word;
 }
 
 .dossier-page .stay-item__name:hover {
@@ -766,225 +837,26 @@
 }
 
 .dossier-page .dossier-source {
-  margin-top: 0.55rem;
-  padding-top: 0.45rem;
+  margin-top: 0.9rem;
+  padding-top: 0.6rem;
   border-top: 1px solid var(--plan-line);
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   color: var(--plan-faint);
 }
 
-.dossier-page .dossier-cta-bar {
-  display: flex;
-  align-items: center;
-  background: var(--dossier-navy);
-  color: var(--dossier-ivory);
-  min-height: 58px;
-}
-
-.dossier-page .dossier-cta-bar__inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  width: 100%;
-  padding-top: 0.45rem;
-  padding-bottom: 0.45rem;
-}
-
-.dossier-page .dossier-cta-bar__copy {
-  margin: 0;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.84rem;
-  font-weight: 600;
-  color: var(--dossier-muted);
-}
-
-.dossier-page .dossier-cta-bar__copy strong {
-  color: var(--dossier-ivory);
-  font-weight: 700;
-}
-
-.dossier-page .dossier-cta-bar .dossier-cta-row {
-  margin-top: 0;
-}
-
-.dossier-page .dossier-cta-bar .dossier-btn {
-  flex-shrink: 0;
-  min-height: 38px;
-}
-
-.dossier-page .dossier-empty {
-  padding: 5rem 1.5rem;
-}
-
-@media (min-width: 768px) {
-  .dossier-page .dossier-top {
-    grid-template-columns: minmax(0, 27fr) minmax(0, 38fr) minmax(0, 35fr);
-    gap: 1rem;
-    align-items: start;
-  }
-
-  .dossier-page .dossier-bottom {
-    grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
-    gap: 1.1rem;
-    align-items: start;
-  }
-
-  /* 당일치기 — 코스를 상단 바로 아래에 붙인다 */
-  .dossier-page .dossier-bottom--solo {
-    grid-template-columns: 1fr;
-    align-content: start;
-  }
-}
-
-@media (min-width: 1024px) {
-  .dossier-page .dossier-hero__grid {
-    grid-template-columns: minmax(0, 36fr) minmax(0, 64fr);
-    gap: 1.7rem;
-    min-height: 278px;
-    height: 278px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    align-items: center;
-  }
-
-  .dossier-page .dossier-hero__copy {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .dossier-page .dossier-title {
-    font-size: 42px;
-  }
-
-  .dossier-page .dossier-photo,
-  .dossier-page .dossier-photo__fallback {
-    height: 270px;
-    min-height: 0;
-  }
-}
-
-@media (min-width: 1280px) {
-  .dossier-page {
-    display: grid;
-    grid-template-rows: 278px minmax(0, 1fr) 58px;
-    height: calc(100svh - 72px);
-    max-height: calc(100svh - 72px);
-    overflow: hidden;
-  }
-
-  .dossier-page .dossier-hero {
-    height: 278px;
-    min-height: 278px;
-    max-height: 278px;
-  }
-
-  /* 당일치기처럼 내용이 적을 때 시트가 위로 쏠리지 않게 남는 높이를 위아래로 나눈다 */
-  .dossier-page .dossier-body {
-    min-height: 0;
-    overflow: hidden;
-    padding: 10px 0 14px;
-    flex-direction: column;
-    justify-content: safe center;
-  }
-
-  .dossier-page .dossier-body .dossier-wrap {
-    height: auto;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    flex: none;
-  }
-
-  .dossier-page .dossier-sheet {
-    height: auto;
-    max-height: 100%;
-    flex: none;
-    min-height: 0;
-    overflow: hidden;
-    padding: 0.8rem 1.35rem 0.55rem;
-  }
-
-  .dossier-page[data-overnight] .dossier-sheet {
-    max-height: 100%;
-  }
-
-  .dossier-page .dossier-top {
-    flex: 0 0 auto;
-  }
-
-  .dossier-page .dossier-bottom {
-    flex: none;
-    min-height: 0;
-    margin-top: 0.28rem;
-    padding-top: 0.28rem;
-  }
-
-  .dossier-page .dossier-title {
-    font-size: 42px;
-  }
-
-  .dossier-page .dossier-map {
-    height: 124px;
-  }
-
-  /* 숙소 — 3곳이 다 있을 때만 시안처럼 카드 3장으로 나란히 (1~2곳이면 빈칸이 생겨 목록 그대로) */
-  .dossier-page .stay-list:has(> :nth-child(3)) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.6rem;
-  }
-
-  .dossier-page .stay-list:has(> :nth-child(3)) .stay-item {
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-
-  .dossier-page .stay-list:has(> :nth-child(3)) .stay-item > a {
-    width: 100%;
-  }
-
-  .dossier-page .stay-list:has(> :nth-child(3)) .stay-item__thumb {
-    width: 100%;
-    height: 84px;
-  }
-
-  .dossier-page .stay-list:has(> :nth-child(3)) .stay-item--text {
-    padding: 0.5rem 0 0;
-    border-left: 0;
-    border-top: 2px solid rgba(138, 106, 22, 0.4);
-  }
-
-  .dossier-page .place-thumb__img {
-    height: 90px;
-  }
-
-  .dossier-page .dossier-source {
-    display: none;
-  }
-
-  .dossier-page .dossier-cta-bar {
-    height: 58px;
-    min-height: 58px;
-  }
-}
-
-/* ── 지역 방명록 — 기존 규칙은 건드리지 않고 이 블록만 추가 ── */
+/* ═══ 지역 방명록 — 결과 페이지의 마지막 여행 기록 섹션 ═══ */
 .dossier-page .dsn-gb {
-  position: relative;
-  z-index: 1;
-  padding: 1.6rem 0 2rem;
+  padding: 1.15rem 0 1.5rem;
 }
 
 .dossier-page .dsn-gb__inner {
+  /* .dossier-wrap의 좌우 패딩만큼 좁혀 메인 ivory 패널과 좌우를 맞춘다 */
+  max-width: calc(var(--wrap) - 3rem);
   background: var(--panel-bg);
-  border: 1px solid var(--plan-line);
-  border-radius: 14px;
-  padding: 1.1rem 1.25rem 1.25rem;
+  border-radius: 20px;
+  padding: 1.25rem 1.15rem;
   color: var(--plan-ink);
+  box-shadow: 0 16px 38px rgba(6, 20, 34, 0.14);
 }
 
 .dossier-page .dsn-gb__head {
@@ -992,7 +864,7 @@
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
 .dossier-page .dsn-gb__eyebrow {
@@ -1002,60 +874,80 @@
   margin: 0;
   font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.2em;
   color: var(--plan-gold);
 }
 
 .dossier-page .dsn-gb__title {
-  margin: 0.3rem 0 0;
-  font-size: 1.12rem;
-  font-weight: 800;
+  margin: 0.35rem 0 0;
+  font-family: var(--font-family-display, "Noto Serif KR Variable", serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
 }
 
 .dossier-page .dsn-gb__desc {
-  margin: 0.2rem 0 0;
+  margin: 0.35rem 0 0;
   font-size: 0.82rem;
+  line-height: 1.55;
   color: var(--plan-muted);
 }
 
 .dossier-page .dsn-gb__actions {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.75rem;
 }
 
 .dossier-page .dsn-gb__count {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
   color: var(--plan-faint);
 }
 
 .dossier-page .dsn-gb__write {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
   min-height: 36px;
-  padding: 0 0.85rem;
-  border-radius: 9px;
-  border: 1px solid rgba(138, 106, 22, 0.4);
+  padding: 0 1rem;
+  border-radius: 6px;
+  border: 1px solid rgba(138, 106, 22, 0.45);
   background: transparent;
   font-size: 0.82rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--plan-gold);
   cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.dossier-page .dsn-gb__write:hover {
+  background: rgba(138, 106, 22, 0.08);
+  border-color: var(--plan-gold);
 }
 
 .dossier-page .dsn-gb__write.is-active {
   background: rgba(138, 106, 22, 0.1);
 }
 
+/* 얇은 gold divider */
 .dossier-page .dsn-gb__rule {
-  margin: 0.9rem 0 0;
-  border-top: 1px solid var(--plan-line);
+  margin: 1rem 0 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(138, 106, 22, 0.5) 0%,
+    rgba(138, 106, 22, 0.16) 32%,
+    rgba(23, 35, 47, 0.08) 100%
+  );
 }
 
 .dossier-page .dsn-gb__form {
-  margin-top: 0.9rem;
+  margin-top: 1rem;
 }
 
 .dossier-page .dsn-gb__input {
@@ -1063,36 +955,39 @@
   resize: vertical;
   border: 1px solid var(--plan-line);
   border-radius: 10px;
-  background: #fff;
-  padding: 0.6rem 0.7rem;
+  background: var(--card-bg);
+  padding: 0.7rem 0.85rem;
   font: inherit;
   font-size: 0.88rem;
+  line-height: 1.55;
   color: var(--plan-ink);
   outline: none;
+  transition: border-color 0.18s ease;
 }
 
 .dossier-page .dsn-gb__input:focus {
-  border-color: rgba(138, 106, 22, 0.55);
+  border-color: rgba(138, 106, 22, 0.6);
 }
 
 .dossier-page .dsn-gb__formfoot {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.6rem;
-  margin-top: 0.45rem;
+  gap: 0.75rem;
+  margin-top: 0.55rem;
 }
 
 .dossier-page .dsn-gb__who {
-  font-size: 0.76rem;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
   color: var(--plan-faint);
 }
 
 .dossier-page .dsn-gb__submit {
-  min-height: 34px;
-  padding: 0 1rem;
+  min-height: 38px;
+  padding: 0 1.2rem;
   border: 0;
-  border-radius: 9px;
+  border-radius: 6px;
   background: var(--dossier-green);
   color: #f0e6c8;
   font-size: 0.82rem;
@@ -1101,7 +996,7 @@
 }
 
 .dossier-page .dsn-gb__submit:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: default;
 }
 
@@ -1112,9 +1007,9 @@
 .dossier-page .dsn-gb__empty {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   margin: 0;
-  padding: 0.9rem 0;
+  padding: 0.5rem 0;
   font-size: 0.85rem;
   color: var(--plan-muted);
 }
@@ -1123,20 +1018,18 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  gap: 0.7rem;
 }
 
 .dossier-page .dsn-gb__item {
   display: flex;
-  gap: 0.6rem;
-  padding-bottom: 0.7rem;
+  gap: 0.75rem;
+  padding: 0.8rem 0;
   border-bottom: 1px solid var(--plan-line);
 }
 
 .dossier-page .dsn-gb__item:last-child {
   border-bottom: 0;
-  padding-bottom: 0;
+  padding-bottom: 0.2rem;
 }
 
 .dossier-page .dsn-gb__avatar {
@@ -1146,10 +1039,12 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: rgba(31, 61, 43, 0.1);
-  color: var(--dossier-green);
-  font-size: 0.8rem;
-  font-weight: 800;
+  border: 1px solid rgba(138, 106, 22, 0.32);
+  background: rgba(138, 106, 22, 0.07);
+  color: var(--plan-gold);
+  font-family: var(--font-family-display, serif);
+  font-size: 0.82rem;
+  font-weight: 700;
 }
 
 .dossier-page .dsn-gb__body {
@@ -1158,58 +1053,369 @@
 
 .dossier-page .dsn-gb__meta {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 0.45rem;
   margin: 0;
 }
 
 .dossier-page .dsn-gb__nick {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .dossier-page .dsn-gb__date {
   font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
   color: var(--plan-faint);
 }
 
 .dossier-page .dsn-gb__text {
-  margin: 0.18rem 0 0;
-  font-size: 0.86rem;
-  line-height: 1.55;
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
   color: var(--plan-muted);
   overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
 }
 
 .dossier-page .dsn-gb__more {
   display: block;
   width: 100%;
   margin-top: 0.85rem;
-  min-height: 36px;
+  min-height: 38px;
   border: 1px solid var(--plan-line);
-  border-radius: 9px;
+  border-radius: 6px;
   background: transparent;
   font-size: 0.8rem;
   font-weight: 700;
   color: var(--plan-muted);
   cursor: pointer;
+  transition: border-color 0.18s ease;
 }
 
-/* 방명록이 .dossier-page 그리드의 4번째 자식이라, 3행 고정(278px/1fr/58px) +
-   height:100svh + overflow:hidden 인 1280px 이상 레이아웃에서 잘려 나갔다.
-   hero·본문 행 높이는 그대로 두고 3번째 행부터 흐르게 해 페이지를 스크롤 가능하게 한다. */
-@media (min-width: 1280px) {
-  .dossier-page {
-    /* 1fr → 기존과 동일한 실측값(100svh - 72px 헤더 - 278px hero - 58px CTA) */
-    grid-template-rows: 278px minmax(0, calc(100svh - 408px)) auto;
-    height: auto;
-    max-height: none;
-    overflow-x: clip;
-    overflow-y: visible;
+.dossier-page .dsn-gb__more:hover {
+  border-color: rgba(138, 106, 22, 0.45);
+  color: var(--plan-gold);
+}
+
+/* ═══ Bottom CTA — 흐름 안에 있는 navy 바 (fixed/sticky 아님) ═══ */
+.dossier-page .dossier-cta-bar {
+  display: flex;
+  align-items: center;
+  background: var(--dossier-navy);
+  color: var(--dossier-ivory);
+  min-height: 62px;
+  border-top: 1px solid rgba(201, 162, 39, 0.22);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.dossier-page .dossier-cta-bar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
+
+.dossier-page .dossier-cta-bar__copy {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--dossier-muted);
+}
+
+.dossier-page .dossier-cta-bar__copy strong {
+  font-family: var(--font-family-display, serif);
+  font-size: 0.98rem;
+  color: var(--dossier-ivory);
+  font-weight: 700;
+}
+
+.dossier-page .dossier-cta-bar .dossier-cta-row {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.dossier-page .dossier-cta-bar .dossier-btn {
+  flex-shrink: 0;
+  min-height: 42px;
+}
+
+.dossier-page .dossier-empty {
+  padding: 6rem 1.5rem;
+}
+
+/* ═══ 데스크톱 (900px~) — 레퍼런스 2단 압축 레이아웃 ═══ */
+@media (min-width: 900px) {
+  .dossier-page .dossier-hero__grid {
+    grid-template-columns: minmax(0, 35fr) minmax(0, 65fr);
+    gap: 2.25rem;
+    padding-top: 1.1rem;
+    padding-bottom: 1.25rem;
+    align-items: center;
+    /* 최소 높이만 주고 위로는 콘텐츠(2줄 제목)에 맞춰 늘어난다 */
+    min-height: 310px;
+  }
+
+  .dossier-page .dossier-hero__copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .dossier-page .dossier-photo,
+  .dossier-page .dossier-photo__fallback {
+    height: 268px;
+    min-height: 0;
+  }
+
+  .dossier-page .dossier-sheet {
+    padding: 1.35rem 1.5rem 1.2rem;
+  }
+
+  /* 상단: 지도 27 / 가볼 곳 38 / 맛집·카페 35 */
+  .dossier-page .dossier-top {
+    grid-template-columns: minmax(0, 27fr) minmax(0, 38fr) minmax(0, 35fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  /* 데이터가 없는 패널이 있으면 빈 칸이 남지 않게 실제 패널 수에 맞춘다 */
+  .dossier-page .dossier-top:not(:has(> :nth-child(3))) {
+    grid-template-columns: minmax(0, 33fr) minmax(0, 67fr);
+  }
+
+  .dossier-page .dossier-top:not(:has(> :nth-child(2))) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* 하단: 추천 코스 43 / 추천 숙소 57 */
+  .dossier-page .dossier-bottom {
+    grid-template-columns: minmax(0, 43fr) minmax(0, 57fr);
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  /* 당일치기 — 숙소가 없으면 코스가 한 줄을 다 쓴다 */
+  .dossier-page .dossier-bottom--solo {
+    grid-template-columns: 1fr;
+    align-content: start;
+  }
+
+  /* 추천 숙소 — 레퍼런스처럼 사진 위 3열 카드 (1~2곳이면 빈 칸이 남지 않게 개수만큼) */
+  .dossier-page .stay-list {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-template-columns: none;
+    gap: 0.7rem;
+    align-items: start;
+  }
+
+  .dossier-page .stay-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.45rem;
+    padding: 0.3rem 0.3rem 0.5rem;
+  }
+
+  .dossier-page .stay-item > a {
+    width: 100%;
+  }
+
+  .dossier-page .stay-item__thumb {
+    width: 100%;
+    /* 가볼 곳·맛집 카드와 같은 높이·비율로 맞춘다 */
+    height: 92px;
+  }
+
+  .dossier-page .stay-item__body {
+    padding: 0 0.25rem;
+  }
+
+  .dossier-page .stay-item--text {
+    padding-left: 0.3rem;
+    border-left: 0;
+    border-top: 2px solid rgba(138, 106, 22, 0.45);
+  }
+
+  /* 방명록 — 좌 25% 헤더 / 우 75% 최신 글 3개 한 줄 */
+  .dossier-page .dsn-gb__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 25fr) minmax(0, 75fr);
+    column-gap: 2rem;
+    align-items: start;
+    padding: 0.95rem 1.6rem;
+  }
+
+  .dossier-page .dsn-gb__head {
+    grid-column: 1;
+    grid-row: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+
+  .dossier-page .dsn-gb__rule {
+    display: none;
+  }
+
+  .dossier-page .dsn-gb__form,
+  .dossier-page .dsn-gb__panel,
+  .dossier-page .dsn-gb__more {
+    grid-column: 2;
+  }
+
+  .dossier-page .dsn-gb__form {
+    margin-top: 0;
+  }
+
+  .dossier-page .dsn-gb__panel {
+    margin-top: 0;
+    padding-left: 2rem;
+    border-left: 1px solid var(--plan-line);
+  }
+
+  .dossier-page .dsn-gb__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+    align-items: start;
+  }
+
+  .dossier-page .dsn-gb__item {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 0;
+    border: 1px solid var(--plan-line);
+    border-radius: 12px;
+    background: var(--card-bg);
+  }
+
+  .dossier-page .dsn-gb__item:last-child {
+    padding-bottom: 0.7rem;
+  }
+
+  .dossier-page .dsn-gb__empty {
+    padding: 0.2rem 0;
+  }
+
+  /* 더 보기는 한 줄을 다 쓰지 않게 — 섹션 높이를 키우지 않는다 */
+  .dossier-page .dsn-gb__more {
+    width: auto;
+    justify-self: start;
+    margin-top: 0.6rem;
+    padding: 0 1rem;
+    min-height: 32px;
+    font-size: 0.76rem;
   }
 }
 
-/* 노치 단말에서 CTA가 홈 인디케이터에 물리지 않게 */
-.dossier-page .dossier-cta-bar {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+@media (min-width: 1280px) {
+  /* 원화 우상단의 "일상에서, 특별한 여행으로" 문구가 hero 사진에 가리지 않도록
+     hero 행만 오른쪽을 더 비운다 (배경을 자르는 대신 UI를 물린다). */
+  .dossier-page .dossier-hero .dossier-wrap {
+    padding-right: 10rem;
+  }
+
+  /* hero 행이 좁아진 만큼 좌측 텍스트 몫을 늘려 긴 목적지명이 2줄에 들어가게 한다 */
+  .dossier-page .dossier-hero__grid {
+    grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+  }
+
+  .dossier-page .dossier-sheet {
+    padding: 1.5rem 1.75rem 1.35rem;
+  }
+
+  .dossier-page .dsn-gb__inner {
+    padding: 1.6rem 1.9rem;
+  }
+}
+
+/* ═══ 모바일 / 태블릿 (~899px) — 세로 stack ═══ */
+@media (max-width: 899px) {
+  /* 세로 화면에서는 100% auto로 두면 원화가 상단 얇은 띠로만 깔려 hero 텍스트가
+     ivory 바탕에 얹힌다. 화면을 채우되 가장자리 문구 대신 비어 있는 중앙을 보여준다
+     (navy→ivory 흐름 유지). */
+  .dossier-page::before {
+    background-size: cover;
+    background-position: top center;
+  }
+
+  .dossier-page .dossier-cta-bar__inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .dossier-page .dossier-cta-bar__copy {
+    text-align: center;
+  }
+
+  .dossier-page .dossier-cta-bar .dossier-cta-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  /* 장소·맛집 카드는 2열 */
+  .dossier-page .place-thumbs {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* 가로 여정선 → 세로 */
+  .dossier-page .route-line--row {
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    gap: 0;
+  }
+
+  .dossier-page .route-line--row .route-stop {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    column-gap: 0.7rem;
+    padding: 0;
+    text-align: left;
+  }
+
+  .dossier-page .route-line--row .route-stop__node {
+    height: auto;
+    margin-bottom: 0;
+  }
+
+  .dossier-page .route-line--row .route-stop__node::before {
+    left: 8px;
+    right: auto;
+    top: 9px;
+    bottom: 0;
+    border-top: 0;
+    border-left: 1px solid rgba(138, 106, 22, 0.3);
+  }
+
+  .dossier-page .route-line--row .route-stop__dot {
+    left: 4px;
+    top: 5px;
+    width: 10px;
+    height: 10px;
+    border-width: 1.5px;
+    transform: none;
+  }
+
+  .dossier-page .route-line--row .route-stop__meta {
+    justify-content: flex-start;
+  }
+
+  .dossier-page .route-line--row .route-stop__body {
+    padding-bottom: 0.5rem;
+  }
 }

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { getDestinationById } from "../../data/destinations";
-import { buildFallbackHints } from "../../lib/icons";
+import { buildCardEmojiHints } from "../../lib/icons";
 import { getLayoutScale, poseForCard } from "../../lib/cardLayout";
 import {
   CARD_MOTION,
@@ -14,7 +14,8 @@ import {
   isSelectable,
 } from "../../lib/cardPhaseUtils";
 import type { MixStep } from "../../lib/cardLayout";
-import type { CardPhase, MysteryCardData } from "../../types/travel";
+import { useTravel } from "../../state/TravelContext";
+import type { CardPhase, MysteryCardData, ThemeKey } from "../../types/travel";
 import { AdventureTravelCard } from "./AdventureTravelCard";
 import { CardFx } from "./CardFx";
 import { PickedStamp } from "./PickedStamp";
@@ -68,6 +69,7 @@ export function CardDeck({
   onHoverChange: (id: string | null) => void;
   onSelect: (cardId: string, destinationId: string) => void;
 }) {
+  const { themes } = useTravel();
   const layoutScale = getLayoutScale(stageW, cardW);
   const [hintOnce, setHintOnce] = useState(false);
 
@@ -81,15 +83,25 @@ export function CardDeck({
     return () => window.clearTimeout(t);
   }, [phase, selectedId, locked, reduce]);
 
+  /* 카드 id 묶음이 같으면(= 같은 판) 힌트를 다시 뽑지 않는다.
+     순서만 바뀌는 셔플·hover·선택 중에는 그대로 유지된다. */
+  const deckKey = useMemo(() => [...cards].map((c) => c.id).sort().join("|"), [cards]);
+  const themeKey = themes.join(",");
+  const hintByCardId = useMemo(() => {
+    const ids = deckKey ? deckKey.split("|") : [];
+    const lists = buildCardEmojiHints(themeKey ? (themeKey.split(",") as ThemeKey[]) : [], ids.length, 3);
+    return new Map(ids.map((id, i) => [id, lists[i]]));
+  }, [themeKey, deckKey]);
+
   const cardEntries = useMemo(
     () =>
       cards
         .map((card, i) => {
           const destination = getDestinationById(card.destinationId);
           if (!destination) return null;
-          /* 힌트는 백엔드가 조건 + KTO 분류로 만든 3개를 그대로 쓴다 */
-          const hints = destination.hints ?? buildFallbackHints(destination);
-          return { card, i, destination, hints: hints.map((h) => h.emoji) };
+          /* 힌트는 조건 설정에서 고른 테마 pool에서 판 시작 때 한 번만 뽑는다 */
+          const hints = hintByCardId.get(card.id) ?? [];
+          return { card, i, destination, hints };
         })
         .filter(Boolean) as {
         card: MysteryCardData;
@@ -97,7 +109,7 @@ export function CardDeck({
         destination: NonNullable<ReturnType<typeof getDestinationById>>;
         hints: string[];
       }[],
-    [cards],
+    [cards, hintByCardId],
   );
 
   /* 나침반 위에 떠 있는 느낌 — 카드가 멈춰 있는 구간에서만 미세하게 부유한다 */

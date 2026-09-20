@@ -1,5 +1,5 @@
 import { ktoPlaceImagesNear, lodgingNearby } from "../../backend/src/kto.js";
-import { attachThumbnails, nearbyPlaces, toHiddenPlaces } from "../../backend/src/kakao.js";
+import { attachNearbyImages, nearbyPlaces, toHiddenPlaces } from "../../backend/src/kakao.js";
 
 async function collectStays(lat, lng) {
   for (const radius of [10000, 20000]) {
@@ -38,11 +38,7 @@ export default async function handler(req, res) {
       ktoPlaceImagesNear(lat, lng).catch(() => []),
     ]);
 
-    await Promise.all([
-      attachThumbnails(places.spots, region, 3, "관광", ktoPool),
-      attachThumbnails(places.foods, region, 2, "음식점", ktoPool),
-      attachThumbnails(places.cafes, region, 1, "카페", ktoPool),
-    ]).catch(() => {});
+    await attachNearbyImages(places, region, ktoPool, stays).catch(() => {});
 
     res.status(200).json({
       ...places,

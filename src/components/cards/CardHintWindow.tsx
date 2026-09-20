@@ -42,7 +42,7 @@ export function CardHintWindow({
       aria-hidden="true"
     >
       {pair.map((emoji, i) => (
-        <span key={i} className="text-[18px] leading-none sm:text-[20px]">
+        <span key={`hint-${emoji}-${i}`} className="text-[18px] leading-none sm:text-[20px]">
           {emoji}
         </span>
       ))}
