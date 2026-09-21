@@ -81,12 +81,21 @@ export function DestinationMap({
 
   if (!lat || !lng) return null;
 
+  /* SDK 키가 없거나 로드에 실패해도, 카카오맵 검색 링크로 바로 이동할 수 있게 한다 */
   if (!appKey || failed) {
+    const query = `${destination.name} ${destination.region}`.trim();
+    const href = `https://map.kakao.com/link/search/${encodeURIComponent(query)}`;
     return (
-      <div className="dossier-map dossier-map--empty">
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className="dossier-map dossier-map--empty"
+        aria-label={`${destination.name} 카카오맵에서 보기`}
+      >
         <MapPin className="h-6 w-6 text-brass" strokeWidth={1.8} aria-hidden="true" />
-        <p className="text-sm">지도 키가 없어 위치만 안내합니다 — {destination.region}</p>
-      </div>
+        <p className="text-sm">지도 키가 없어 카카오맵에서 바로 열어드려요 — {destination.region}</p>
+      </a>
     );
   }
 
