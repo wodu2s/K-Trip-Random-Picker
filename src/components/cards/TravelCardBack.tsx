@@ -18,6 +18,7 @@ export function TravelCardBack({
   pulseHint = false,
   serial,
   expedition = false,
+  hintLimit,
 }: {
   index?: number;
   total?: number;
@@ -30,6 +31,8 @@ export function TravelCardBack({
   /** Expedition 셔플 덱 뒷면 */
   serial?: number;
   expedition?: boolean;
+  /** 모바일 부채꼴에서 뒤에 가려진 카드는 힌트 개수를 줄여 겹침 없이 보이게 한다 */
+  hintLimit?: number;
 }) {
   if (expedition || serial != null) {
     return (
@@ -39,6 +42,7 @@ export function TravelCardBack({
         slotHints={
           hintEmojis ?? (serial != null ? EXPEDITION_SLOT_HINTS[serial - 1] : undefined)
         }
+        hintLimit={hintLimit}
       />
     );
   }

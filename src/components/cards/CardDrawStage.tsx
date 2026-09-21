@@ -97,7 +97,7 @@ function useStageSize(ref: React.RefObject<HTMLDivElement | null>) {
   const isMobile = width < 640;
   const isTablet = width < 1024;
   const cardW = isMobile
-    ? Math.round(Math.min(width * 0.40, 150))
+    ? Math.round(Math.min(width * 0.34, 128))
     : isTablet
       ? Math.round(Math.min(width * 0.30, 228))
       : Math.round(Math.min(width * 0.24, 268));

@@ -112,6 +112,9 @@
   font-weight: 700;
   line-height: 1.14;
   letter-spacing: -0.02em;
+  /* 한글이 음절 중간에서 잘려 줄바꿈되지 않도록 낱말(어절) 단위로만 줄바꿈한다 */
+  word-break: keep-all;
+  overflow-wrap: normal;
   color: var(--cards-ivory);
   text-shadow: 0 2px 24px rgba(201, 162, 39, 0.12);
 }
@@ -247,7 +250,8 @@
 /* ── Desktop: 좌측 카피 + 중앙 스테이지 ── */
 @media (min-width: 1024px) {
   .cards-page__layout {
-    grid-template-columns: minmax(240px, 22vw) 1fr;
+    /* "운명의 방향, / 당신의 다음 여정은?" 두 줄이 각각 한 줄로 들어갈 만큼 넓힌다 */
+    grid-template-columns: minmax(280px, 34vw) 1fr;
     grid-template-rows: 1fr;
     align-items: stretch;
   }
@@ -261,7 +265,7 @@
   }
 
   .cards-page__lead {
-    font-size: clamp(2rem, 2.8vw, 2.85rem);
+    font-size: clamp(1.7rem, 2.8vw, 2.85rem);
   }
 
   .cards-page__main {

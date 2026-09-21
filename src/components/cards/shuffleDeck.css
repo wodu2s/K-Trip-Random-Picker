@@ -198,6 +198,11 @@
   gap: clamp(6px, 3%, 10px);
   padding: 0 8px;
 }
+/* 모바일 부채꼴에서 뒤에 가려진 카드 — z-index가 왼쪽에서 오른쪽으로 커지므로
+   항상 오른쪽 이웃 카드에 덮인다. 가려지지 않는 왼쪽 가장자리에 힌트를 붙인다 */
+.expedition-card-art__hints--edge {
+  justify-content: flex-start;
+}
 .expedition-card-art__hint-chip {
   display: flex;
   align-items: center;

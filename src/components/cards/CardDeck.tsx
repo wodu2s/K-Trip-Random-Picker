@@ -115,6 +115,14 @@ export function CardDeck({
   /* 나침반 위에 떠 있는 느낌 — 카드가 멈춰 있는 구간에서만 미세하게 부유한다 */
   const idleFloat = !reduce && (phase === "ready" || phase === "selectable");
 
+  /* 가장 앞(z 최댓값) 카드를 찾아둔다 — 모바일 부채꼴 힌트 개수 조절에 쓴다 */
+  const maxZ = Math.max(
+    ...cardEntries.map(
+      ({ card, i }) =>
+        poseForCard(phase, mixStep, i, cardEntries.length, layoutScale, selectedId, card.id).z,
+    ),
+  );
+
   const deckClass = [
     "shuffle-deck",
     isMobile ? "shuffle-deck--mobile" : "",
@@ -149,6 +157,11 @@ export function CardDeck({
             selectedId,
             card.id,
           );
+
+          /* 모바일 부채꼴은 카드끼리 많이 겹쳐 뒤 카드의 힌트가 가려진다.
+             맨 앞(z 최댓값) 카드만 힌트 3개를 보여주고, 나머지는 1개만 노출한다. */
+          const isFrontmost = pose.z === maxZ;
+          const hintLimit = isMobile && !isFrontmost ? 1 : undefined;
 
           const isHover =
             isSelectable(phase) &&
@@ -273,7 +286,12 @@ export function CardDeck({
                   }}
                 >
                   <div className="backface-hidden absolute inset-0">
-                    <TravelCardBack expedition serial={i + 1} hintEmojis={hints} />
+                    <TravelCardBack
+                      expedition
+                      serial={i + 1}
+                      hintEmojis={hints}
+                      hintLimit={hintLimit}
+                    />
                     <PickedStamp active={isSelected && stamped && !showReveal} reduce={reduce} />
                   </div>
 

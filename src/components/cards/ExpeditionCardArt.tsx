@@ -20,6 +20,7 @@ export function ExpeditionCardArt({
   showHints = false,
   serial,
   slotHints,
+  hintLimit,
 }: {
   className?: string;
   featured?: boolean;
@@ -29,11 +30,13 @@ export function ExpeditionCardArt({
   serial?: number;
   /** Shuffle deck — slot-specific hint emojis overlay */
   slotHints?: readonly string[];
+  /** 모바일 부채꼴에서 뒤에 가려진 카드는 힌트 개수를 줄여 겹침 없이 보이게 한다 */
+  hintLimit?: number;
 }) {
   const asset = useLandingAsset(LANDING_ASSET_CONFIG.cardBack.src);
-  const hints =
-    slotHints ??
-    (serial != null ? EXPEDITION_SLOT_HINTS[serial - 1] : undefined);
+  const hints = (
+    slotHints ?? (serial != null ? EXPEDITION_SLOT_HINTS[serial - 1] : undefined)
+  )?.slice(0, hintLimit);
 
   return (
     <div
@@ -84,7 +87,12 @@ export function ExpeditionCardArt({
       ) : null}
       {featured ? <div className="expedition-card-art__emboss" aria-hidden="true" /> : null}
       {hints && featured ? (
-        <div className="expedition-card-art__hints" aria-hidden="true">
+        <div
+          className={`expedition-card-art__hints${
+            hintLimit && hintLimit < 3 ? " expedition-card-art__hints--edge" : ""
+          }`}
+          aria-hidden="true"
+        >
           {hints.map((emoji, i) => (
             <span key={`${emoji}-${i}`} className="expedition-card-art__hint-chip">
               {emoji}
