@@ -128,7 +128,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { nickname } },
+        options: {
+          data: { nickname },
+          // 가입 확인 메일의 링크가 로컬 개발 주소가 아니라 지금 접속한 배포 주소로 돌아오게 한다.
+          // Supabase 대시보드 Authentication > URL Configuration의 Redirect URLs에도
+          // 이 배포 주소를 등록해야 실제로 허용된다.
+          emailRedirectTo: window.location.origin,
+        },
       });
 
       if (error) return { ok: false, message: toKoreanAuthError(error.message) };
