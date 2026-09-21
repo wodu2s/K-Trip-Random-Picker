@@ -15,8 +15,6 @@ import type { AuthUser } from "../types/community";
 export type AuthResult = {
   ok: boolean;
   message?: string;
-  /** 이메일 인증이 필요해 아직 로그인되지 않은 경우 */
-  needsEmailConfirm?: boolean;
 };
 
 type AuthContextValue = {
@@ -31,29 +29,45 @@ type AuthContextValue = {
   loginReason: string;
   openLogin: (reason?: string) => void;
   closeLogin: () => void;
-  signIn: (email: string, password: string) => Promise<AuthResult>;
-  signUp: (email: string, password: string, nickname: string) => Promise<AuthResult>;
+  signIn: (userId: string, password: string) => Promise<AuthResult>;
+  signUp: (userId: string, password: string, nickname: string) => Promise<AuthResult>;
   logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/**
+ * 아이디만으로 가입·로그인하기 위해 Supabase Auth(이메일 기반) 뒤에서 쓰는 가짜 이메일 도메인.
+ * 실제로 메일을 보내지 않으므로 Supabase 프로젝트의 Authentication > Providers > Email에서
+ * "Confirm email"을 꺼둬야 가입 즉시 로그인된다.
+ */
+const ID_EMAIL_DOMAIN = "users.pickandgo.app";
+
+/** 아이디(4~20자, 영문/숫자/밑줄)를 내부용 이메일로 바꾼다 */
+function idToEmail(userId: string): string {
+  return `${userId.trim().toLowerCase()}@${ID_EMAIL_DOMAIN}`;
+}
+
+export const USER_ID_PATTERN = /^[a-zA-Z0-9_]{4,20}$/;
+
 /** Supabase 영문 에러를 한국어 안내로 바꾼다. */
 function toKoreanAuthError(message: string): string {
   const m = message.toLowerCase();
-  if (m.includes("invalid login credentials")) return "이메일 또는 비밀번호가 올바르지 않습니다.";
-  if (m.includes("user already registered")) return "이미 가입된 이메일입니다. 로그인해 주세요.";
+  if (m.includes("invalid login credentials")) return "아이디 또는 비밀번호가 올바르지 않습니다.";
+  if (m.includes("user already registered")) return "이미 사용 중인 아이디입니다.";
   if (m.includes("password should be at least")) return "비밀번호는 6자 이상이어야 합니다.";
   if (
     m.includes("invalid email") ||
     m.includes("unable to validate email") ||
     (m.includes("email") && m.includes("invalid"))
   ) {
-    return "이메일 형식이 올바르지 않거나 사용할 수 없는 주소예요. 다른 이메일로 시도해 주세요.";
+    return "아이디 형식이 올바르지 않아요. 영문/숫자 4~20자로 다시 시도해 주세요.";
   }
-  if (m.includes("email not confirmed")) return "이메일 인증을 완료한 뒤 로그인해 주세요.";
+  if (m.includes("email not confirmed")) {
+    return "아직 로그인할 수 없는 계정이에요. 관리자에게 문의해 주세요.";
+  }
   if (m.includes("rate limit")) {
-    return "이메일 발송 요청이 너무 많아요. 몇 분 후 다시 시도해 주세요.";
+    return "요청이 너무 많아요. 몇 분 후 다시 시도해 주세요.";
   }
   if (m.includes("failed to fetch") || m.includes("network")) {
     return "네트워크 오류로 요청에 실패했습니다. 잠시 후 다시 시도해 주세요.";
@@ -111,9 +125,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoginReason("");
   }, []);
 
-  const signIn = useCallback(async (email: string, password: string): Promise<AuthResult> => {
+  const signIn = useCallback(async (userId: string, password: string): Promise<AuthResult> => {
     if (!supabase) return { ok: false, message: "Supabase가 설정되지 않았습니다." };
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: idToEmail(userId),
+      password,
+    });
     if (error) return { ok: false, message: toKoreanAuthError(error.message) };
     setLoginOpen(false);
     setLoginReason("");
@@ -121,30 +138,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp = useCallback(
-    async (email: string, password: string, nickname: string): Promise<AuthResult> => {
+    async (userId: string, password: string, nickname: string): Promise<AuthResult> => {
       if (!supabase) return { ok: false, message: "Supabase가 설정되지 않았습니다." };
+      if (!USER_ID_PATTERN.test(userId)) {
+        return { ok: false, message: "아이디는 영문/숫자 4~20자로 입력해 주세요." };
+      }
 
       // 비밀번호는 Supabase Auth 가 서버에서 해시해 저장한다. 앱은 보관하지 않는다.
+      // 아이디만으로 가입받기 위해 내부적으로만 가짜 이메일을 만들어 Supabase Auth에 넘긴다.
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: idToEmail(userId),
         password,
-        options: {
-          data: { nickname },
-          // 가입 확인 메일의 링크가 로컬 개발 주소가 아니라 지금 접속한 배포 주소로 돌아오게 한다.
-          // Supabase 대시보드 Authentication > URL Configuration의 Redirect URLs에도
-          // 이 배포 주소를 등록해야 실제로 허용된다.
-          emailRedirectTo: window.location.origin,
-        },
+        options: { data: { nickname, userId } },
       });
 
       if (error) return { ok: false, message: toKoreanAuthError(error.message) };
 
-      // 이메일 확인 설정이 켜져 있으면 session 이 없다.
+      // 가짜 이메일은 확인 메일을 받을 수 없으므로, Supabase 프로젝트의
+      // Authentication > Providers > Email에서 "Confirm email"이 꺼져 있어야
+      // 가입 즉시 session이 생겨 바로 로그인된다.
       if (!data.session) {
         return {
-          ok: true,
-          needsEmailConfirm: true,
-          message: "가입 확인 메일을 보냈어요. 메일의 링크를 눌러 인증을 완료해 주세요.",
+          ok: false,
+          message:
+            "가입은 됐지만 바로 로그인이 안 돼요. Supabase 프로젝트의 이메일 확인(Confirm email) 설정을 꺼주세요.",
         };
       }
       setLoginOpen(false);

@@ -8,16 +8,15 @@ const FIELD_CLASS =
   "h-11 rounded-[10px] border border-[rgba(201,162,39,0.4)] bg-[rgba(255,255,255,0.06)] px-3 " +
   "text-[15px] text-[#F7F3E9] outline-none focus:border-[#C9A227]";
 
-/** 이메일 · 비밀번호 로그인 / 회원가입 모달. 랜덤 여행은 로그인 없이도 모두 이용할 수 있다. */
+/** 아이디 · 비밀번호 로그인 / 회원가입 모달. 랜덤 여행은 로그인 없이도 모두 이용할 수 있다. */
 export function LoginModal() {
   const { loginOpen, loginReason, signIn, signUp, closeLogin, configured } = useAuth();
   const ref = useRef<HTMLDialogElement>(null);
   const [mode, setMode] = useState<Mode>("signin");
-  const [email, setEmail] = useState("");
+  const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -26,11 +25,10 @@ export function LoginModal() {
     if (loginOpen && !el.open) el.showModal();
     if (!loginOpen && el.open) el.close();
     if (loginOpen) {
-      setEmail("");
+      setUserId("");
       setPassword("");
       setNickname("");
       setError("");
-      setNotice("");
       setSubmitting(false);
       setMode("signin");
     }
@@ -40,10 +38,13 @@ export function LoginModal() {
     e.preventDefault();
     if (submitting) return;
     setError("");
-    setNotice("");
 
-    if (!email.trim() || !password) {
-      setError("이메일과 비밀번호를 입력해 주세요.");
+    if (!userId.trim() || !password) {
+      setError("아이디와 비밀번호를 입력해 주세요.");
+      return;
+    }
+    if (mode === "signup" && !/^[a-zA-Z0-9_]{4,20}$/.test(userId.trim())) {
+      setError("아이디는 영문/숫자/밑줄 4~20자로 입력해 주세요.");
       return;
     }
     if (mode === "signup" && !nickname.trim()) {
@@ -58,16 +59,13 @@ export function LoginModal() {
     setSubmitting(true);
     const result =
       mode === "signin"
-        ? await signIn(email.trim(), password)
-        : await signUp(email.trim(), password, nickname.trim());
+        ? await signIn(userId.trim(), password)
+        : await signUp(userId.trim(), password, nickname.trim());
     setSubmitting(false);
 
     if (!result.ok) {
       setError(result.message ?? "요청에 실패했습니다.");
       return;
-    }
-    if (result.needsEmailConfirm) {
-      setNotice(result.message ?? "가입 확인 메일을 확인해 주세요.");
     }
     // 로그인/가입 성공 시 signIn·signUp 내부에서 모달을 닫는다.
   }
@@ -113,18 +111,17 @@ export function LoginModal() {
             ) : null}
 
             <div className="flex flex-col gap-1">
-              <label className="text-[13px] font-semibold text-[#C9A227]" htmlFor="pickgo-email">
-                이메일
+              <label className="text-[13px] font-semibold text-[#C9A227]" htmlFor="pickgo-userid">
+                아이디
               </label>
               <input
-                id="pickgo-email"
-                type="email"
+                id="pickgo-userid"
                 className={FIELD_CLASS}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                inputMode="email"
-                placeholder="you@example.com"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                maxLength={20}
+                autoComplete="username"
+                placeholder="영문/숫자 4~20자"
                 required
               />
             </div>
@@ -150,11 +147,6 @@ export function LoginModal() {
                 {error}
               </p>
             ) : null}
-            {notice ? (
-              <p role="status" className="text-[13px] font-medium text-[#8FD3A6]">
-                {notice}
-              </p>
-            ) : null}
 
             <button
               type="submit"
@@ -169,7 +161,6 @@ export function LoginModal() {
               onClick={() => {
                 setMode(mode === "signin" ? "signup" : "signin");
                 setError("");
-                setNotice("");
               }}
             >
               {mode === "signin" ? "계정이 없으신가요? 회원가입" : "이미 계정이 있으신가요? 로그인"}
